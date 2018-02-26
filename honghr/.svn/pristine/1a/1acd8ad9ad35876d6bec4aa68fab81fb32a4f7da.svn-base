@@ -1,0 +1,51 @@
+package com.hongedu.honghr.honghr.shiro;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.hongedu.honghr.honghr.common.constant.SessionConstant;
+import com.hongedu.honghr.honghr.entity.Employee;
+import com.hongedu.honghr.honghr.service.EmployeeService;
+
+public class MyShiroRealm extends AuthorizingRealm {
+
+	@Autowired
+	private EmployeeService employeeService;
+
+	// 认证 登录
+	@Override
+	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+		UsernamePasswordToken upToken = (UsernamePasswordToken) token;
+		Employee employee = employeeService.login(upToken.getUsername(), String.valueOf(upToken.getPassword()));
+		if (employee != null) {
+			Session session = SecurityUtils.getSubject().getSession();
+			session.setAttribute(SessionConstant.SESSION_USER_KEY, employee);
+			return new SimpleAuthenticationInfo(employee, upToken.getPassword(), getName());
+		}
+		throw new AuthenticationException();
+	}
+
+	// 
+	@Override
+	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+		Employee employee = (Employee) principals.getPrimaryPrincipal();
+		List<String> roles = new ArrayList<String>();
+		roles.add("system" + employee.getEmployeeId());
+		SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
+		simpleAuthorizationInfo.addStringPermissions(roles);
+		return simpleAuthorizationInfo;
+	}
+}

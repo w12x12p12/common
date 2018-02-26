@@ -1,0 +1,8 @@
+package com.hongedu.honghr.honghr.common.constant;
+
+public class CodeConstant {
+	public static final Integer ABSENCE_APPLY_TYPE_MENU = 1;// 假期种类
+	public static final Integer OVERTIME_WORK_APPLY_TYPE_MENU = 11;// 加班性质
+	public static final Integer BUSINESS_TRIP_APPLY_TYPE_MENU = 15;// 出差类型
+	public static final Integer PROVINCE_MENU = 19;// 省份列表
+}

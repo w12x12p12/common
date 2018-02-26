@@ -1,0 +1,47 @@
+package com.hongedu.honghr.honghr.entity;
+
+import java.io.Serializable;
+
+import com.hongedu.honghr.base.entity.BaseEntity;
+import com.hongedu.honghr.base.dao.annotation.Table;
+/**
+ * @author  
+ * el_sys_role 表对应实体
+ * 2017/12/07 04:00:58
+ */
+@Table(name="sys_role", pk="roleId")
+public class Role extends BaseEntity implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	/***/
+	private java.lang.Integer roleId;
+	/***/
+	private java.lang.String roleName;
+	/***/
+	private java.lang.String deleted;
+	
+	public void setRoleId(java.lang.Integer value) {
+		this.roleId = value;
+	}
+	
+	public java.lang.Integer getRoleId() {
+		return roleId;
+	}
+	public void setRoleName(java.lang.String value) {
+		this.roleName = value;
+	}
+	
+	public java.lang.String getRoleName() {
+		return roleName;
+	}
+	public void setDeleted(java.lang.String value) {
+		this.deleted = value;
+	}
+	
+	public java.lang.String getDeleted() {
+		return deleted;
+	}
+}
+
+

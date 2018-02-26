@@ -1,0 +1,171 @@
+
+package com.hongedu.honghr.honghr.web;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.hongedu.honghr.util.json.JsonResult;
+import com.hongedu.honghr.util.page.Pager;
+import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.entity.Department;
+import com.hongedu.honghr.honghr.service.DepartmentService;
+
+
+/**
+ * @author  
+ * el_bp_department 表对应的controller
+ * 2017/12/07 04:04:40
+ */
+@Controller
+@RequestMapping("/admin/department")
+public class DepartmentController {
+	
+	@Autowired
+	private DepartmentService departmentService;
+	
+	/**
+	 * 查询Department详情
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/findDepartment",method=RequestMethod.POST)
+	public JsonResult findDepartment(
+			@RequestParam(required=true)java.lang.Integer departmentId) {
+		try {
+			Department department = departmentService.findById(departmentId);
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", department);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 编辑Department
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value="/editDepartment",method=RequestMethod.GET)
+	public String editDepartment(
+			java.lang.Integer departmentId,
+			Model model) {
+		List<Department> list = departmentService.findDepartmentList();
+		if(departmentId != null){
+			Department department = departmentService.findById(departmentId);
+			Department departmentParent = departmentService.findParentInfo(department.getDepartmentParentId());
+			model.addAttribute("department", department);
+			model.addAttribute("departmentParent", departmentParent);
+		}
+		model.addAttribute("list", list);
+		return "admin/department/editDepartment";
+	}
+	
+	/**
+	 * 保存Department
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/saveDepartment", method = RequestMethod.POST)
+	public JsonResult saveDepartment(Department department) {
+		try {
+			if (department.getDepartmentId() == null) {
+				Integer departmentParentId = department.getDepartmentParentId();
+
+				Department departments = departmentService.findParentInfo(departmentParentId);
+				Department departmentNum = departmentService.findMaxNum(departmentParentId);
+				if (departmentParentId == null) {
+					department.setDepartmentParentId(0);
+					Department department2 = departmentService.findMaxNum(0);
+					if (department2.getDepartmentNum() != null) {
+						Integer DEPNUM = Integer.parseInt(department2.getDepartmentNum()) + 1;
+						department.setDepartmentNum(String.valueOf(DEPNUM));
+					} else {
+						department.setDepartmentNum("1");
+					}
+				} else {
+					if (departmentNum.getDepartmentNum() != null) {
+						Integer DEPNUM = Integer.parseInt(departmentNum.getDepartmentNum()) + 1;
+						department.setDepartmentNum(String.valueOf(DEPNUM));
+					} else {
+						String parentNum = departments.getDepartmentNum();
+						department.setDepartmentNum(parentNum + "101");
+					}
+					departments.setReferred(DataConstant.REFERRED);
+					departmentService.update(departments);
+				}
+				department.setDeleted(DataConstant.EXIST);
+				department.setReferred(DataConstant.UNREFERRED);
+				departmentService.save(department);
+
+			} else {
+				department.setDeleted(DataConstant.EXIST);
+				department.setReferred(DataConstant.UNREFERRED);
+				departmentService.update(department);
+			}
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+
+	/**
+	 * 删除Department
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/deleteDepartment", method = RequestMethod.POST)
+	public JsonResult deleteDepartment(Department department) {
+		try {
+			Department departmentInfo = departmentService.findById(department.getDepartmentId());
+			if (!departmentInfo.getReferred().equals(DataConstant.REFERRED)) {
+				department.setReferred(department.getReferred());
+				departmentService.updateDel(department);
+				return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+			}else{
+				return new JsonResult(JsonResult.FAILE_CODE, "该部门已被引用，暂时无法删除", null);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**部门list
+	 * 
+	 * <p>Title: departmentList</p> 
+	 * <p>Description: </p>  
+	 * @time 下午2:20:06 
+	 * @param currentPage
+	 * @param pageSize
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/departmentList", method = RequestMethod.GET)
+	public String departmentList(@RequestParam(required = false, defaultValue = "1") Integer currentPage,
+			@RequestParam(required = false, defaultValue = "10") Integer pageSize, String departmentName, Model model) {
+		Pager<Department> page = departmentService.findPage(departmentName, currentPage, pageSize);
+		for (int i = 0; i < page.getDataList().size(); i++) {
+			int departmentParentId = page.getDataList().get(i).getDepartmentParentId();
+			if (departmentParentId != 0) {
+				Department departments = departmentService.findParentInfo(departmentParentId);
+				page.getDataList().get(i).setParentDepName(departments.getDepartmentName());
+			} else {
+				continue;
+			}
+		}
+		model.addAttribute("page", page);
+		model.addAttribute("departmentName", departmentName);
+		return "admin/department/departmentList";
+	}
+}

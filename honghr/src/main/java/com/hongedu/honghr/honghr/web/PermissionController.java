@@ -1,0 +1,122 @@
+
+package com.hongedu.honghr.honghr.web;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.hongedu.honghr.util.json.JsonResult;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.honghr.entity.Permission;
+import com.hongedu.honghr.honghr.service.PermissionService;
+
+
+/**
+ * @author  
+ * el_sys_permission 表对应的controller
+ * 2017/12/07 04:04:41
+ */
+@Controller
+@RequestMapping("/admin/permission")
+public class PermissionController {
+	
+	@Autowired
+	private PermissionService permissionService;
+	
+	/**
+	 * 查询Permission详情
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/findPermission",method=RequestMethod.POST)
+	public JsonResult findPermission(
+			@RequestParam(required=true)java.lang.Integer permissionId) {
+		try {
+			Permission permission = permissionService.findById(permissionId);
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", permission);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 编辑Permission
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value="/editPermission",method=RequestMethod.GET)
+	public String editPermission(
+			java.lang.Integer permissionId,
+			Model model) {
+		if(permissionId != null){
+			Permission permission = permissionService.findById(permissionId);
+			model.addAttribute("permission", permission);
+		}
+		return "admin/permission/editPermission";
+	}
+	
+	/**
+	 * 保存Permission
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/savePermission",method=RequestMethod.POST)
+	public JsonResult savePermission(
+			Permission permission
+			) {
+		try {
+			if(permission.getPermissionId() == null){
+				permissionService.save(permission);
+			}else{
+				permissionService.update(permission);
+			}
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 删除Permission
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deletePermission",method=RequestMethod.POST)
+	public JsonResult deletePermission(
+			@RequestParam(required=true)java.lang.Integer permissionId) {
+		try {
+			permissionService.delete(permissionId);
+		return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+						return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 查询Permission表单页面
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/permissionList",method=RequestMethod.GET)
+	public String permissionList(
+			@RequestParam(required=false,defaultValue="1")Integer currentPage,
+			@RequestParam(required=false,defaultValue="10")Integer pageSize,
+			Model model) {
+		Pager<Permission> page = permissionService.findPage(currentPage, pageSize);
+		model.addAttribute("page", page);
+		return "admin/permission/permissionList";
+	}
+}

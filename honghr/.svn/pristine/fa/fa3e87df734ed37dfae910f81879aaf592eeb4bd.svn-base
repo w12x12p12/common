@@ -1,0 +1,12 @@
+/* 添加时长 */
+function changeDuration(){
+	var applyBeginTime = $("#startDate").val();
+	var applyEndTime = $("#endDate").val();
+	if(applyBeginTime && applyEndTime){
+		var msec = (new Date(applyEndTime)).getTime() - (new Date(applyBeginTime)).getTime();
+		var days = Math.floor(msec / (1000 * 60 * 60 * 24));
+		var hours = (msec % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
+		var time = days * 8 + hours <= days * 8 + 8 ? days * 8 + hours : days * 8 + 8;
+		$(".w_edit_applyDuration").val(parseInt(time) + "天");
+	}
+}

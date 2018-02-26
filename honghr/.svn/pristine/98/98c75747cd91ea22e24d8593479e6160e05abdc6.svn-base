@@ -1,0 +1,138 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.entity.Department;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+
+/**
+ * @author  
+ * el_bp_department 表对应业务实现对象
+ * 2017/12/07 04:00:57
+ */
+@Transactional
+@Service
+public class DepartmentService{
+	
+	@Autowired
+	private BaseDaoImpl<Department> departmentDao;
+	
+	/**
+	 * 根据主键查询Department对象
+	 * @param id
+	 * @return
+	 */
+	public Department findById (Serializable id){
+		Department entity = departmentDao.findById(Department.class, id);
+		return entity;
+	}
+	
+	/**
+	 * 插入Department对象
+	 * @param entity
+	 */
+	public void save (Department entity){
+		departmentDao.save(entity);
+	}
+	
+	/**
+	 * 修改Department对象
+	 * @param entity
+	 */
+	public void update (Department entity){
+		departmentDao.update(entity);
+	}
+	
+	/**
+	 * 删除Department对象
+	 * @param id
+	 */
+	public void delete (Serializable id){
+		departmentDao.delete(Department.class, id);
+	}
+	
+	/**
+	 * 根据sql查询Department对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Department对象集合
+	 */
+	public List<Department> findListBySql(int currentPage, int pageSize){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select Department.* from Department");
+		List<Department> list = departmentDao.findListBySql(Department.class, sql.toString(), currentPage, pageSize);	
+		return list;
+	}
+	
+	/**
+	 * 根据sql查询Department集合数量
+	 * @return Department集合数量
+	 */
+	public int findCountBySql(){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select count(1) from department");
+		int count = departmentDao.findCountBySql(sql.toString());	
+		return count;
+	}
+	
+	/**
+	 * 根据sql查询Department分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Department分页对象
+	 */
+	public Pager<Department> findPageBySql(int currentPage, int pageSize){
+		int totalRecord = findCountBySql();	
+		Pager<Department> pager = new Pager<Department>(currentPage, pageSize, totalRecord);
+		List<Department> dataList = findListBySql(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+	
+	/**
+	 * 根据表达式查询Department对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Department对象集合
+	 */
+	public List<Department> findList(int currentPage, int pageSize){
+		List<Exp> expList = new ArrayList<Exp>();
+		List<Department> DepartmentList = departmentDao.findList(Department.class, expList, currentPage, pageSize);	
+		return DepartmentList;
+	}
+	
+	/**
+	 * 根据表达式查询Department集合数量
+	 * @return Department集合数量
+	 */
+	public int findCount(){
+		List<Exp> expList = new ArrayList<Exp>();
+		int count = departmentDao.findCount(Department.class, expList);	
+		return count;
+	}
+	
+	/**
+	 * 根据表达式查询Department分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Department分页对象
+	 */
+	public Pager<Department> findPage(int currentPage, int pageSize){
+		int totalRecord = findCount();	
+		Pager<Department> pager = new Pager<Department>(currentPage, pageSize, totalRecord);
+		List<Department> dataList = findList(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+}
+
+

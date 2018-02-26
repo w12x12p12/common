@@ -1,0 +1,102 @@
+$(function(){
+	$("#save_btn").bind("click", ApplyPermission.saveData);
+});
+var ApplyPermission={
+	//弹出编辑对话框
+	showEdit : function(applyPermissionId){
+		//弹框方式
+		$(".formError").remove();
+		if(!applyPermissionId){//新增
+			this.clearData();
+		}
+		else{//修改
+			this.fillData(applyPermissionId);
+		}
+		$('#editModal').modal({keyboard: false});
+		//页面跳转方式
+		//if(!applyPermissionId) applyPermissionId = "";
+		//document.location.href = ctx + "/applyPermission/editApplyPermission?applyPermissionId="+applyPermissionId;
+	},	
+	//清除弹出框数据
+	clearData : function(){
+		$("#editForm select").each(function() {
+			$(this).find("option:first").prop("selected", 'selected');
+		})
+		$("#editForm input").each(function() {
+			$(this).val("");
+		})
+	},
+	//填充弹出框数据
+	fillData : function(applyPermissionId){
+		this.getData(applyPermissionId, function(data){
+			for (dataAttr in data)  
+			  {  
+			   	 if($("#editForm [name="+dataAttr+"]")){
+			   		$("#editForm [name="+dataAttr+"]").val(data[dataAttr]);
+			   	 }
+			  } 
+		});
+	},
+	//保存数据
+	saveData : function(){
+		if(!$("form#editForm").validationEngine("validate")) return ;  
+		$.ajax({
+    		url: ctx+"/admin/applyPermission/saveApplyPermission",
+    		type: "POST",
+    		async: true,
+    		data: $("#editForm").serialize(),
+    		success: function(data){
+    			if(data.errorCode =="000000"){
+    				Dialog.showSuccess("保存成功");
+    				document.location.reload();
+    				//document.location.href = ctx + "/applyPermission/applyPermissionList";
+    			}
+    			else{
+    				Dialog.showError(data.errorMessage);
+    			}
+    		},
+    		error: function(){
+    		}
+    	});
+	},	
+	//获取数据
+	getData : function(applyPermissionId, callback){
+		$.ajax({
+    		url: ctx+"/admin/applyPermission/findApplyPermission",
+    		type: "POST",
+    		async: true,
+    		data: {"applyPermissionId" : applyPermissionId},
+    		success: function(data){
+    			if(data.errorCode =="000000"){
+    				callback(data.data);
+    				return;
+    			}
+    			else{
+    				Dialog.showError(data.errorMessage);
+    			}
+    		},
+    		error: function(){
+    		}
+    	});
+	},
+	//删除数据
+	deleteData : function (applyPermissionId, delFlag) {
+		$.ajax({
+    		url: ctx+"/admin/applyPermission/deleteApplyPermission",
+    		type: "POST",
+    		async: true,
+    		data: {"applyPermissionId" : applyPermissionId},
+    		success: function(data){
+    			if(data.errorCode =="000000"){
+    				Dialog.showSuccess("操作成功");
+    				document.location.reload();
+    			}
+    			else{
+    				Dialog.showError(data.errorMessage);
+    			}
+    		},
+    		error: function(){
+    		}
+    	});
+	}
+}

@@ -1,0 +1,218 @@
+package com.hongedu.honghr.honghr.entity.vo;
+
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.hongedu.honghr.honghr.entity.BusinessTripApply;
+import com.hongedu.honghr.honghr.entity.BusinessTripApplyCheck;
+
+public class BusinessTripApplyVo extends BusinessTripApply {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private String applyEmployeeName;
+
+	private String applyDepartmentName;
+
+	private String applyTypeShow;
+
+	private Integer applyBeginProvinceId;
+
+	private String applyBeginProvinceName;
+
+	private String applyBeginCityName;
+
+	private Integer applyEndProvinceId;
+
+	private String applyEndProvinceName;
+
+	private String applyEndCityName;
+
+	private String applyCheckStatusShow;
+
+	private Integer checkEmployeeId;
+
+	private String checkEmployeeName;
+
+	private Date applyCheckTime;
+
+	private String applyIsAllowed;
+
+	private String applyIsAllowedShow;
+
+	private String applyCheckSuggest;
+
+	private List<BusinessTripApplyCheck> businessTripApplyChecks;
+
+	private List<BusinessTripApplyCheckVo> businessTripApplyCheckVos;
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date startTime;
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date endTime;
+
+	public String getApplyEmployeeName() {
+		return applyEmployeeName;
+	}
+
+	public void setApplyEmployeeName(String applyEmployeeName) {
+		this.applyEmployeeName = applyEmployeeName;
+	}
+
+	public String getApplyDepartmentName() {
+		return applyDepartmentName;
+	}
+
+	public void setApplyDepartmentName(String applyDepartmentName) {
+		this.applyDepartmentName = applyDepartmentName;
+	}
+
+	public String getApplyTypeShow() {
+		return applyTypeShow;
+	}
+
+	public void setApplyTypeShow(String applyTypeShow) {
+		this.applyTypeShow = applyTypeShow;
+	}
+
+	public Integer getApplyBeginProvinceId() {
+		return applyBeginProvinceId;
+	}
+
+	public void setApplyBeginProvinceId(Integer applyBeginProvinceId) {
+		this.applyBeginProvinceId = applyBeginProvinceId;
+	}
+
+	public String getApplyBeginProvinceName() {
+		return applyBeginProvinceName;
+	}
+
+	public void setApplyBeginProvinceName(String applyBeginProvinceName) {
+		this.applyBeginProvinceName = applyBeginProvinceName;
+	}
+
+	public String getApplyBeginCityName() {
+		return applyBeginCityName;
+	}
+
+	public void setApplyBeginCityName(String applyBeginCityName) {
+		this.applyBeginCityName = applyBeginCityName;
+	}
+
+	public Integer getApplyEndProvinceId() {
+		return applyEndProvinceId;
+	}
+
+	public void setApplyEndProvinceId(Integer applyEndProvinceId) {
+		this.applyEndProvinceId = applyEndProvinceId;
+	}
+
+	public String getApplyEndProvinceName() {
+		return applyEndProvinceName;
+	}
+
+	public void setApplyEndProvinceName(String applyEndProvinceName) {
+		this.applyEndProvinceName = applyEndProvinceName;
+	}
+
+	public String getApplyEndCityName() {
+		return applyEndCityName;
+	}
+
+	public void setApplyEndCityName(String applyEndCityName) {
+		this.applyEndCityName = applyEndCityName;
+	}
+
+	public String getApplyCheckStatusShow() {
+		return applyCheckStatusShow;
+	}
+
+	public void setApplyCheckStatusShow(String applyCheckStatusShow) {
+		this.applyCheckStatusShow = applyCheckStatusShow;
+	}
+
+	public Integer getCheckEmployeeId() {
+		return checkEmployeeId;
+	}
+
+	public void setCheckEmployeeId(Integer checkEmployeeId) {
+		this.checkEmployeeId = checkEmployeeId;
+	}
+
+	public String getCheckEmployeeName() {
+		return checkEmployeeName;
+	}
+
+	public void setCheckEmployeeName(String checkEmployeeName) {
+		this.checkEmployeeName = checkEmployeeName;
+	}
+
+	public Date getApplyCheckTime() {
+		return applyCheckTime;
+	}
+
+	public void setApplyCheckTime(Date applyCheckTime) {
+		this.applyCheckTime = applyCheckTime;
+	}
+
+	public String getApplyIsAllowed() {
+		return applyIsAllowed;
+	}
+
+	public void setApplyIsAllowed(String applyIsAllowed) {
+		this.applyIsAllowed = applyIsAllowed;
+	}
+
+	public String getApplyIsAllowedShow() {
+		return applyIsAllowedShow;
+	}
+
+	public void setApplyIsAllowedShow(String applyIsAllowedShow) {
+		this.applyIsAllowedShow = applyIsAllowedShow;
+	}
+
+	public String getApplyCheckSuggest() {
+		return applyCheckSuggest;
+	}
+
+	public void setApplyCheckSuggest(String applyCheckSuggest) {
+		this.applyCheckSuggest = applyCheckSuggest;
+	}
+
+	public List<BusinessTripApplyCheck> getBusinessTripApplyChecks() {
+		return businessTripApplyChecks;
+	}
+
+	public void setBusinessTripApplyChecks(List<BusinessTripApplyCheck> businessTripApplyChecks) {
+		this.businessTripApplyChecks = businessTripApplyChecks;
+	}
+
+	public List<BusinessTripApplyCheckVo> getBusinessTripApplyCheckVos() {
+		return businessTripApplyCheckVos;
+	}
+
+	public void setBusinessTripApplyCheckVos(List<BusinessTripApplyCheckVo> businessTripApplyCheckVos) {
+		this.businessTripApplyCheckVos = businessTripApplyCheckVos;
+	}
+
+	public Date getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
+	}
+
+	public Date getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
+	}
+}

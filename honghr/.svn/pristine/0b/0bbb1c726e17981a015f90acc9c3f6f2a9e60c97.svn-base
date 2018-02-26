@@ -1,0 +1,142 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.entity.Module;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+
+/**
+ * @author  
+ * el_sys_module 表对应业务实现对象
+ * 2017/12/07 04:00:58
+ */
+@Transactional
+@Service
+public class ModuleService{
+	
+	private final static Logger logger= LoggerFactory.getLogger(ModuleService.class);
+	
+	@Autowired
+	private BaseDaoImpl<Module> moduleDao;
+	
+	/**
+	 * 根据主键查询Module对象
+	 * @param id
+	 * @return
+	 */
+	public Module findById (Serializable id){
+		Module entity = moduleDao.findById(Module.class, id);
+		return entity;
+	}
+	
+	/**
+	 * 插入Module对象
+	 * @param entity
+	 */
+	public void save (Module entity){
+		moduleDao.save(entity);
+	}
+	
+	/**
+	 * 修改Module对象
+	 * @param entity
+	 */
+	public void update (Module entity){
+		moduleDao.update(entity);
+	}
+	
+	/**
+	 * 删除Module对象
+	 * @param id
+	 */
+	public void delete (Serializable id){
+		moduleDao.delete(Module.class, id);
+	}
+	
+	/**
+	 * 根据sql查询Module对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Module对象集合
+	 */
+	public List<Module> findListBySql(int currentPage, int pageSize){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select Module.* from Module");
+		List<Module> list = moduleDao.findListBySql(Module.class, sql.toString(), currentPage, pageSize);	
+		return list;
+	}
+	
+	/**
+	 * 根据sql查询Module集合数量
+	 * @return Module集合数量
+	 */
+	public int findCountBySql(){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select count(1) from Module");
+		int count = moduleDao.findCountBySql(Module.class, sql.toString());	
+		return count;
+	}
+	
+	/**
+	 * 根据sql查询Module分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Module分页对象
+	 */
+	public Pager<Module> findPageBySql(int currentPage, int pageSize){
+		int totalRecord = findCountBySql();	
+		Pager<Module> pager = new Pager<Module>(currentPage, pageSize, totalRecord);
+		List<Module> dataList = findListBySql(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+	
+	/**
+	 * 根据表达式查询Module对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Module对象集合
+	 */
+	public List<Module> findList(int currentPage, int pageSize){
+		List<Exp> expList = new ArrayList<Exp>();
+		List<Module> ModuleList = moduleDao.findList(Module.class, expList, currentPage, pageSize);	
+		return ModuleList;
+	}
+	
+	/**
+	 * 根据表达式查询Module集合数量
+	 * @return Module集合数量
+	 */
+	public int findCount(){
+		List<Exp> expList = new ArrayList<Exp>();
+		int count = moduleDao.findCount(Module.class, expList);	
+		return count;
+	}
+	
+	/**
+	 * 根据表达式查询Module分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Module分页对象
+	 */
+	public Pager<Module> findPage(int currentPage, int pageSize){
+		int totalRecord = findCount();	
+		Pager<Module> pager = new Pager<Module>(currentPage, pageSize, totalRecord);
+		List<Module> dataList = findList(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+}
+
+

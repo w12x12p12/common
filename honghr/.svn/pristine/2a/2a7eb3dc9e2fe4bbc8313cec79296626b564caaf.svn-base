@@ -1,0 +1,75 @@
+package com.hongedu.honghr.honghr.entity;
+
+import java.io.Serializable;
+
+import com.hongedu.honghr.base.entity.BaseEntity;
+import com.hongedu.honghr.base.dao.annotation.Table;
+
+/**
+ * @author el_bp_employee_position 表对应实体 2017/12/07 04:00:57
+ */
+@Table(name = "employee_position", pk = "employeePositionId")
+public class EmployeePosition extends BaseEntity implements Serializable {
+
+	private static final long serialVersionUID = 1L;  
+
+	private Integer employeePositionId;
+	
+	private Integer employeeId;
+
+	private String departmentNum;
+
+	private String positionNum;
+
+	private Integer leaderId;
+
+	private String deleted;
+	
+	public Integer getEmployeePositionId() {
+		return employeePositionId;
+	}
+
+	public void setEmployeePositionId(Integer employeePositionId) {
+		this.employeePositionId = employeePositionId;
+	}
+
+	public Integer getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(Integer employeeId) {
+		this.employeeId = employeeId;
+	}
+
+	public String getDepartmentNum() {
+		return departmentNum;
+	}
+
+	public void setDepartmentNum(String departmentNum) {
+		this.departmentNum = departmentNum;
+	}
+
+	public String getPositionNum() {
+		return positionNum;
+	}
+
+	public void setPositionNum(String positionNum) {
+		this.positionNum = positionNum;
+	}
+
+	public Integer getLeaderId() {
+		return leaderId;
+	}
+
+	public void setLeaderId(Integer leaderId) {
+		this.leaderId = leaderId;
+	}
+
+	public String getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(String deleted) {
+		this.deleted = deleted;
+	}
+}

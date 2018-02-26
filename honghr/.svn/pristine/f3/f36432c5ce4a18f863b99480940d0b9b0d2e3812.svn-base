@@ -1,0 +1,120 @@
+
+package com.hongedu.honghr.honghr.web;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.hongedu.honghr.util.json.JsonResult;
+import com.hongedu.honghr.util.page.Pager;
+import com.hongedu.honghr.honghr.common.constant.PageConstant;
+import com.hongedu.honghr.honghr.entity.AbsenceApplyCheck;
+import com.hongedu.honghr.honghr.service.AbsenceApplyCheckService;
+
+/**
+ * @author el_bp_absence_apply_check 表对应的controller 2017/12/07 04:04:39
+ */
+@Controller
+@RequestMapping("/admin/absenceApplyCheck")
+public class AbsenceApplyCheckController {
+
+	@Autowired
+	private AbsenceApplyCheckService absenceApplyCheckService;
+	
+	/**
+	 * 查询AbsenceApplyCheck表单页面
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/absenceApplyCheckList", method = RequestMethod.GET)
+	public String absenceApplyCheckList(
+			@RequestParam(required = false, defaultValue = PageConstant.DEFAULT_PAGE_START) Integer currentPage,
+			@RequestParam(required = false, defaultValue = PageConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
+			Model model) {
+		Pager<AbsenceApplyCheck> page = absenceApplyCheckService.findPage(currentPage, pageSize);
+		model.addAttribute("page", page);
+		return "admin/absenceApplyCheck/absenceApplyCheckList";
+	}
+
+	/**
+	 * 查询AbsenceApplyCheck详情
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/findAbsenceApplyCheck", method = RequestMethod.POST)
+	public JsonResult findAbsenceApplyCheck(@RequestParam(required = true) java.lang.Integer absenceApplyCheckId) {
+		try {
+			AbsenceApplyCheck absenceApplyCheck = absenceApplyCheckService.findById(absenceApplyCheckId);
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", absenceApplyCheck);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+
+	/**
+	 * 编辑AbsenceApplyCheck
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = "/editAbsenceApplyCheck", method = RequestMethod.GET)
+	public String editAbsenceApplyCheck(java.lang.Integer absenceApplyCheckId, Model model) {
+		if (absenceApplyCheckId != null) {
+			AbsenceApplyCheck absenceApplyCheck = absenceApplyCheckService.findById(absenceApplyCheckId);
+			model.addAttribute("absenceApplyCheck", absenceApplyCheck);
+		}
+		return "admin/absenceApplyCheck/editAbsenceApplyCheck";
+	}
+
+	/**
+	 * 保存AbsenceApplyCheck
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/saveAbsenceApplyCheck", method = RequestMethod.POST)
+	public JsonResult saveAbsenceApplyCheck(AbsenceApplyCheck absenceApplyCheck) {
+		try {
+			if (absenceApplyCheck.getAbsenceApplyCheckId() == null) {
+				absenceApplyCheckService.save(absenceApplyCheck);
+			} else {
+				absenceApplyCheckService.update(absenceApplyCheck);
+			}
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+
+	/**
+	 * 删除AbsenceApplyCheck
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/deleteAbsenceApplyCheck", method = RequestMethod.POST)
+	public JsonResult deleteAbsenceApplyCheck(@RequestParam(required = true) java.lang.Integer absenceApplyCheckId) {
+		try {
+			absenceApplyCheckService.delete(absenceApplyCheckId);
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+}

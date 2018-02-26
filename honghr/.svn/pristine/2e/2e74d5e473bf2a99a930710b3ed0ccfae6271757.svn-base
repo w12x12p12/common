@@ -1,0 +1,99 @@
+<%@ page language="java" contentType="text/html; UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+
+<!-- 引入校验插件 -->
+<link rel="stylesheet"
+	href="<%=basePath%>resources/js/common/jQueryValidate/css/validationEngine.jquery.css">
+<script
+	src="<%=basePath%>resources/js/common/jQueryValidate/js/jquery.validationEngine.js"></script>
+<script
+	src="<%=basePath%>resources/js/common/jQueryValidate/js/jquery.validationEngine-zh_CN.js"></script>
+
+<div class="container d_cr_i_con">
+	<!--列表-->
+	<div class="d_cr_i_listWrap d_settings_wrap">
+		<!--切换按钮-->
+		<div class="d_notice_tabCon">
+			<!--基本信息-->
+			<div class="d_settings_info">
+				<form action="<%=basePath%>spoc/students/home/passwordEdit"
+					method="post" id="editForm">
+					<table class="d_home_settings_table">
+						<tr>
+							<td><br></td>
+							<td><br></td>
+						</tr>
+						<tr>
+							<td><br></td>
+							<td><br></td>
+						</tr>
+						<tr>
+							<td><span class="d_notNull">*</span>当前密码：</td>
+							<td><input type="password" id="password"
+								class="form-control validate[required,ajax[ajaxPasswordCheck]]"></td>
+						</tr>
+						<tr>
+							<td><span class="d_notNull">*</span>新密码：</td>
+							<td><input type="password" name="newPassword"
+								id="Newpassword"
+								class="form-control validate[required,custom[onleNum]]"></td>
+						</tr>
+						<tr>
+							<td><span class="d_notNull">*</span>新密码确认：</td>
+							<td><input type="password" name="repassword" id="Repassword"
+								class="form-control validate[equals[Newpassword]]"></td>
+						</tr>
+					</table>
+					<br>
+					<button class="btn btn-primary" onclick="SubmitEditFrom()">保存</button>
+					<button class="btn btn-default" onclick="back()">取消</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+//导航点击样式切换
+$('.d_h_nav li').click(function(){
+    $(this).addClass('active').siblings().removeClass('active');
+})
+//消息通知tab切换
+$('.d_notice_tab>span').click(function(){
+    $(this).addClass('active').siblings().removeClass('active');
+    $('.d_notice_tabCon>div').eq($('.d_notice_tab>span').index(this)).show().siblings().hide();
+})
+//校验
+$(function(){
+    $("#editForm").validationEngine({
+		submitHandler:function(form){
+			SubmitEditFrom();
+		}
+	});
+})	
+//提交表单
+function SubmitEditFrom(){
+	 $("#editForm").attr("action","<%=basePath%>spoc/students/home/passwordEdit");
+    $("#editForm").submit();
+}
+//性别单选
+$('.d_settings_radio').click(function(){
+    $(this).addClass('active').siblings().removeClass('active');
+    $(this).find('input').click();
+})
+//最小高
+ $('.d_settings_wrap').css('min-height', $(window).height()-241+'px')
+function back(){
+	window.location.href="<%=basePath%>admin/employee/password";
+}
+
+function password(){
+	window.location.href="<%=basePath%>spoc/students/home/password";
+}
+</script>

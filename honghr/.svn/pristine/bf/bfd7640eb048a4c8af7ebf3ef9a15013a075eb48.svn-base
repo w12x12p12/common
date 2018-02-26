@@ -1,0 +1,147 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.entity.AbsenceApply;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+
+/**
+ * @author el_bp_absence_apply 表对应业务实现对象 2017/12/07 04:00:54
+ */
+@Transactional
+@Service
+public class AbsenceApplyService {
+
+	@Autowired
+	private BaseDaoImpl<AbsenceApply> absenceApplyDao;
+
+	/**
+	 * 根据主键查询AbsenceApply对象
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public AbsenceApply findById(Serializable id) {
+		return absenceApplyDao.findById(AbsenceApply.class, id);
+	}
+
+	/**
+	 * 插入AbsenceApply对象
+	 * 
+	 * @param entity
+	 */
+	public void save(AbsenceApply entity) {
+		absenceApplyDao.save(entity);
+	}
+
+	/**
+	 * 修改AbsenceApply对象
+	 * 
+	 * @param entity
+	 */
+	public void update(AbsenceApply entity) {
+		absenceApplyDao.update(entity);
+	}
+
+	/**
+	 * 删除AbsenceApply对象
+	 * 
+	 * @param id
+	 */
+	public void delete(Serializable id) {
+		absenceApplyDao.delete(AbsenceApply.class, id);
+	}
+
+	/**
+	 * 根据sql查询AbsenceApply对象集合
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return AbsenceApply对象集合
+	 */
+	public List<AbsenceApply> findListBySql(int currentPage, int pageSize) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select absence_apply.* from absence_apply");
+		return absenceApplyDao.findListBySql(AbsenceApply.class, sql.toString(), currentPage, pageSize);
+	}
+
+	/**
+	 * 根据sql查询AbsenceApply集合数量
+	 * 
+	 * @return AbsenceApply集合数量
+	 */
+	public int findCountBySql() {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select count(1) from absence_apply");
+		return absenceApplyDao.findCountBySql(sql.toString());
+	}
+
+	/**
+	 * 根据sql查询AbsenceApply分页对象
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return AbsenceApply分页对象
+	 */
+	public Pager<AbsenceApply> findPageBySql(int currentPage, int pageSize) {
+		int totalRecord = findCountBySql();
+		Pager<AbsenceApply> pager = new Pager<AbsenceApply>(currentPage, pageSize, totalRecord);
+		List<AbsenceApply> dataList = findListBySql(pager.getFromIndex(), pageSize);
+		pager.setDataList(dataList);
+		return pager;
+	}
+
+	/**
+	 * 根据表达式查询AbsenceApply对象集合
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return AbsenceApply对象集合
+	 */
+	public List<AbsenceApply> findList(int currentPage, int pageSize) {
+		List<Exp> expList = new ArrayList<Exp>();
+		return absenceApplyDao.findList(AbsenceApply.class, expList, currentPage, pageSize);
+	}
+
+	/**
+	 * 根据表达式查询AbsenceApply集合数量
+	 * 
+	 * @return AbsenceApply集合数量
+	 */
+	public int findCount() {
+		List<Exp> expList = new ArrayList<Exp>();
+		return absenceApplyDao.findCount(AbsenceApply.class, expList);
+	}
+
+	/**
+	 * 根据表达式查询AbsenceApply分页对象
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return AbsenceApply分页对象
+	 */
+	public Pager<AbsenceApply> findPage(int currentPage, int pageSize) {
+		int totalRecord = findCount();
+		Pager<AbsenceApply> pager = new Pager<AbsenceApply>(currentPage, pageSize, totalRecord);
+		List<AbsenceApply> dataList = findList(pager.getFromIndex(), pageSize);
+		pager.setDataList(dataList);
+		return pager;
+	}
+}

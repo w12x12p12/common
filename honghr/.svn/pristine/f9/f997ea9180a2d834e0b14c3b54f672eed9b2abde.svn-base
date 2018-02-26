@@ -1,0 +1,155 @@
+package com.hongedu.honghr.honghr.entity;
+
+import java.io.Serializable;
+
+import com.hongedu.honghr.base.entity.BaseEntity;
+import com.hongedu.honghr.base.dao.annotation.Table;
+/**
+ * @author  
+ * el_bp_overtime_work_apply 表对应实体
+ * 2017/12/07 04:00:57
+ */
+@Table(name="el_bp_overtime_work_apply", pk="overtimeWorkApplyId")
+public class OvertimeWorkApply extends BaseEntity implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	/***/
+	private java.lang.Integer overtimeWorkApplyId;
+	/***/
+	private java.lang.String overtimeWorkApplyNum;
+	/***/
+	private java.lang.Integer employeeId;
+	/***/
+	private java.lang.String applyType;
+	/***/
+	private java.lang.String applyReason;
+	/***/
+	private java.lang.String applyWorkContent;
+	/***/
+	private java.util.Date applyBeginTime;
+	/***/
+	private java.util.Date applyEndTime;
+	/***/
+	private java.lang.String applyDuration;
+	/***/
+	private java.util.Date applyDateTime;
+	/***/
+	private java.lang.String applyCheckStatus;
+	/***/
+	private java.lang.String applyCheckProgress;
+	/***/
+	private java.lang.Integer createEmployeeId;
+	/***/
+	private java.util.Date createDateTime;
+	/***/
+	private java.lang.String deleted;
+	
+	public void setOvertimeWorkApplyId(java.lang.Integer value) {
+		this.overtimeWorkApplyId = value;
+	}
+	
+	public java.lang.Integer getOvertimeWorkApplyId() {
+		return overtimeWorkApplyId;
+	}
+	public void setOvertimeWorkApplyNum(java.lang.String value) {
+		this.overtimeWorkApplyNum = value;
+	}
+	
+	public java.lang.String getOvertimeWorkApplyNum() {
+		return overtimeWorkApplyNum;
+	}
+	public void setEmployeeId(java.lang.Integer value) {
+		this.employeeId = value;
+	}
+	
+	public java.lang.Integer getEmployeeId() {
+		return employeeId;
+	}
+	public void setApplyType(java.lang.String value) {
+		this.applyType = value;
+	}
+	
+	public java.lang.String getApplyType() {
+		return applyType;
+	}
+	public void setApplyReason(java.lang.String value) {
+		this.applyReason = value;
+	}
+	
+	public java.lang.String getApplyReason() {
+		return applyReason;
+	}
+	public void setApplyWorkContent(java.lang.String value) {
+		this.applyWorkContent = value;
+	}
+	
+	public java.lang.String getApplyWorkContent() {
+		return applyWorkContent;
+	}
+	public void setApplyBeginTime(java.util.Date value) {
+		this.applyBeginTime = value;
+	}
+	
+	public java.util.Date getApplyBeginTime() {
+		return applyBeginTime;
+	}
+	public void setApplyEndTime(java.util.Date value) {
+		this.applyEndTime = value;
+	}
+	
+	public java.util.Date getApplyEndTime() {
+		return applyEndTime;
+	}
+	public void setApplyDuration(java.lang.String value) {
+		this.applyDuration = value;
+	}
+	
+	public java.lang.String getApplyDuration() {
+		return applyDuration;
+	}
+	public void setApplyDateTime(java.util.Date value) {
+		this.applyDateTime = value;
+	}
+	
+	public java.util.Date getApplyDateTime() {
+		return applyDateTime;
+	}
+	public void setApplyCheckStatus(java.lang.String value) {
+		this.applyCheckStatus = value;
+	}
+	
+	public java.lang.String getApplyCheckStatus() {
+		return applyCheckStatus;
+	}
+	public void setApplyCheckProgress(java.lang.String value) {
+		this.applyCheckProgress = value;
+	}
+	
+	public java.lang.String getApplyCheckProgress() {
+		return applyCheckProgress;
+	}
+	public void setCreateEmployeeId(java.lang.Integer value) {
+		this.createEmployeeId = value;
+	}
+	
+	public java.lang.Integer getCreateEmployeeId() {
+		return createEmployeeId;
+	}
+	public void setCreateDateTime(java.util.Date value) {
+		this.createDateTime = value;
+	}
+	
+	public java.util.Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setDeleted(java.lang.String value) {
+		this.deleted = value;
+	}
+	
+	public java.lang.String getDeleted() {
+		return deleted;
+	}
+}
+
+

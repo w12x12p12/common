@@ -1,0 +1,455 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.sql.Types;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.common.constant.NumConstant;
+import com.hongedu.honghr.honghr.common.enums.EnumApplyCheckStatus;
+import com.hongedu.honghr.honghr.common.enums.EnumApplyStatus;
+import com.hongedu.honghr.honghr.entity.AbsenceApply;
+import com.hongedu.honghr.honghr.entity.AbsenceApplyCheck;
+import com.hongedu.honghr.honghr.entity.vo.AbsenceApplyVo;
+import com.hongedu.honghr.util.page.Pager;
+
+/**
+ * @author el_bp_absence_apply 表对应业务实现对象 2017/12/07 04:00:54
+ */
+@Transactional
+@Service
+public class AbsenceApplyService {
+
+	@Autowired
+	private BaseDaoImpl<AbsenceApply> absenceApplyDao;
+	@Autowired
+	private BaseDaoImpl<AbsenceApplyVo> absenceApplyVoDao;
+	@Autowired
+	private AbsenceApplyCheckService absenceApplyCheckService;
+
+	/**
+	 * 根据主键查询AbsenceApply对象
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public AbsenceApply findById(Serializable id) {
+		return absenceApplyDao.findById(AbsenceApply.class, id);
+	}
+
+	/**
+	 * 插入AbsenceApply对象
+	 * 
+	 * @param entity
+	 */
+	public void save(AbsenceApply entity) {
+		absenceApplyDao.save(entity);
+	}
+
+	/**
+	 * 修改AbsenceApply对象
+	 * 
+	 * @param entity
+	 */
+	public void update(AbsenceApply entity) {
+		absenceApplyDao.update(entity);
+	}
+
+	/**
+	 * 删除AbsenceApply对象
+	 * 
+	 * @param id
+	 */
+	public void delete(Serializable id) {
+		absenceApplyDao.delete(AbsenceApply.class, id);
+	}
+
+	/**
+	 * 根据sql查询AbsenceApply对象集合
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return AbsenceApply对象集合
+	 */
+	public List<AbsenceApply> findListBySql(int currentPage, int pageSize) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select absence_apply.* from absence_apply");
+		return absenceApplyDao.findListBySql(AbsenceApply.class, sql.toString(), currentPage, pageSize);
+	}
+
+	/**
+	 * 根据sql查询AbsenceApply集合数量
+	 * 
+	 * @return AbsenceApply集合数量
+	 */
+	public int findCountBySql(String sql, Object[] args) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select count(1) from ( ");
+		sb.append(sql);
+		sb.append(")main ");
+		return absenceApplyDao.findCountBySql(sb.toString(), args);
+	}
+
+	/**
+	 * 根据表达式查询AbsenceApply对象集合
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return AbsenceApply对象集合
+	 */
+	public List<AbsenceApply> findList(int currentPage, int pageSize) {
+		List<Exp> expList = new ArrayList<Exp>();
+		return absenceApplyDao.findList(AbsenceApply.class, expList, currentPage, pageSize);
+	}
+
+	/**
+	 * 根据表达式查询AbsenceApply集合数量
+	 * 
+	 * @return AbsenceApply集合数量
+	 */
+	public int findCount() {
+		List<Exp> expList = new ArrayList<Exp>();
+		return absenceApplyDao.findCount(AbsenceApply.class, expList);
+	}
+
+	public Pager<AbsenceApplyVo> findHasCheckPage(Integer employeeId, int currentPage, int pageSize) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"select a.absence_apply_id, a.absence_apply_num, a.employee_id, a.apply_type, a.apply_reason, a.apply_begin_time, a.apply_end_time, a.apply_duration, a.apply_date_time, a.apply_check_status, a.deleted, ");
+		sb.append(
+				"d.department_name applyDepartmentName, e.employee_name applyEmployeeName, c.code_name applyTypeShow, ");
+		sb.append(
+				"ac.check_employee_id checkEmployeeId, ac.apply_check_time applyCheckTime, ac.apply_is_allowed applyCheckIsAllowed, ac.apply_check_suggest applyCheckSuggest, ");
+		sb.append("ee.employee_name checkEmployeeName ");
+		sb.append("from absence_apply a ");
+		sb.append("left join department d on a.apply_department_num = d.department_num ");
+		sb.append("left join employee e on a.employee_id = e.employee_id ");
+		sb.append("left join code c on a.apply_type = c.code_value ");
+		sb.append("join absence_apply_check ac on a.absence_apply_id = ac.absence_apply_id ");
+		sb.append("join employee ee on ac.check_employee_id = ee.employee_id ");
+		sb.append("where ac.check_employee_id = ? ");
+		sb.append("and ac.apply_is_allowed != ? ");
+		sb.append("order by ac.apply_check_time desc");
+		Pager<AbsenceApplyVo> pager = new Pager<AbsenceApplyVo>(currentPage, pageSize,
+				findCountBySql(sb.toString(), new Object[] { employeeId, EnumApplyCheckStatus.UN_CHECK.getCode() }));
+		List<AbsenceApplyVo> absenceApplyVoList = absenceApplyVoDao.findEntityListByPage(AbsenceApplyVo.class,
+				sb.toString(), new Object[] { employeeId, EnumApplyCheckStatus.UN_CHECK.getCode() },
+				pager.getFromIndex(), pageSize);
+		setApplyStatusShowByList(absenceApplyVoList);
+		setApplyCheckStatusShowByList(absenceApplyVoList);
+		pager.setDataList(absenceApplyVoList);
+		return pager;
+	}
+
+	private void setApplyCheckStatusShowByList(List<AbsenceApplyVo> absenceApplyVoList) {
+		for (AbsenceApplyVo absenceApplyVo : absenceApplyVoList) {
+			for (EnumApplyCheckStatus enumApplyCheckStatus : EnumApplyCheckStatus.values()) {
+				if (enumApplyCheckStatus.getCode().equals(absenceApplyVo.getApplyCheckIsAllowed())) {
+					absenceApplyVo.setApplyCheckIsAllowedShow(enumApplyCheckStatus.getValue());
+					break;
+				}
+			}
+		}
+	}
+
+	public AbsenceApplyVo getAbsenceApplyVo(Integer absenceApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"select a.absence_apply_id, a.absence_apply_num, a.apply_department_num, a.employee_id, a.apply_type, a.apply_reason, a.apply_begin_time, a.apply_end_time, a.apply_duration, a.apply_date_time, a.apply_check_status, a.deleted, ");
+		sb.append(
+				"d.department_name applyDepartmentName, e.employee_name applyEmployeeName, c.code_name applyTypeShow ");
+		sb.append("from absence_apply a ");
+		sb.append("left join department d on a.apply_department_num = d.department_num ");
+		sb.append("left join employee e on a.employee_id = e.employee_id ");
+		sb.append("left join code c on a.apply_type = c.code_value ");
+		sb.append("where a.absence_apply_id = ? ");
+		AbsenceApplyVo absenceApplyVo = absenceApplyVoDao.getEntityBySql(AbsenceApplyVo.class, sb.toString(),
+				new Object[] { absenceApplyId });
+		setApplyStatusShow(absenceApplyVo);
+		absenceApplyVo
+				.setAbsenceApplyCheckVos(absenceApplyCheckService.findAbsenceApplyCheckVosByApplyId(absenceApplyId));
+		return absenceApplyVo;
+	}
+
+	private void setApplyStatusShow(AbsenceApplyVo absenceApplyVo) {
+		for (EnumApplyStatus enumApplyStatus : EnumApplyStatus.values()) {
+			if (enumApplyStatus.getCode().equals(absenceApplyVo.getApplyCheckStatus())) {
+				absenceApplyVo.setApplyCheckStatusShow(enumApplyStatus.getValue());
+				break;
+			}
+		}
+	}
+
+	public Pager<AbsenceApplyVo> findForCheckPage(Integer employeeId, int currentPage, int pageSize) {
+		StringBuilder sb = new StringBuilder();
+		// 查询其为第一个审批人且未审批的休假申请单
+		sb.append(
+				"select a.absence_apply_id, a.absence_apply_num, a.employee_id, a.apply_type, a.apply_reason, a.apply_begin_time, a.apply_end_time, a.apply_duration, a.apply_date_time, a.apply_check_status, a.deleted, ");
+		sb.append(
+				"d.department_name applyDepartmentName, e.employee_name applyEmployeeName, c.code_name applyTypeShow, ac.apply_is_allowed ");
+		sb.append("from absence_apply a ");
+		sb.append("left join department d on a.apply_department_num = d.department_num ");
+		sb.append("left join employee e on a.employee_id = e.employee_id ");
+		sb.append("left join code c on a.apply_type = c.code_value ");
+		sb.append("join absence_apply_check ac on a.absence_apply_id = ac.absence_apply_id ");
+		sb.append("where ac.check_employee_id = ? ");
+		sb.append("and ac.apply_check_sequence = ? ");
+		sb.append("and ac.apply_is_allowed = ? ");
+		sb.append("and ac.deleted = ? ");
+		sb.append("and a.apply_check_status = ? ");
+		sb.append("and a.deleted = ? ");
+		sb.append("union all ");
+		// 查询其为非第一个审批人且未审批且前一个审批人已经审批通过的休假申请单
+		sb.append(
+				"select a.absence_apply_id, a.absence_apply_num, a.employee_id, a.apply_type, a.apply_reason, a.apply_begin_time, a.apply_end_time, a.apply_duration, a.apply_date_time, a.apply_check_status, a.deleted, ");
+		sb.append(
+				"d.department_name applyDepartmentName, e.employee_name applyEmployeeName, c.code_name applyTypeShow, ac.apply_is_allowed ");
+		sb.append("from absence_apply a ");
+		sb.append("left join department d on a.apply_department_num = d.department_num ");
+		sb.append("left join employee e on a.employee_id = e.employee_id ");
+		sb.append("left join code c on a.apply_type = c.code_value ");
+		sb.append("join absence_apply_check ac on a.absence_apply_id = ac.absence_apply_id ");
+		sb.append("where ac.check_employee_id = ? ");
+		sb.append("and ac.apply_check_sequence != ? ");
+		sb.append("and ac.apply_is_allowed = ? ");
+		sb.append("and ac.absence_apply_id in( ");
+		sb.append("select ak.absence_apply_id  ");
+		sb.append("from absence_apply_check ak ");
+		sb.append("where ak.absence_apply_id = ac.absence_apply_id ");
+		sb.append("and ak.apply_check_sequence = ac.apply_check_sequence - 1 ");
+		sb.append("and ak.apply_is_allowed = ? ");
+		sb.append("and ak.deleted = ?) ");
+		sb.append("and ac.deleted = ? ");
+		sb.append("and a.apply_check_status = ? ");
+		sb.append("and a.deleted = ? ");
+		Pager<AbsenceApplyVo> pager = new Pager<AbsenceApplyVo>(currentPage, pageSize,
+				findCountBySql(sb.toString(),
+						new Object[] { employeeId, DataConstant.FIRST_CHECK, EnumApplyCheckStatus.UN_CHECK.getCode(),
+								DataConstant.EXIST, EnumApplyStatus.WAIT_CHECK.getCode(), DataConstant.EXIST,
+								employeeId, DataConstant.FIRST_CHECK, EnumApplyCheckStatus.UN_CHECK.getCode(),
+								EnumApplyCheckStatus.AGREE.getCode(), DataConstant.EXIST, DataConstant.EXIST,
+								EnumApplyStatus.CHECK.getCode(), DataConstant.EXIST }));
+		List<AbsenceApplyVo> absenceApplyVoList = absenceApplyVoDao.findEntityUnionListByPage(AbsenceApplyVo.class,
+				sb.toString(),
+				new Object[] { employeeId, DataConstant.FIRST_CHECK, EnumApplyCheckStatus.UN_CHECK.getCode(),
+						DataConstant.EXIST, EnumApplyStatus.WAIT_CHECK.getCode(), DataConstant.EXIST, employeeId,
+						DataConstant.FIRST_CHECK, EnumApplyCheckStatus.UN_CHECK.getCode(),
+						EnumApplyCheckStatus.AGREE.getCode(), DataConstant.EXIST, DataConstant.EXIST,
+						EnumApplyStatus.CHECK.getCode(), DataConstant.EXIST },
+				pager.getFromIndex(), pageSize);
+		pager.setDataList(absenceApplyVoList);
+		return pager;
+	}
+
+	/**
+	 * 查询休假申请列表分页对象
+	 * 
+	 * @param currentPage:当前页
+	 * @param pageSize:分页数
+	 * @return AbsenceApplyVo分页对象
+	 */
+	public Pager<AbsenceApplyVo> findPage(Integer employeeId, int currentPage, int pageSize) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"select a.absence_apply_id, a.absence_apply_num, a.employee_id, a.apply_type, a.apply_reason, a.apply_begin_time, a.apply_end_time, a.apply_duration, a.apply_date_time, a.apply_check_status, a.deleted, ");
+		sb.append(
+				"d.department_name applyDepartmentName, e.employee_name applyEmployeeName, c.code_name applyTypeShow ");
+		sb.append("from absence_apply a ");
+		sb.append("left join department d on a.apply_department_num = d.department_num ");
+		sb.append("left join employee e on a.employee_id = e.employee_id ");
+		sb.append("left join code c on a.apply_type = c.code_value ");
+		sb.append("where a.employee_id = ? ");
+		sb.append("and a.deleted = ? ");
+		sb.append("order by a.absence_apply_id desc");
+		Pager<AbsenceApplyVo> pager = new Pager<AbsenceApplyVo>(currentPage, pageSize,
+				findCountBySql(sb.toString(), new Object[] { employeeId, DataConstant.EXIST }));
+		List<AbsenceApplyVo> absenceApplyVoList = absenceApplyVoDao.findEntityListByPage(AbsenceApplyVo.class,
+				sb.toString(), new Object[] { employeeId, DataConstant.EXIST }, pager.getFromIndex(), pageSize);
+		setApplyStatusShowByList(absenceApplyVoList);
+		pager.setDataList(absenceApplyVoList);
+		return pager;
+	}
+
+	private void setApplyStatusShowByList(List<AbsenceApplyVo> absenceApplyVoList) {
+		for (AbsenceApplyVo absenceApplyVo : absenceApplyVoList) {
+			for (EnumApplyStatus enumApplyStatus : EnumApplyStatus.values()) {
+				if (enumApplyStatus.getCode().equals(absenceApplyVo.getApplyCheckStatus())) {
+					absenceApplyVo.setApplyCheckStatusShow(enumApplyStatus.getValue());
+					break;
+				}
+			}
+		}
+	}
+
+	public String getAbsenceApplyNum(Integer employeeId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select count(1) from absence_apply where employee_id = ? ");
+		sb.append("and DATE(apply_date_time) = curdate() ");
+		Integer number = absenceApplyVoDao.findCountBySql(sb.toString(), new Object[] { employeeId });
+		number = number != null ? number + 1 : 1;
+		sb.delete(0, sb.length());
+		return sb.append(NumConstant.ABSENCE_APPLY_NUM_START)
+				.append(new SimpleDateFormat("yyyyMMdd").format(new Date())).append(employeeId).append(number)
+				.toString();
+	}
+
+	public void insertAbsenceApplyVo(AbsenceApplyVo absenceApplyVo) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"insert into absence_apply(absence_apply_num, apply_department_num, employee_id, apply_type, apply_reason, apply_begin_time, apply_end_time, apply_duration, apply_date_time, apply_check_status, create_employee_id, create_date_time, deleted)");
+		sb.append("values(?,?,?,?,?,?,?,?,?,?,?,?,?)");
+		int absenceApplyId = absenceApplyDao.insert(sb.toString(),
+				new int[] { Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.TIMESTAMP,
+						Types.TIMESTAMP, Types.VARCHAR, Types.DATE, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP,
+						Types.CHAR },
+				new Object[] { absenceApplyVo.getAbsenceApplyNum(), absenceApplyVo.getApplyDepartmentNum(),
+						absenceApplyVo.getEmployeeId(), absenceApplyVo.getApplyType(), absenceApplyVo.getApplyReason(),
+						absenceApplyVo.getApplyBeginTime(), absenceApplyVo.getApplyEndTime(),
+						absenceApplyVo.getApplyDuration(), absenceApplyVo.getApplyDateTime(),
+						absenceApplyVo.getApplyCheckStatus(), absenceApplyVo.getCreateEmployeeId(),
+						absenceApplyVo.getCreateDateTime(), absenceApplyVo.getDeleted() });
+		batchInsertAbsenceApplyCheck(absenceApplyId, absenceApplyVo.getAbsenceApplyChecks());
+	}
+
+	public void batchInsertAbsenceApplyCheck(Integer absenceApplyId, List<AbsenceApplyCheck> absenceApplyCheckList) {
+		if (absenceApplyCheckList != null && !absenceApplyCheckList.isEmpty()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(
+					"insert into absence_apply_check(absence_apply_id, check_employee_id, apply_is_allowed, apply_check_sequence, deleted)values");
+			List<Object> args = new ArrayList<Object>();
+			for (AbsenceApplyCheck absenceApplyCheck : absenceApplyCheckList) {
+				args.add(absenceApplyId);
+				args.add(absenceApplyCheck.getCheckEmployeeId());
+				args.add(EnumApplyCheckStatus.UN_CHECK.getCode());
+				args.add(absenceApplyCheck.getApplyCheckSequence());
+				args.add(DataConstant.EXIST);
+				sb.append("(?,?,?,?,?),");
+			}
+			String sql = sb.toString().substring(0, sb.length() - 1);
+			absenceApplyVoDao.insertBySql(sql, args.toArray(new Object[] {}));
+		}
+	}
+
+	public void deleteApplyCheckByAbsenceApplyId(Integer absenceApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("delete from absence_apply_check ");
+		sb.append("where absence_apply_id = ? ");
+		absenceApplyVoDao.delete(sb.toString(), new Object[] { absenceApplyId });
+	}
+
+	public void updateAbsenceApplyVo(AbsenceApplyVo absenceApplyVo) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"update absence_apply set apply_type = ?, apply_reason = ?, apply_begin_time = ?, apply_end_time = ?, apply_duration = ? ");
+		sb.append("where absence_apply_id = ? ");
+		absenceApplyDao.update(sb.toString(),
+				new Object[] { absenceApplyVo.getApplyType(), absenceApplyVo.getApplyReason(),
+						absenceApplyVo.getApplyBeginTime(), absenceApplyVo.getApplyEndTime(),
+						absenceApplyVo.getApplyDuration(), absenceApplyVo.getAbsenceApplyId() });
+		deleteApplyCheckByAbsenceApplyId(absenceApplyVo.getAbsenceApplyId());
+		batchInsertAbsenceApplyCheck(absenceApplyVo.getAbsenceApplyId(), absenceApplyVo.getAbsenceApplyChecks());
+	}
+
+	public void logicalDeleteAbsenceApply(Integer absenceApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("update absence_apply set deleted = ? ");
+		sb.append("where absence_apply_id = ? ");
+		absenceApplyDao.update(sb.toString(), new Object[] { DataConstant.DELETE, absenceApplyId });
+	}
+
+	public void logicalDeleteAbsenceApplyCheck(Integer absenceApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("update absence_apply_check set deleted = ? ");
+		sb.append("where absence_apply_id = ? ");
+		absenceApplyVoDao.update(sb.toString(), new Object[] { DataConstant.DELETE, absenceApplyId });
+	}
+
+	public void deleteAbsenceApply(Integer absenceApplyId) {
+		logicalDeleteAbsenceApplyCheck(absenceApplyId);
+		logicalDeleteAbsenceApply(absenceApplyId);
+	}
+
+	public void updateAbsenceApplyStatus(String applyCheckStatus, Integer absenceApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("update absence_apply set apply_check_status = ? ");
+		sb.append("where absence_apply_id = ? ");
+		absenceApplyDao.update(sb.toString(), new Object[] { applyCheckStatus, absenceApplyId });
+	}
+
+	public void checkAbsenceApply(AbsenceApplyCheck absenceApplyCheck) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"update absence_apply_check set apply_check_time = ?, apply_is_allowed = ?, apply_check_suggest = ? ");
+		sb.append("where absence_apply_id = ? ");
+		sb.append("and check_employee_id = ? ");
+		absenceApplyDao.update(sb.toString(),
+				new Object[] { absenceApplyCheck.getApplyCheckTime(), absenceApplyCheck.getApplyIsAllowed(),
+						absenceApplyCheck.getApplyCheckSuggest(), absenceApplyCheck.getAbsenceApplyId(),
+						absenceApplyCheck.getCheckEmployeeId() });
+		// 判断是否批准
+		if (EnumApplyCheckStatus.AGREE.getCode().equals(absenceApplyCheck.getApplyIsAllowed())) {
+			// 查询该审批人是否为最后一个审批人
+			Integer checkEmployeeId = getCheckEmployeeIdBySeqAndAbsenceApplyId(absenceApplyCheck.getAbsenceApplyId());
+			// 如果该审批人为最后一个审批人将休假申请单状态改为审批通过，否则改为审批中
+			if (checkEmployeeId != null && checkEmployeeId.compareTo(absenceApplyCheck.getCheckEmployeeId()) == 0) {
+				updateAbsenceApplyStatus(EnumApplyStatus.CHECK_ALLOW.getCode(), absenceApplyCheck.getAbsenceApplyId());
+			} else {
+				updateAbsenceApplyStatus(EnumApplyStatus.CHECK.getCode(), absenceApplyCheck.getAbsenceApplyId());
+			}
+		} else {
+			// 将休假申请单状态改为审批不通过
+			updateAbsenceApplyStatus(EnumApplyStatus.CHECK_LIMIT.getCode(), absenceApplyCheck.getAbsenceApplyId());
+		}
+	}
+
+	public Integer getCheckEmployeeIdBySeqAndAbsenceApplyId(Integer absenceApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select ac.check_employee_id ");
+		sb.append("from absence_apply_check ac ");
+		sb.append("where ac.apply_check_sequence =( ");
+		sb.append("select MAX(ak.apply_check_sequence) ");
+		sb.append("from absence_apply_check ak ");
+		sb.append("where ak.absence_apply_id = ? ");
+		sb.append("and ak.deleted = ?) ");
+		sb.append("and ac.absence_apply_id = ? ");
+		sb.append("and ac.deleted = ? ");
+		return absenceApplyDao.getNumBySql(sb.toString(),
+				new Object[] { absenceApplyId, DataConstant.EXIST, absenceApplyId, DataConstant.EXIST });
+	}
+	
+	public String getAbsenceApplyDuration(Integer employeeId, String applyType) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select sum(apply_duration) ");
+		sb.append("from absence_apply ");
+		sb.append("where employee_id = ? ");
+		sb.append("and apply_type = ? ");
+		sb.append("and apply_check_status = ? ");
+		String time = absenceApplyDao.getPropertyBySql(sb.toString(),new Object[] { employeeId, applyType, EnumApplyStatus.CHECK_ALLOW.getCode() });
+		return time != null ? time: "0";
+	}
+
+	public String getAbsenceApplyDurationThisMonth(Integer employeeId, String applyType) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select sum(apply_duration) ");
+		sb.append("from absence_apply ");
+		sb.append("where employee_id = ? ");
+		sb.append("and apply_type = ? ");
+		sb.append("and apply_check_status = ? ");
+		sb.append("and date_format(apply_date_time,'%Y-%m') = date_format(now(),'%Y-%m') ");
+		String time = absenceApplyDao.getPropertyBySql(sb.toString(),new Object[] { employeeId, applyType, EnumApplyStatus.CHECK_ALLOW.getCode() });
+		return time != null ? time: "0";
+	}
+}

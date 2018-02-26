@@ -1,0 +1,43 @@
+$(function(){
+	/* 点击查看 */
+	$(".business_look").click(function(){
+		var flag = true;
+		$.ajax({
+			url: ctx + "/admin/businessTripApply/getBusinessTripApply",
+			type: "GET",
+			async: false,
+			data: {
+				"businessTripApplyId": $(this).attr("data")
+			},
+			dataType: "JSON",
+			success: function(businessTripApplyVo){
+				$(".showBusinessTripApply").text("");
+				$(".show_businessTripApplyNum").text(businessTripApplyVo.businessTripApplyNum);
+				$(".show_applyEmployeeName").text(businessTripApplyVo.applyEmployeeName);
+				$(".show_applyDepartmentName").text(businessTripApplyVo.applyDepartmentName);
+				$(".show_applyTypeShow").text(businessTripApplyVo.applyTypeShow);
+				$(".show_applyReason").text(businessTripApplyVo.applyReason);
+				$(".show_applyBeginAddressName").text(businessTripApplyVo.applyBeginProvinceName + businessTripApplyVo.applyBeginCityName);
+				$(".show_applyEndAddressName").text(businessTripApplyVo.applyEndProvinceName + businessTripApplyVo.applyEndCityName);
+				$(".show_applyBeginTime").text(new Date(parseInt(businessTripApplyVo.applyBeginTime)).toLocaleString());
+				$(".show_applyEndTime").text(new Date(parseInt(businessTripApplyVo.applyEndTime)).toLocaleString())
+				$(".show_applyDuration").text(businessTripApplyVo.applyDuration + "天");
+				$(".show_applyDateTime").text(new Date(parseInt(businessTripApplyVo.applyDateTime)).toLocaleDateString());
+				$(".show_applyCheckStatusShow").text(businessTripApplyVo.applyCheckStatusShow);
+				var array = [];
+				var businessTripApplyCheckVos = businessTripApplyVo.businessTripApplyCheckVos;
+				$(businessTripApplyCheckVos).each(function(index){
+					array.push(this.checkEmployeeName);
+					if(index < businessTripApplyCheckVos.length - 1){
+						array.push("→");
+					} 
+				});
+				$(".show_checkEmployeeName").text(array.join(""));
+			},
+			error: function(){
+				layer.msg("暂时无法查看",{time:1000});
+				flag = false;
+    		}
+		});
+	}); 
+});

@@ -1,0 +1,138 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.entity.Permission;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+
+/**
+ * @author  
+ * el_sys_permission 表对应业务实现对象
+ * 2017/12/07 04:00:58
+ */
+@Transactional
+@Service
+public class PermissionService{
+	
+	@Autowired
+	private BaseDaoImpl<Permission> permissionDao;
+	
+	/**
+	 * 根据主键查询Permission对象
+	 * @param id
+	 * @return
+	 */
+	public Permission findById (Serializable id){
+		Permission entity = permissionDao.findById(Permission.class, id);
+		return entity;
+	}
+	
+	/**
+	 * 插入Permission对象
+	 * @param entity
+	 */
+	public void save (Permission entity){
+		permissionDao.save(entity);
+	}
+	
+	/**
+	 * 修改Permission对象
+	 * @param entity
+	 */
+	public void update (Permission entity){
+		permissionDao.update(entity);
+	}
+	
+	/**
+	 * 删除Permission对象
+	 * @param id
+	 */
+	public void delete (Serializable id){
+		permissionDao.delete(Permission.class, id);
+	}
+	
+	/**
+	 * 根据sql查询Permission对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Permission对象集合
+	 */
+	public List<Permission> findListBySql(int currentPage, int pageSize){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select Permission.* from Permission");
+		List<Permission> list = permissionDao.findListBySql(Permission.class, sql.toString(), currentPage, pageSize);	
+		return list;
+	}
+	
+	/**
+	 * 根据sql查询Permission集合数量
+	 * @return Permission集合数量
+	 */
+	public int findCountBySql(){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select count(1) from sys_permission");
+		int count = permissionDao.findCountBySql(sql.toString());	
+		return count;
+	}
+	
+	/**
+	 * 根据sql查询Permission分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Permission分页对象
+	 */
+	public Pager<Permission> findPageBySql(int currentPage, int pageSize){
+		int totalRecord = findCountBySql();	
+		Pager<Permission> pager = new Pager<Permission>(currentPage, pageSize, totalRecord);
+		List<Permission> dataList = findListBySql(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+	
+	/**
+	 * 根据表达式查询Permission对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Permission对象集合
+	 */
+	public List<Permission> findList(int currentPage, int pageSize){
+		List<Exp> expList = new ArrayList<Exp>();
+		List<Permission> PermissionList = permissionDao.findList(Permission.class, expList, currentPage, pageSize);	
+		return PermissionList;
+	}
+	
+	/**
+	 * 根据表达式查询Permission集合数量
+	 * @return Permission集合数量
+	 */
+	public int findCount(){
+		List<Exp> expList = new ArrayList<Exp>();
+		int count = permissionDao.findCount(Permission.class, expList);	
+		return count;
+	}
+	
+	/**
+	 * 根据表达式查询Permission分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Permission分页对象
+	 */
+	public Pager<Permission> findPage(int currentPage, int pageSize){
+		int totalRecord = findCount();	
+		Pager<Permission> pager = new Pager<Permission>(currentPage, pageSize, totalRecord);
+		List<Permission> dataList = findList(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+}
+
+

@@ -1,0 +1,74 @@
+package com.hongedu.honghr.honghr.entity;
+
+import java.io.Serializable;
+
+import com.hongedu.honghr.base.entity.BaseEntity;
+import com.hongedu.honghr.base.dao.annotation.Table;
+/**
+ * @author  
+ * el_bp_apply_permission 表对应实体
+ * 2017/12/07 04:00:56
+ */
+@Table(name="apply_permission", pk="applyPermissionId")
+public class ApplyPermission extends BaseEntity implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	/***/
+	private java.lang.Integer applyPermissionId;
+	/***/
+	private java.lang.Integer employeeId;
+	/***/
+	private java.lang.Integer departmentId;
+	/***/
+	private java.lang.String checkPermission;
+	/***/
+	private java.lang.String checkLevel;
+	/***/
+	private java.lang.String deleted;
+	
+	public void setApplyPermissionId(java.lang.Integer value) {
+		this.applyPermissionId = value;
+	}
+	
+	public java.lang.Integer getApplyPermissionId() {
+		return applyPermissionId;
+	}
+	public void setEmployeeId(java.lang.Integer value) {
+		this.employeeId = value;
+	}
+	
+	public java.lang.Integer getEmployeeId() {
+		return employeeId;
+	}
+	public void setDepartmentId(java.lang.Integer value) {
+		this.departmentId = value;
+	}
+	
+	public java.lang.Integer getDepartmentId() {
+		return departmentId;
+	}
+	public void setCheckPermission(java.lang.String value) {
+		this.checkPermission = value;
+	}
+	
+	public java.lang.String getCheckPermission() {
+		return checkPermission;
+	}
+	public void setCheckLevel(java.lang.String value) {
+		this.checkLevel = value;
+	}
+	
+	public java.lang.String getCheckLevel() {
+		return checkLevel;
+	}
+	public void setDeleted(java.lang.String value) {
+		this.deleted = value;
+	}
+	
+	public java.lang.String getDeleted() {
+		return deleted;
+	}
+}
+
+

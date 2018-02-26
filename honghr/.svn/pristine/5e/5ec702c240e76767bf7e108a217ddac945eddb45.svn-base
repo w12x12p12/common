@@ -1,0 +1,83 @@
+package com.hongedu.honghr.honghr.entity;
+
+import java.io.Serializable;
+
+import com.hongedu.honghr.base.entity.BaseEntity;
+import com.hongedu.honghr.base.dao.annotation.Table;
+/**
+ * @author  
+ * el_bp_absence_apply_check 表对应实体
+ * 2017/12/07 04:00:56
+ */
+@Table(name="absence_apply_check", pk="absenceApplyCheckId")
+public class AbsenceApplyCheck extends BaseEntity implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	/***/
+	private java.lang.Integer absenceApplyCheckId;
+	/***/
+	private java.lang.Integer absenceApplyId;
+	/***/
+	private java.lang.Integer checkEmployeeId;
+	/***/
+	private java.util.Date applyCheckTime;
+	/***/
+	private java.lang.String applyIsAllowed;
+	/***/
+	private java.lang.String applyCheckSuggest;
+	/***/
+	private java.lang.String deleted;
+	
+	public void setAbsenceApplyCheckId(java.lang.Integer value) {
+		this.absenceApplyCheckId = value;
+	}
+	
+	public java.lang.Integer getAbsenceApplyCheckId() {
+		return absenceApplyCheckId;
+	}
+	public void setAbsenceApplyId(java.lang.Integer value) {
+		this.absenceApplyId = value;
+	}
+	
+	public java.lang.Integer getAbsenceApplyId() {
+		return absenceApplyId;
+	}
+	public void setCheckEmployeeId(java.lang.Integer value) {
+		this.checkEmployeeId = value;
+	}
+	
+	public java.lang.Integer getCheckEmployeeId() {
+		return checkEmployeeId;
+	}
+	public void setApplyCheckTime(java.util.Date value) {
+		this.applyCheckTime = value;
+	}
+	
+	public java.util.Date getApplyCheckTime() {
+		return applyCheckTime;
+	}
+	public void setApplyIsAllowed(java.lang.String value) {
+		this.applyIsAllowed = value;
+	}
+	
+	public java.lang.String getApplyIsAllowed() {
+		return applyIsAllowed;
+	}
+	public void setApplyCheckSuggest(java.lang.String value) {
+		this.applyCheckSuggest = value;
+	}
+	
+	public java.lang.String getApplyCheckSuggest() {
+		return applyCheckSuggest;
+	}
+	public void setDeleted(java.lang.String value) {
+		this.deleted = value;
+	}
+	
+	public java.lang.String getDeleted() {
+		return deleted;
+	}
+}
+
+

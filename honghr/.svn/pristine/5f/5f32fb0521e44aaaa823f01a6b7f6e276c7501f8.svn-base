@@ -1,0 +1,122 @@
+
+package com.hongedu.honghr.honghr.web;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.hongedu.honghr.util.json.JsonResult;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.honghr.entity.BusinessTripApply;
+import com.hongedu.honghr.honghr.service.BusinessTripApplyService;
+
+
+/**
+ * @author  
+ * el_bp_business_trip_apply 表对应的controller
+ * 2017/12/07 04:04:40
+ */
+@Controller
+@RequestMapping("/admin/businessTripApply")
+public class BusinessTripApplyController {
+	
+	@Autowired
+	private BusinessTripApplyService businessTripApplyService;
+	
+	/**
+	 * 查询BusinessTripApply详情
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/findBusinessTripApply",method=RequestMethod.POST)
+	public JsonResult findBusinessTripApply(
+			@RequestParam(required=true)java.lang.Integer businessTripApplyId) {
+		try {
+			BusinessTripApply businessTripApply = businessTripApplyService.findById(businessTripApplyId);
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", businessTripApply);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 编辑BusinessTripApply
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value="/editBusinessTripApply",method=RequestMethod.GET)
+	public String editBusinessTripApply(
+			java.lang.Integer businessTripApplyId,
+			Model model) {
+		if(businessTripApplyId != null){
+			BusinessTripApply businessTripApply = businessTripApplyService.findById(businessTripApplyId);
+			model.addAttribute("businessTripApply", businessTripApply);
+		}
+		return "admin/businessTripApply/editBusinessTripApply";
+	}
+	
+	/**
+	 * 保存BusinessTripApply
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveBusinessTripApply",method=RequestMethod.POST)
+	public JsonResult saveBusinessTripApply(
+			BusinessTripApply businessTripApply
+			) {
+		try {
+			if(businessTripApply.getBusinessTripApplyId() == null){
+				businessTripApplyService.save(businessTripApply);
+			}else{
+				businessTripApplyService.update(businessTripApply);
+			}
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 删除BusinessTripApply
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deleteBusinessTripApply",method=RequestMethod.POST)
+	public JsonResult deleteBusinessTripApply(
+			@RequestParam(required=true)java.lang.Integer businessTripApplyId) {
+		try {
+			businessTripApplyService.delete(businessTripApplyId);
+		return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+						return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 查询BusinessTripApply表单页面
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/businessTripApplyList",method=RequestMethod.GET)
+	public String businessTripApplyList(
+			@RequestParam(required=false,defaultValue="1")Integer currentPage,
+			@RequestParam(required=false,defaultValue="10")Integer pageSize,
+			Model model) {
+		Pager<BusinessTripApply> page = businessTripApplyService.findPage(currentPage, pageSize);
+		model.addAttribute("page", page);
+		return "admin/businessTripApplyList";
+	}
+}

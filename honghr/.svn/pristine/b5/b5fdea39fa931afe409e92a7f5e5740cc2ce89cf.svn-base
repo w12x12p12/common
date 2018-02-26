@@ -1,0 +1,510 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+<body>
+	<script type="text/javascript">
+		$(function(){
+			var submit = true;
+			/* 点击查看 */
+			$(".business_look").click(function(){
+				var flag = true;
+				$.ajax({
+					url: ctx + "/admin/businessTripApply/getBusinessTripApply",
+					type: "GET",
+					async: false,
+					data: {
+						"businessTripApplyId": $(this).attr("data")
+					},
+					dataType: "JSON",
+					success: function(businessTripApplyVo){
+						$(".showBusinessTripApply").text("");
+						$(".show_businessTripApplyNum").text(businessTripApplyVo.businessTripApplyNum);
+						$(".show_applyEmployeeName").text(businessTripApplyVo.applyEmployeeName);
+						$(".show_applyDepartmentName").text(businessTripApplyVo.applyDepartmentName);
+						$(".show_applyTypeShow").text(businessTripApplyVo.applyTypeShow);
+						$(".show_applyReason").text(businessTripApplyVo.applyReason);
+						$(".show_applyBeginAddressName").text(businessTripApplyVo.applyBeginProvinceName + businessTripApplyVo.applyBeginCityName);
+						$(".show_applyEndAddressName").text(businessTripApplyVo.applyEndProvinceName + businessTripApplyVo.applyEndCityName);
+						$(".show_applyBeginTime").text(new Date(parseInt(businessTripApplyVo.applyBeginTime)).toLocaleString());
+						$(".show_applyEndTime").text(new Date(parseInt(businessTripApplyVo.applyEndTime)).toLocaleString())
+						$(".show_applyDuration").text(businessTripApplyVo.applyDuration + "天");
+						$(".show_applyDateTime").text(new Date(parseInt(businessTripApplyVo.applyDateTime)).toLocaleDateString());
+						$(".show_applyCheckStatusShow").text(businessTripApplyVo.applyCheckStatusShow);
+						var array = [];
+						var businessTripApplyCheckVos = businessTripApplyVo.businessTripApplyCheckVos;
+						$(businessTripApplyCheckVos).each(function(index){
+							array.push(this.checkEmployeeName);
+							if(index < businessTripApplyCheckVos.length - 1){
+								array.push("→");
+							} 
+						});
+						$(".show_checkEmployeeName").text(array.join(""));
+					},
+					error: function(){
+						layer.msg("暂时无法查看",{time:1000});
+						flag = false;
+		    		}
+				});
+			}); 
+			/* 打开编辑休假单弹框 */
+			$(".business_edit").click(function(){
+				var flag = true;
+				$.ajax({
+					url: ctx + "/admin/businessTripApply/businessTripApplyToEdit",
+					type: "GET",
+					async: false,
+					data: {
+						"businessTripApplyId": $(this).attr("data")
+					},
+					dataType: "JSON",
+					success: function(resultMap){
+						var array = [];
+						var businessTripApplyVo = resultMap.businessTripApplyVo;
+						var businessTripApplyCheckVos = businessTripApplyVo.businessTripApplyCheckVos;
+						var applyTypeList = resultMap.applyTypeList;
+						var provinceList = resultMap.provinceList;
+						var beginCityList = resultMap.beginCityList;
+						var endCityList = resultMap.endCityList;
+						$(".edit_business_show").val("");
+						$(".w_edit_businessTripApplyId").val(businessTripApplyVo.businessTripApplyId);
+						$(".w_edit_businessTripApplyNum").val(businessTripApplyVo.businessTripApplyNum);
+						$(".w_edit_applyEmployeeName").val(businessTripApplyVo.applyEmployeeName);
+						$(".w_edit_applyDepartmentName").val(businessTripApplyVo.applyDepartmentName);
+						$(".w_edit_applyReason").val(businessTripApplyVo.applyReason);
+						$(".w_edit_applyBeginTime").val(new Date(parseInt(businessTripApplyVo.applyBeginTime)).toLocaleString('chinese',{hour12:false}).replace(/\//g,"-"));
+						$(".w_edit_applyEndTime").val(new Date(parseInt(businessTripApplyVo.applyEndTime)).toLocaleString('chinese',{hour12:false}).replace(/\//g,"-"));
+						$(".w_edit_applyDuration").val(businessTripApplyVo.applyDuration + "天");
+						$(".w_edit_applyDateTime").val(new Date(parseInt(businessTripApplyVo.applyDateTime)).toLocaleDateString().replace(/\//g,"-"));
+						$(".w_edit_applyCheckStatusShow").val(businessTripApplyVo.applyCheckStatusShow);
+						$(applyTypeList).each(function(){
+							array.push("<label class='w_honghr_radio_label' title='" + this.codeName + "' >");
+							if(this.codeValue == businessTripApplyVo.applyType){
+								array.push("<input type='radio' name='applyType' class='w_honghr_radio' value='" + this.codeValue + "' checked = 'checked' >" + this.codeName + "</input>");
+							}else{
+								array.push("<input type='radio' name='applyType' class='w_honghr_radio' value='" + this.codeValue + "' >" + this.codeName + "</input>");
+							}
+							array.push("</label>");
+						});
+						$(".w_business_type").html("");
+						$(".w_business_type").html(array.join(""));
+						$(".beginProvince").html("");
+						$(".endProvince").html("");
+						if(provinceList){
+							array = [];
+							array.push("<option class='defaultChoice' value='-1'>请选择</option>");
+							$(provinceList).each(function(){
+								if(this.codeId == businessTripApplyVo.applyBeginProvinceId){
+									array.push("<option class='defaultChoice' value='" + this.codeId + "' selected = 'selected'>" + this.codeName + "</option>");
+								}else{
+									array.push("<option class='defaultChoice' value='" + this.codeId + "'>" + this.codeName + "</option>");
+								}
+							});
+							$(".beginProvince").html(array.join(""));
+							array = [];
+							array.push("<option class='defaultChoice' value='-1'>请选择</option>");
+							$(provinceList).each(function(){
+								if(this.codeId == businessTripApplyVo.applyEndProvinceId){
+									array.push("<option class='defaultChoice' value='" + this.codeId + "' selected = 'selected'>" + this.codeName + "</option>");
+								}else{
+									array.push("<option class='defaultChoice' value='" + this.codeId + "'>" + this.codeName + "</option>");
+								}
+							});
+							$(".endProvince").html(array.join(""));
+						}
+						$(".w_edit_showBeginCity").html("");
+						if(beginCityList){
+							array = [];
+							array.push("<option class='defaultChoice' value='-1'>请选择</option>");
+							$(beginCityList).each(function(){
+								if(this.codeValue == businessTripApplyVo.applyBeginAddress){
+									array.push("<option class='defaultChoice' value='" + this.codeValue + "' selected = 'selected'>" + this.codeName + "</option>");
+								}else{
+									array.push("<option class='defaultChoice' value='" + this.codeValue + "'>" + this.codeName + "</option>");
+								}
+							});
+							$(".w_edit_showBeginCity").html(array.join(""));
+						}
+						$(".w_edit_showEndCity").html("");
+						if(endCityList){
+							array = [];
+							array.push("<option class='defaultChoice' value='-1'>请选择</option>");
+							$(endCityList).each(function(){
+								if(this.codeValue == businessTripApplyVo.applyEndAddress){
+									array.push("<option class='defaultChoice' value='" + this.codeValue + "' selected = 'selected'>" + this.codeName + "</option>");
+								}else{
+									array.push("<option class='defaultChoice' value='" + this.codeValue + "'>" + this.codeName + "</option>");
+								}
+							});
+							$(".w_edit_showEndCity").html(array.join(""));
+						}
+						array = [];
+						if(businessTripApplyCheckVos){
+							$(businessTripApplyCheckVos).each(function(){
+								array.push("<div class='w_honghr_check'><span class='w_checkEmployee' seq='" + this.applyCheckSequence + "' data='" + this.checkEmployeeId + "'>" + this.applyCheckSequence + "." + this.checkEmployeeName + "</span></div>");
+							});
+							if(businessTripApplyCheckVos.length < 4){
+								array.push("<button type='button' id='showEmployee' class='btn btn-default' data-toggle='modal' data-target='#myModal_add'>+添加</button>");
+							}else{
+								array.push("<button type='button' style='display:none;' id='showEmployee' class='btn btn-default' data-toggle='modal' data-target='#myModal_add'>+添加</button>");
+							}
+						}
+						$(".w_edit_businessTripApplyChecks").html("");
+						$(".w_edit_businessTripApplyChecks").html(array.join(""));
+					},
+					error: function(){
+						layer.msg("暂时无法编辑",{time:1000});
+						flag = false;
+		    		}
+				});
+				if(!flag){
+					return false;
+				}
+			});
+			/* 保存编辑 */
+			$("#edit_businessTripApplyForm").click(function(){
+				var applyType = $(".w_honghr_radio:checked").val();
+				var $checkEmployee = $(".w_checkEmployee");
+				if(!applyType){
+					layer.msg("请选择出差类型",{time:1000});
+					return false;
+				}
+				if($checkEmployee.length == 0){
+					layer.msg("请选择审批人",{time:1000});
+					return false;
+				}
+				if(submit){
+					$("#editForm .edit_checkEmployee").remove();
+					$("#editForm .edit_checkSequence").remove();
+					$checkEmployee.each(function(index){
+						$("#editForm").append("<input type='hidden' name='businessTripApplyChecks["+index+"].checkEmployeeId' class='edit_checkEmployee' value='" + $(this).attr("data") + "' />");
+						$("#editForm").append("<input type='hidden' name='businessTripApplyChecks["+index+"].applyCheckSequence' class='edit_checkSequence' value='" + $(this).attr("seq") + "' />");
+					});
+					$.ajax({
+						url: ctx + "/admin/businessTripApply/editForBusinessTripApplyCheck",
+						type: "POST",
+						async: true,
+						data: $("#editForm").serialize(),
+						beforeSend: function(){
+							submit = false;
+		           		},
+		           		success: function(data){
+		           			if(data == "000000"){
+		           				layer.msg("保存成功", {time:1000}, function(){
+		           					window.location.href = ctx + "/admin/businessTripApply/businessTripApplyList";
+		        				});
+		           			}
+		           		},
+		           		error: function(){
+		           			layer.msg("暂时无法提交",{time:1000});
+		           			submit = true;
+		           		}
+					});
+				}else{
+					layer.msg("正在保存,请您耐心等待",{time:1000});
+					return false;		
+				}
+			});
+		}); 
+	</script>
+	<script type="text/javascript" src="${ctx}/resources/js/admin/businessTripApply/businessTripApplyCommon.js"></script>
+	<form class="form-inline" role="form">
+		<div class="form-group btn-group-sm z_margin_tb">
+			<label class="sr-only" for="name">查询条件</label> 
+			<input type="text" name="" value="" class="form-control input-sm" id="" placeholder="请输入">
+			<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>查询</button>
+		</div>
+		<ul class="nav nav-list"> <li class="divider"></li> </ul>
+	</form>
+	<div class="table-responsive">
+		<table class="table table-striped w_cee_table">
+			<thead>
+				<tr>
+					<th>出差单编号</th>
+					<th>出差人</th>
+					<th>所属部门</th>
+					<th>出差类型</th>
+					<th>出差事由</th>
+					<th>出差始发地</th>
+					<th>出差目的地</th>
+					<th>出差开始时间</th>
+					<th>出差结束时间</th>
+					<th>出差时长</th>
+					<th>申请日期</th>
+					<th>出差单状态</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<c:forEach var="entity" items="${page.dataList}" varStatus="status">
+					<tr>
+						<td style="max-width:80px;">${entity.businessTripApplyNum}</td>
+						<td>${entity.applyEmployeeName}</td>
+						<td>${entity.applyDepartmentName}</td>
+						<td>${entity.applyTypeShow}</td>
+						<td style="max-width:70px;">${entity.applyReason}</td>
+						<td style="max-width:73.5px;">${entity.applyBeginProvinceName}${entity.applyBeginCityName}</td>
+						<td style="max-width:73.5px;">${entity.applyEndProvinceName}${entity.applyEndCityName}</td>
+						<td style="max-width:100px;"><fmt:formatDate type="both" value="${entity.applyBeginTime}" pattern="yyyy年M月d日 HH:mm" /></td>
+						<td style="max-width:100px;"><fmt:formatDate type="both" value="${entity.applyEndTime}" pattern="yyyy年M月d日 HH:mm"/></td>
+						<td>${entity.applyDuration}<c:if test="${entity.applyDuration!=null && entity.applyDuration!=''}">天</c:if></td>
+						<td style="max-width:100px;"><fmt:formatDate type="both" value="${entity.applyDateTime}" pattern="yyyy年M月d日"/></td>
+						<td>${entity.applyCheckStatusShow}</td>
+						<td>
+							<c:choose>
+								<c:when test="${entity.applyCheckStatus == -1}">
+									<button type="button" class="btn btn-default btn-sm business_look" data="${entity.businessTripApplyId}" data-toggle="modal" data-target="#myModal_look">
+								  		<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>查看
+									</button>
+									<button type="button" class="btn btn-default btn-sm business_edit" data = "${entity.businessTripApplyId}" data-toggle="modal" data-target="#myModal_edit">
+						  				<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>编辑
+									</button>
+									<button type="button" class="btn btn-default btn-sm business_submitCheck" data = "${entity.businessTripApplyId}">
+								  		<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>提交审批
+									</button>
+									<button type="button" class="btn btn-default btn-sm btn-danger business_delete" data = "${entity.businessTripApplyId}">
+									  <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>删除
+									</button>
+								</c:when>
+								<c:when test="${entity.applyCheckStatus == 0}">
+									<button type="button" class="btn btn-default btn-sm business_look" data="${entity.businessTripApplyId}" data-toggle="modal" data-target="#myModal_look">
+								  		<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>查看
+									</button>
+									<button type="button" class="btn btn-default btn-sm business_back" data="${entity.businessTripApplyId}">
+								  		<span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>撤回
+									</button>
+								</c:when>
+								<c:otherwise>
+									<button type="button" class="btn btn-default btn-sm business_look" data="${entity.businessTripApplyId}" data-toggle="modal" data-target="#myModal_look">
+								  		<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>查看
+									</button>
+									<button type="button" class="btn btn-default btn-sm business_lookProgress" data="${entity.businessTripApplyId}" data-toggle="modal" data-target="#myModal_look_progress">
+								  		<span class="glyphicon glyphicon-file" aria-hidden="true"></span>审批记录
+									</button>
+								</c:otherwise>
+							 </c:choose>
+						</td>
+					</tr>
+				</c:forEach>
+			</tbody>
+		</table>
+		<!-- 分页区域 -->
+		<jsp:include page="/WEB-INF/jsp/common/page.jsp"></jsp:include>
+	</div>
+	<!-- 模态框查看（Modal） -->
+	<div class="modal fade d_model_box" id="myModal_look" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+		<div class="modal-dialog modal-show">
+		 	<div class="modal-content">
+		 		<div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+	                	&times;
+	                </button>
+	                <h4 class="modal-title w_absence_title" id="myModalLabel">查看出差申请单</h4>
+	            </div>
+	            <div class="modal-body">
+           			<div class="z_lcms_lookbox">
+					    <table class="table table-bordered table-striped w_show_text" style="margin:0 auto">
+					        <tr>
+					            <td>出差单编号</td>
+					            <td class="showBusinessTripApply show_businessTripApplyNum"></td>
+					        </tr>
+					        <tr>
+					            <td>出差人</td>
+					            <td class="showBusinessTripApply show_applyEmployeeName"></td>
+					        </tr>
+					        <tr>
+					            <td>所属部门</td>
+					            <td class="showBusinessTripApply show_applyDepartmentName"></td>
+					        </tr>
+					        <tr>
+					        	<td>出差类型</td>
+					        	<td class="showBusinessTripApply show_applyTypeShow"></td>
+					        </tr>
+					        <tr>
+					            <td>出差事由</td>
+					            <td class="showBusinessTripApply show_applyReason"></td>
+					        </tr>
+   						    <tr>
+					            <td>出差始发地</td>
+					            <td class="showBusinessTripApply show_applyBeginAddressName"></td>
+					        </tr>
+					        <tr>
+					            <td>出差目的地</td>
+					            <td class="showBusinessTripApply show_applyEndAddressName"></td>
+					        </tr>
+					        <tr>
+					        	<td>出差开始时间</td>
+					        	<td class="showBusinessTripApply show_applyBeginTime"></td>
+					        </tr>
+					        <tr>
+					        	<td>出差结束时间</td>
+					        	<td class="showBusinessTripApply show_applyEndTime"></td>
+					        </tr>
+					        <tr>
+					        	<td>出差时长</td>
+					        	<td class="showBusinessTripApply show_applyDuration"></td>
+					        </tr>
+					        <tr>
+					        	<td>申请日期</td>
+					        	<td class="showBusinessTripApply show_applyDateTime"></td>
+					        </tr>
+					        <tr>
+					        	<td>出差单状态</td>
+					        	<td class="showBusinessTripApply show_applyCheckStatusShow"></td>
+					        </tr>
+					        <tr>
+					        	<td>审批人流程</td>
+					        	<td class="showBusinessTripApply show_checkEmployeeName"></td>
+					        </tr>
+					    </table>
+					</div>
+	            </div>
+		 	</div>
+ 		</div>
+	</div>
+	<!-- 模态框编辑（Modal） -->
+	<div class="modal fade d_model_box" id="myModal_edit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+		<div class="modal-dialog modal-show">
+			<div class="modal-content">
+		 		<div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+	                	&times;
+	                </button>
+	                <h4 class="modal-title w_absence_title" id="myModalLabel">编辑出差申请单</h4>
+	            </div>
+				<div class="modal-body">
+					<form id="editForm" class="form-horizontal" role="form">
+						<input name="businessTripApplyId" class="edit_business_show w_edit_businessTripApplyId" type="hidden" />
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>出差单编号</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control form-control_readonly edit_business_show w_edit_businessTripApplyNum" readonly="readonly"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>出差人</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control form-control_readonly edit_business_show w_edit_applyEmployeeName" readonly="readonly"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>所属部门</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control form-control_readonly edit_business_show w_edit_applyDepartmentName" readOnly="readOnly" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>出差类型</label>
+							<div class="col-sm-10 w_business_type"></div>
+						</div>
+						<div class="form-group w_edit_textArea clearfix">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>出差事由</label>
+							<div class="col-sm-10">
+								<textarea name="applyReason" class="form-control w_honghr_textArea edit_business_show w_edit_applyReason" cols="3" placeholder="请输入出差事由" ></textarea> 
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>出差始发地</label>
+							<div class="col-sm-5 w_business_beginProvince">
+								<select class="form-control input-sm edit_business_show beginProvince">
+							 		<option class="defaultChoice" value="-1">请选择</option>
+								</select>
+							</div>
+							<div class="col-sm-5 w_select_near">
+								<select name="applyBeginAddress" class="form-control input-sm edit_business_show w_edit_showBeginCity">
+									<option class="defaultChoice" value="-1">请选择</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>出差目的地</label>
+							<div class="col-sm-5">
+							 	<select class="form-control input-sm edit_business_show endProvince">
+									<option class="defaultChoice" value="-1">请选择</option>
+								</select>
+							</div>
+							<div class="col-sm-5 w_select_near">
+							 	<select name="applyEndAddress" class="form-control input-sm edit_business_show w_edit_showEndCity">
+									<option class="defaultChoice" value="-1">请选择</option>
+								</select>
+							</div>						
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>出差开始时间</label>
+							<div class="col-sm-10">
+								<input type="text" id="startDate" name="applyBeginTime" class="form-control w_date_input edit_business_show w_edit_applyBeginTime validate[required]" placeholder="请输入100字以内字符" maxlength="100" onFocus="var endDate=$dp.$('endDate');WdatePicker({onpicked:function(){endDate.focus();},dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false,maxDate:'#F{$dp.$D(\'endDate\',{d:0})}'})" onchange="changeDuration();" readonly="readonly" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>出差结束时间</label>
+							<div class="col-sm-10">
+								<input type="text" id="endDate" name="applyEndTime" class="form-control w_date_input edit_business_show w_edit_applyEndTime validate[required]" placeholder="请输入100字以内字符" maxlength="100" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'startDate\',{d:0})}',dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false})" onchange="changeDuration();" readonly="readonly" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>出差时长</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control form-control_readonly edit_business_show w_edit_applyDuration" readonly="readonly" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>申请日期</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control form-control_readonly edit_business_show w_edit_applyDateTime" readonly="readonly"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>审批状态</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control form-control_readonly edit_business_show w_edit_applyCheckStatusShow" readonly="readonly"/>
+							</div>
+						</div>
+						<div class="form-group w_honghr_input">
+							<label for="disabledSelect" class="col-sm-2 control-label" style="padding-top:0px;"><b class="z_common_star">*</b>审批人流程</label>
+							<div class="col-sm-10 w_edit_businessTripApplyChecks"></div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-primary" id="edit_businessTripApplyForm">保存</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 模态框（Modal） -->
+	<div class="modal fade d_model_box" id="myModal_add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"   data-backdrop="static">
+	    <div class="modal-dialog modal-show">
+	        <div class="modal-content">
+	        	<div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+	                	&times;
+	                </button>
+	                <h4 class="modal-title w_absence_title" id="myModalLabel">添加审批人</h4>
+	            </div>
+	            <div class="modal-body">
+	           		<div class="form-group w_honghr_input">
+						<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>部门名称</label>
+						<div class="col-sm-10">
+							<select class="form-control input-sm showDepartment">
+								<option class="defaultChoice" value="-1">请选择</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group w_honghr_input">
+						<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>员工姓名</label>
+						<div class="col-sm-10">
+							<select class="form-control input-sm showName">
+								<option class="defaultChoice" value="-1">请选择</option>
+							</select>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" id="save_checkEmployee">保存</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					</div>
+				</div>
+	        </div><!-- /.modal-content -->
+	    </div><!-- /.modal -->
+	</div>
+</body>

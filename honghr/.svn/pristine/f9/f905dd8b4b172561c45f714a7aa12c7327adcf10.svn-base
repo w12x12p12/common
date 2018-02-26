@@ -1,0 +1,172 @@
+package com.hongedu.honghr.honghr.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.hongedu.honghr.base.dao.annotation.Table;
+import com.hongedu.honghr.base.entity.BaseEntity;
+/**
+ * @author  
+ * el_bp_overtime_work_apply 表对应实体
+ * 2017/12/07 04:00:57
+ */
+@Table(name="overtime_work_apply", pk="overtimeWorkApplyId")
+public class OvertimeWorkApply extends BaseEntity implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	/***/
+	private Integer overtimeWorkApplyId;
+	/***/
+	private String overtimeWorkApplyNum;
+	/***/
+	private String applyDepartmentNum;
+	/***/
+	private Integer employeeId;
+	/***/
+	private String applyType;
+	/***/
+	private String applyReason;
+	/***/
+	private String applyWorkContent;
+	/***/
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	private Date applyBeginTime;
+	/***/
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	private Date applyEndTime;
+	/***/
+	private String applyDuration;
+	/***/
+	@DateTimeFormat(pattern="yyyy-MM-dd")
+	private Date applyDateTime;
+	/***/
+	private String applyCheckStatus;
+	/***/
+	private String applyCheckProgress;
+	/***/
+	private Integer createEmployeeId;
+	/***/
+	private Date createDateTime;
+	/***/
+	private String deleted;
+	
+	public void setOvertimeWorkApplyId(Integer value) {
+		this.overtimeWorkApplyId = value;
+	}
+	
+	public Integer getOvertimeWorkApplyId() {
+		return overtimeWorkApplyId;
+	}
+	public void setOvertimeWorkApplyNum(String value) {
+		this.overtimeWorkApplyNum = value;
+	}
+	
+	public String getOvertimeWorkApplyNum() {
+		return overtimeWorkApplyNum;
+	}
+	
+	public String getApplyDepartmentNum() {
+		return applyDepartmentNum;
+	}
+
+	public void setApplyDepartmentNum(String applyDepartmentNum) {
+		this.applyDepartmentNum = applyDepartmentNum;
+	}
+
+	public void setEmployeeId(Integer value) {
+		this.employeeId = value;
+	}
+	
+	public Integer getEmployeeId() {
+		return employeeId;
+	}
+	public void setApplyType(String value) {
+		this.applyType = value;
+	}
+	
+	public String getApplyType() {
+		return applyType;
+	}
+	public void setApplyReason(String value) {
+		this.applyReason = value;
+	}
+	
+	public String getApplyReason() {
+		return applyReason;
+	}
+	public void setApplyWorkContent(String value) {
+		this.applyWorkContent = value;
+	}
+	
+	public String getApplyWorkContent() {
+		return applyWorkContent;
+	}
+	public void setApplyBeginTime(Date value) {
+		this.applyBeginTime = value;
+	}
+	
+	public Date getApplyBeginTime() {
+		return applyBeginTime;
+	}
+	public void setApplyEndTime(Date value) {
+		this.applyEndTime = value;
+	}
+	
+	public Date getApplyEndTime() {
+		return applyEndTime;
+	}
+	public void setApplyDuration(String value) {
+		this.applyDuration = value;
+	}
+	
+	public String getApplyDuration() {
+		return applyDuration;
+	}
+	public void setApplyDateTime(Date value) {
+		this.applyDateTime = value;
+	}
+	
+	public Date getApplyDateTime() {
+		return applyDateTime;
+	}
+	public void setApplyCheckStatus(String value) {
+		this.applyCheckStatus = value;
+	}
+	
+	public String getApplyCheckStatus() {
+		return applyCheckStatus;
+	}
+	public void setApplyCheckProgress(String value) {
+		this.applyCheckProgress = value;
+	}
+	
+	public String getApplyCheckProgress() {
+		return applyCheckProgress;
+	}
+	public void setCreateEmployeeId(Integer value) {
+		this.createEmployeeId = value;
+	}
+	
+	public Integer getCreateEmployeeId() {
+		return createEmployeeId;
+	}
+	public void setCreateDateTime(Date value) {
+		this.createDateTime = value;
+	}
+	
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setDeleted(String value) {
+		this.deleted = value;
+	}
+	
+	public String getDeleted() {
+		return deleted;
+	}
+}
+
+

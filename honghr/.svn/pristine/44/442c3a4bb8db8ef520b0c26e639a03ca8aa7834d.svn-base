@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>加班申请</title>
+</head>
+<body>
+	<script type="text/javascript">
+		$(function(){
+			$("#showEmployee").click(function(){
+				$.ajax({
+					url: ctx + "/admin/absenceApply/showDepartmentList",
+					type: "GET",
+		    		async: true,
+		    		dataType: "JSON",
+		    		success: function(departmentList){
+		    			var array = [];
+		    			if(departmentList){
+	    					array.push("<option value='-1'>请选择</option>");
+			    			$(departmentList).each(function(){
+			    				array.push("<option value='" + this.departmentNum + "'>" + this.departmentName + "</option>")
+			    			});
+		    			}
+		    			$(".showName").html("");
+		    			$(".showDepartment").html("");
+		    			$(".showName").append("<option value='-1'>请选择</option>");
+		    			$(".showDepartment").append(array.join(""));
+		    		},
+		    		error: function(){
+	    				layer.msg("暂时无法获取部门",{time:1000});
+		    		}
+				});
+			});
+			$(".showDepartment").change(function(){
+				$.ajax({
+					url: ctx + "/admin/absenceApply/showCheckEmployeeList",
+					type: "GET",
+					async: true,
+					data: {
+						"departmentNum": $(this).val()
+					},
+					dataType: "JSON",
+					success: function(employeeList){
+						var array = [];
+						if(employeeList){
+							array.push("<option value='-1'>请选择</option>");
+							$(employeeList).each(function(){
+								array.push("<option value='" + this.employeeId + "'>" + this.employeeName + "</option>");
+							});
+						}
+						$(".showName").html("");
+						$(".showName").append(array.join(""));
+					},
+					error: function(){
+						layer.msg("暂时无法获取审批人",{time:1000});
+					}
+				});
+			});
+			$("#save_checkEmployee").click(function(){
+				var departmentNum = $(".showDepartment").val();
+				var employeeId =  $(".showName").val();
+				if(departmentNum!="-1" && employeeId!="-1"){
+					$.ajax({
+						url: ctx + "/admin/absenceApply/getEmployeeById",
+						type: "GET",
+						async: true,
+						data: {
+							"employeeId": employeeId
+						},
+						dataType: "JSON",
+						success: function(employee){
+							$("#showEmployee").before("<span seq='' value='" + employee.employeeId + "'>" + employee.employeeName + '———>' + "</span>")
+						},
+						error: function(){
+							layer.msg("暂时无法添加审批人",{time:1000});
+						}
+					});
+				}else{
+					layer.msg("请选择审批员工",{time:1000});
+				}
+			});
+		});
+	</script>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班单编号</label>
+		<div class="col-sm-10">
+			<input class="form-control form-control_readonly" type="text" value="${overtimeWorkApplyVo.overtimeWorkApplyNum}" maxlength="100" readonly="readonly"/>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班人</label>
+		<div class="col-sm-10">
+			<input class="form-control form-control_readonly" type="text" value="${overtimeWorkApplyVo.applyEmployeeName}" maxlength="100" readonly="readonly"/>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>所属部门</label>
+		<div class="col-sm-10">
+			<c:choose>
+				<c:when test="${fn:length(departmentList) > 1}">
+					<select class="form-control input-sm">
+						<c:forEach items="${departmentList}" var="department">
+							<option value="${department.departmentNum}">${department.departmentName}</option>
+						</c:forEach>
+					</select>
+				</c:when>
+				<c:otherwise>
+					<input class="form-control form-control_readonly" type="text" value="${departmentList[0].departmentName}" maxlength="100" readonly="readonly"/>
+					<input type="hidden" value="${departmentList[0].departmentNum}" />
+				</c:otherwise>
+			</c:choose>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班开始时间</label>
+		<div class="col-sm-10">
+			<input id="startDate" class="form-control w_date_input" type="text" maxlength="100" onFocus="var endDate=$dp.$('endDate');WdatePicker({onpicked:function(){endDate.focus();},dateFmt:'yyyy/MM/dd HH:mm:ss',isShowClear:false,maxDate:'#F{$dp.$D(\'endDate\',{d:-1})}'})" readonly="readonly"/>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班结束时间</label>
+		<div class="col-sm-10">
+			<input id="endDate" class="form-control w_date_input" type="text"  maxlength="100" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'startDate\',{d:1})}',dateFmt:'yyyy/MM/dd HH:mm:ss',isShowClear:false})" readonly="readonly"/>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班性质</label>
+		<div class="col-sm-10">
+			<select class="form-control input-sm">
+				<option value="-1">请选择</option>
+				<c:forEach items="${codeList}" var="code">
+					<option value="${code.codeValue}">${code.codeName}</option>
+				</c:forEach>
+			</select>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班原因</label>
+		<div class="col-sm-10">
+			<textarea class="form-control" placeholder="请输入加班原因" rows="3" cols="20" maxlength="300">
+            </textarea>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>申请日期</label>
+		<div class="col-sm-10">
+			<input class="form-control form-control_readonly" type="text"  maxlength="100" value="<fmt:formatDate type="both" value="${overtimeWorkApplyVo.applyDateTime}" pattern="yyyy/MM/dd" />" readonly="readonly"/>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-12 control-label"><b class="z_common_star">*</b>审批人</label>
+		<div class="col-sm-10">
+			<button type="button" id="showEmployee" class="btn btn-default" data-toggle="modal" data-target="#myModal_add">+添加</button>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-default" id="save_default">保存草稿</button>
+		<button type="button" class="btn btn-primary" id="save_submit">提交审批</button>
+	</div>
+	<!-- 模态框（Modal） -->
+	<div class="modal fade d_model_box" id="myModal_add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"   data-backdrop="static">
+	    <div class="modal-dialog">
+	        <div class="modal-content">
+	        	<div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+	                	&times;
+	                </button>
+	            </div>
+	            <div class="modal-body">
+	           		<div class="form-group w_honghr_input">
+						<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>部门名称</label>
+						<div class="col-sm-10">
+							<select class="form-control input-sm showDepartment">
+								<option class="defaultChoice" value="-1">请选择</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group w_honghr_input">
+						<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>员工姓名</label>
+						<div class="col-sm-10">
+							<select class="form-control input-sm showName">
+								<option class="defaultChoice" value="-1">请选择</option>
+							</select>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-dismiss="modal" id="save_checkEmployee">保存</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					</div>
+				</div>
+	        </div><!-- /.modal-content -->
+	    </div><!-- /.modal -->
+	</div>
+</body>
+</html>

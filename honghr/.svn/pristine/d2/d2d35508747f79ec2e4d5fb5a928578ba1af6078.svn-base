@@ -1,0 +1,176 @@
+package com.hongedu.honghr.honghr.entity;
+
+import java.io.Serializable;
+
+import com.hongedu.honghr.base.entity.BaseEntity;
+import com.hongedu.honghr.base.dao.annotation.Table;
+/**
+ * @author  
+ * el_bp_employee 表对应实体
+ * 2017/12/07 04:00:57
+ */
+@Table(name="employee", pk="employeeId")
+public class Employee extends BaseEntity implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	/***/
+	private java.lang.Integer employeeId;
+	/***/
+	private java.lang.String username;
+	/***/
+	private java.lang.String password;
+	/***/
+	private java.lang.String employeeName;
+	/***/
+	private java.lang.String gender;
+	/***/
+	private java.util.Date birthday;
+	/***/
+	private java.lang.String nativePlace;
+	/***/
+	private java.lang.String nation;
+	/***/
+	private java.lang.String address;
+	/***/
+	private java.lang.String phoneNumber;
+	/***/
+	private java.lang.String email;
+	/***/
+	private java.lang.String idcard;
+	/***/
+	private java.lang.String education;
+	
+	private java.util.Date entryTime;
+	/***/
+	private java.lang.String forbided;
+	/***/
+	private java.lang.String referred;
+	/***/
+	private java.lang.String deleted;
+	
+	public void setEmployeeId(java.lang.Integer value) {
+		this.employeeId = value;
+	}
+	
+	public java.lang.Integer getEmployeeId() {
+		return employeeId;
+	}
+	public void setUsername(java.lang.String value) {
+		this.username = value;
+	}
+	
+	public java.lang.String getUsername() {
+		return username;
+	}
+	public void setPassword(java.lang.String value) {
+		this.password = value;
+	}
+	
+	public java.lang.String getPassword() {
+		return password;
+	}
+	public void setEmployeeName(java.lang.String value) {
+		this.employeeName = value;
+	}
+	
+	public java.lang.String getEmployeeName() {
+		return employeeName;
+	}
+	public void setGender(java.lang.String value) {
+		this.gender = value;
+	}
+	
+	public java.lang.String getGender() {
+		return gender;
+	}
+	public void setBirthday(java.util.Date value) {
+		this.birthday = value;
+	}
+	
+	public java.util.Date getBirthday() {
+		return birthday;
+	}
+	public void setNativePlace(java.lang.String value) {
+		this.nativePlace = value;
+	}
+	
+	public java.lang.String getNativePlace() {
+		return nativePlace;
+	}
+	public void setNation(java.lang.String value) {
+		this.nation = value;
+	}
+	
+	public java.lang.String getNation() {
+		return nation;
+	}
+	public void setAddress(java.lang.String value) {
+		this.address = value;
+	}
+	
+	public java.lang.String getAddress() {
+		return address;
+	}
+	public void setPhoneNumber(java.lang.String value) {
+		this.phoneNumber = value;
+	}
+	
+	public java.lang.String getPhoneNumber() {
+		return phoneNumber;
+	}
+	public void setEmail(java.lang.String value) {
+		this.email = value;
+	}
+	
+	public java.lang.String getEmail() {
+		return email;
+	}
+	public void setIdcard(java.lang.String value) {
+		this.idcard = value;
+	}
+	
+	public java.lang.String getIdcard() {
+		return idcard;
+	}
+	public void setEducation(java.lang.String value) {
+		this.education = value;
+	}
+	
+	public java.lang.String getEducation() {
+		return education;
+	}
+	public void setForbided(java.lang.String value) {
+		this.forbided = value;
+	}
+	
+	public java.lang.String getForbided() {
+		return forbided;
+	}
+	public void setReferred(java.lang.String value) {
+		this.referred = value;
+	}
+	
+	public java.lang.String getReferred() {
+		return referred;
+	}
+	public void setDeleted(java.lang.String value) {
+		this.deleted = value;
+	}
+	
+	public java.lang.String getDeleted() {
+		return deleted;
+	}
+
+	public java.util.Date getEntryTime() {
+		return entryTime;
+	}
+
+	public void setEntryTime(java.util.Date entryTime) {
+		this.entryTime = entryTime;
+	}
+	
+	
+}
+
+

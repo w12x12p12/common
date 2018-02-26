@@ -1,0 +1,41 @@
+package com.hongedu.honghr.honghr.entity.vo;
+
+import com.hongedu.honghr.honghr.entity.AbsenceApply;
+
+public class AbsenceApplyVo extends AbsenceApply {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private String applyTypeShow;
+
+	private String applyCheckStatusShow;
+
+	private String createEmployeeName;
+
+	public String getApplyTypeShow() {
+		return applyTypeShow;
+	}
+
+	public void setApplyTypeShow(String applyTypeShow) {
+		this.applyTypeShow = applyTypeShow;
+	}
+
+	public String getApplyCheckStatusShow() {
+		return applyCheckStatusShow;
+	}
+
+	public void setApplyCheckStatusShow(String applyCheckStatusShow) {
+		this.applyCheckStatusShow = applyCheckStatusShow;
+	}
+
+	public String getCreateEmployeeName() {
+		return createEmployeeName;
+	}
+
+	public void setCreateEmployeeName(String createEmployeeName) {
+		this.createEmployeeName = createEmployeeName;
+	}
+}

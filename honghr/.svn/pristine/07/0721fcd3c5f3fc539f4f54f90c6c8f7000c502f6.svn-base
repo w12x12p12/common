@@ -1,0 +1,176 @@
+
+package com.hongedu.honghr.honghr.web;
+
+import java.util.Date;
+import java.util.List;
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import com.hongedu.honghr.util.json.JsonResult;
+import com.hongedu.honghr.util.page.Pager;
+import com.hongedu.honghr.honghr.common.constant.CodeConstant;
+import com.hongedu.honghr.honghr.common.constant.PageConstant;
+import com.hongedu.honghr.honghr.common.constant.SessionConstant;
+import com.hongedu.honghr.honghr.entity.Code;
+import com.hongedu.honghr.honghr.entity.Department;
+import com.hongedu.honghr.honghr.entity.Employee;
+import com.hongedu.honghr.honghr.entity.OvertimeWorkApply;
+import com.hongedu.honghr.honghr.entity.vo.OvertimeWorkApplyVo;
+import com.hongedu.honghr.honghr.service.CodeService;
+import com.hongedu.honghr.honghr.service.DepartmentService;
+import com.hongedu.honghr.honghr.service.OvertimeWorkApplyService;
+/**
+ * @author  
+ * el_bp_overtime_work_apply 表对应的controller
+ * 2017/12/07 04:04:40
+ */
+@Controller
+@RequestMapping("/admin/overtimeWorkApply")
+public class OvertimeWorkApplyController {
+	
+	@Autowired
+	private OvertimeWorkApplyService overtimeWorkApplyService;
+	
+	@Autowired
+	private DepartmentService departmentService;
+
+	@Autowired
+	private CodeService codeServcie;
+	
+	/**
+	 * 查询OvertimeWorkApply详情
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/findOvertimeWorkApply",method=RequestMethod.POST)
+	public JsonResult findOvertimeWorkApply(
+			@RequestParam(required=true)java.lang.Integer overtimeWorkApplyId) {
+		try {
+			OvertimeWorkApply overtimeWorkApply = overtimeWorkApplyService.findById(overtimeWorkApplyId);
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", overtimeWorkApply);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 编辑OvertimeWorkApply
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value="/editOvertimeWorkApply",method=RequestMethod.GET)
+	public String editOvertimeWorkApply(
+			java.lang.Integer overtimeWorkApplyId,
+			Model model) {
+		if(overtimeWorkApplyId != null){
+			OvertimeWorkApply overtimeWorkApply = overtimeWorkApplyService.findById(overtimeWorkApplyId);
+			model.addAttribute("overtimeWorkApply", overtimeWorkApply);
+		}
+		return "admin/overtimeWorkApply/editOvertimeWorkApply";
+	}
+	
+	/**
+	 * 保存OvertimeWorkApply
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveOvertimeWorkApply",method=RequestMethod.POST)
+	public JsonResult saveOvertimeWorkApply(
+			OvertimeWorkApply overtimeWorkApply
+			) {
+		try {
+			if(overtimeWorkApply.getOvertimeWorkApplyId() == null){
+				overtimeWorkApplyService.save(overtimeWorkApply);
+			}else{
+				overtimeWorkApplyService.update(overtimeWorkApply);
+			}
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 删除OvertimeWorkApply
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deleteOvertimeWorkApply",method=RequestMethod.POST)
+	public JsonResult deleteOvertimeWorkApply(
+			@RequestParam(required=true)java.lang.Integer overtimeWorkApplyId) {
+		try {
+			overtimeWorkApplyService.delete(overtimeWorkApplyId);
+		return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+						return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 查询OvertimeWorkApply表单页面
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/overtimeWorkApplyList",method=RequestMethod.GET)
+	public String overtimeWorkApplyList(
+			@RequestParam(required=false,defaultValue = PageConstant.DEFAULT_PAGE_START)Integer currentPage,
+			@RequestParam(required=false,defaultValue = PageConstant.DEFAULT_PAGE_SIZE)Integer pageSize,
+			Model model) {
+		Pager<OvertimeWorkApplyVo> page = overtimeWorkApplyService.findPage(currentPage, pageSize);
+		model.addAttribute("page", page);
+		return "admin/overtimeWorkApply/overtimeWorkApplyList";
+	}
+	
+	/**
+	 * 去到加班申请页面
+	 * @param model
+	 * @return
+	 * @Author wanghui
+	 * @Date 2018年1月4日
+	 */
+	@RequestMapping(value="/addovertimeWorkApply", method = RequestMethod.GET)
+	public String overtimeWorkApply(Model model){
+		Employee employee = (Employee) SecurityUtils.getSubject().getSession()
+				.getAttribute(SessionConstant.SESSION_EMPLOYEE_KEY);
+		if (employee != null) {
+			List<Department> departmentList = departmentService.findDepartmentListByEmployee(employee.getEmployeeId());
+			List<Code> codeList = codeServcie.findCodeById(CodeConstant.OVERTIME_WORK_APPLY_TYPE_MENU);
+			OvertimeWorkApplyVo overtimeWorkApplyVo = new OvertimeWorkApplyVo();
+			overtimeWorkApplyVo.setOvertimeWorkApplyNum(overtimeWorkApplyService.getOvertimeWorkApplyNum(employee.getEmployeeId()));
+			overtimeWorkApplyVo.setApplyEmployeeName(employee.getEmployeeName());
+			overtimeWorkApplyVo.setApplyDateTime(new Date());
+			model.addAttribute("departmentList", departmentList);
+			model.addAttribute("codeList", codeList);
+			model.addAttribute("overtimeWorkApplyVo", overtimeWorkApplyVo);
+		}
+		return "admin/overtimeWorkApply/addovertimeWorkApply";
+	}
+	
+	
+	@RequestMapping(value = "/overtimeWorkApplyForCheck", method = RequestMethod.GET)
+	public String overtimeWorkApplyForCheck(
+			@RequestParam(required = false, defaultValue = PageConstant.DEFAULT_PAGE_START) Integer currentPage,
+			@RequestParam(required = false, defaultValue = PageConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
+			Model model) {
+		Employee employee = (Employee) SecurityUtils.getSubject().getSession().getAttribute(SessionConstant.SESSION_EMPLOYEE_KEY);
+		if (employee != null) {
+			Pager<OvertimeWorkApplyVo> page = overtimeWorkApplyService.findForCheckPage(employee.getEmployeeId(), currentPage, pageSize);
+			model.addAttribute("page", page);
+		}
+		return "admin/overtimeWorkApply/overtimeWorkApplyForCheck";
+	}
+
+}

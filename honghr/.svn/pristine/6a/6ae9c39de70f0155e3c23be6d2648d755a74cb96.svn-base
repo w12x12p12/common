@@ -1,0 +1,108 @@
+package com.hongedu.honghr.honghr.entity.vo;
+
+import com.hongedu.honghr.honghr.entity.EmployeePosition;
+
+public class EmployeePositionVo extends EmployeePosition{
+	
+	private static final long serialVersionUID = 1L;
+
+	private String employeeName;
+	
+	private String departmentName;
+	
+	private String positionName;
+	
+	private String leaderName;
+	
+	private Integer employeeId;
+	private String phoneNumber;
+	private String email;
+	private String address;
+	private String departmentId;
+	private String departmentNum;
+	
+
+	
+	public Integer getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(Integer employeeId) {
+		this.employeeId = employeeId;
+	}
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getDepartmentId() {
+		return departmentId;
+	}
+
+	public void setDepartmentId(String departmentId) {
+		this.departmentId = departmentId;
+	}
+
+	public String getDepartmentNum() {
+		return departmentNum;
+	}
+
+	public void setDepartmentNum(String departmentNum) {
+		this.departmentNum = departmentNum;
+	}
+
+	public String getEmployeeName() {
+		return employeeName;
+	}
+
+	public void setEmployeeName(String employeeName) {
+		this.employeeName = employeeName;
+	}
+
+	public String getDepartmentName() {
+		return departmentName;
+	}
+
+	public void setDepartmentName(String departmentName) {
+		this.departmentName = departmentName;
+	}
+
+	public String getPositionName() {
+		return positionName;
+	}
+
+	public void setPositionName(String positionName) {
+		this.positionName = positionName;
+	}
+
+	public String getLeaderName() {
+		return leaderName;
+	}
+
+	public void setLeaderName(String leaderName) {
+		this.leaderName = leaderName;
+	}
+	
+	
+
+}

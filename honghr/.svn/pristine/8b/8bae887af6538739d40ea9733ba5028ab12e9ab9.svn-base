@@ -1,0 +1,204 @@
+$(function(){
+	/* 点击假期种类 */
+	$(document).on("click", ".show_absence_applyType", function(){
+		var $self = $(this);
+		var applyType = $self.val();
+		var applyBeginTime = $("#startDate").val();
+		var applyEndTime = $("#endDate").val();
+		if(applyType == "101101" || applyType == "101105" || applyType == "101106" ||applyType == "101109"){
+			var result = showRemainingDuration(ctx + "/admin/absenceApply/showRemainingDuration",applyType);
+			if(result){
+				var array = [];
+				array.push("<div class='form-group");
+				if($self.parents(".form-group").hasClass("w_honghr_input")){
+					array.push(" w_honghr_input");
+				}
+				array.push(" show_remainingDuration'>");
+				array.push("<label for='disabledSelect' class='col-sm-2 control-label'><b class='z_common_star'>*</b>剩余时长</label>");
+				array.push("<div class='col-sm-10'>");
+				array.push("<input type='text' class='form-control form-control_readonly' value='" + result + "小时" + "' readonly='readonly' />");
+				array.push("</div></div>");
+				$(".show_remainingDuration").remove();
+				$self.parents(".form-group").after(array.join(""));
+				var time = getDurationTime(applyBeginTime,applyEndTime);
+				if (time && parseInt(result) < time){
+					layer.confirm("剩余休假时长不足,请重新选择", {btn: ["确定"],closeBtn: 0,},function(){
+						layer.closeAll();
+						$("#startDate").val("");
+						$("#endDate").val("");
+						$(".w_edit_applyDuration").val("0小时");
+					});
+				}
+			}
+		}else{
+			$(".show_remainingDuration").remove();
+		}
+	});
+	/* 点击添加审批人 */
+	$(document).on("click", "#showEmployee", function(){
+		$.ajax({
+			url: ctx + "/admin/absenceApply/showDepartmentList",
+			type: "GET",
+    		async: true,
+    		dataType: "JSON",
+    		success: function(departmentList){
+    			var array = [];
+    			if(departmentList){
+					array.push("<option value='-1'>请选择</option>");
+	    			$(departmentList).each(function(){
+	    				array.push("<option value='" + this.departmentNum + "'>" + this.departmentName + "</option>")
+	    			});
+    			}
+    			$(".showName").html("");
+    			$(".showDepartment").html("");
+    			$(".showName").append("<option value='-1'>请选择</option>");
+    			$(".showDepartment").append(array.join(""));
+    		},
+    		error: function(){
+				layer.msg("暂时无法获取部门",{time:1500});
+    		}
+		});
+	});
+	/* 选择审批人部门 */
+	$(".showDepartment").change(function(){
+		$.ajax({
+			url: ctx + "/admin/absenceApply/showCheckEmployeeList",
+			type: "GET",
+			async: true,
+			data: {
+				"departmentNum": $(this).val()
+			},
+			dataType: "JSON",
+			success: function(employeeList){
+				var array = [];
+				if(employeeList){
+					array.push("<option value='-1'>请选择</option>");
+					$(employeeList).each(function(){
+						array.push("<option value='" + this.employeeId + "'>" + this.employeeName + "</option>");
+					});
+				}
+				$(".showName").html("");
+				$(".showName").append(array.join(""));
+			},
+			error: function(){
+				layer.msg("暂时无法获取审批人",{time:1500});
+			}
+		});
+	});
+	/* 保存审批人 */
+	$("#save_checkEmployee").click(function(){
+		var departmentNum = $(".showDepartment").val();
+		var employeeId =  $(".showName").val();
+		if(departmentNum!="-1" && employeeId!="-1"){
+			var flag = true;
+			$(".w_checkEmployee").each(function(){
+				if($(this).attr("data") == employeeId){
+					flag = false;
+					return false;
+				}
+			});
+			if(flag){
+				$.ajax({
+					url: ctx + "/admin/absenceApply/getEmployeeById",
+					type: "GET",
+					async: true,
+					data: {
+						"employeeId": employeeId
+					},
+					dataType: "JSON",
+					success: function(employee){
+						var seq = 1;
+						var $employee = $(".w_checkEmployee");
+						if($employee.length > 0){
+							$employee.each(function(){
+								if(parseInt($(this).attr("seq")) > seq){
+									seq = parseInt($(this).attr("seq"));
+								}
+							});
+							seq++;
+						}
+						$("#showEmployee").before("<div class='w_honghr_check'><span class='w_checkEmployee' seq='" + seq + "' data='" + employee.employeeId + "'>" + seq + "." + employee.employeeName + "</span></div>");
+						if($(".w_honghr_check").length == 4){
+							$("#showEmployee").hide();
+						}
+						$("#myModal_add").modal("hide");
+					},
+					error: function(){
+						layer.msg("暂时无法添加审批人",{time:1500});
+					}
+				});
+			}else{
+				layer.msg("已添加过该审批人",{time:1500});
+			} 
+		}else{
+			layer.msg("请选择审批员工",{time:1500});
+		}
+	});
+	/* 点击删除审批人 */
+	$(document).on("click",".w_honghr_check",function(){
+		var $checkEmployee = $(this).nextAll();
+		if($checkEmployee){
+			$checkEmployee.find(".w_checkEmployee").each(function(){
+				var seq = parseInt($(this).attr("seq")) - 1;
+				var sequenceName = $(this).text();
+				var employeeName = sequenceName.substring(sequenceName.lastIndexOf("."));
+				$(this).attr("seq",seq);
+				$(this).text(seq + employeeName);
+			});
+		}
+		$(this).remove();
+		$("#showEmployee").show();
+	});
+});
+/* 添加时长 */
+function changeDuration(){
+	var applyType = $(".show_absence_applyType:checked").val();
+	var applyBeginTime = $("#startDate").val();
+	var applyEndTime = $("#endDate").val();
+	var time = getDurationTime(applyBeginTime,applyEndTime);
+	if(time){
+		$(".w_edit_applyDuration").val(parseInt(time) + "小时");
+		if(applyType && applyType == "101101" || applyType == "101105" || applyType == "101106" ||applyType == "101109"){
+			var result = showRemainingDuration(ctx + "/admin/absenceApply/showRemainingDuration",applyType);
+			if(result && parseInt(result) < time){
+				layer.confirm("剩余休假时长不足,请重新选择", {btn: ["确定"],closeBtn: 0,},function(){
+					layer.closeAll();
+					$("#startDate").val("");
+					$("#endDate").val("");
+					$(".w_edit_applyDuration").val("0小时");
+				});
+			}
+		}
+	}
+}
+
+function showRemainingDuration(url,applyType){
+	var remainingDuration = "";
+	$.ajax({
+		url: url,
+		type: "GET",
+		async: false,
+		data: {
+			"applyType": applyType
+		},
+		success: function(result){
+			if(result!="failure"){
+				remainingDuration = result;
+			}
+		},
+		error: function(){
+			layer.msg("获取数据失败",{time:1500});
+		}
+	});
+	return remainingDuration;
+}
+
+function getDurationTime(applyBeginTime,applyEndTime){
+	if(applyBeginTime && applyEndTime){
+		var msec = (new Date(applyEndTime)).getTime() - (new Date(applyBeginTime)).getTime();
+		var days = Math.floor(msec / (1000 * 60 * 60 * 24));
+		var hours = (msec % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
+		return days * 8 + hours <= days * 8 + 8 ? days * 8 + hours : days * 8 + 8;
+	}
+	return null;
+}

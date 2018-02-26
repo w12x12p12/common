@@ -1,0 +1,231 @@
+
+package com.hongedu.honghr.honghr.web;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.hongedu.honghr.util.chineseChar.ChineseInital;
+import com.hongedu.honghr.util.json.JsonResult;
+import com.hongedu.honghr.util.page.Pager;
+import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.entity.Department;
+import com.hongedu.honghr.honghr.entity.Position;
+import com.hongedu.honghr.honghr.service.DepartmentService;
+import com.hongedu.honghr.honghr.service.PositionService;
+
+
+/**
+ * @author  
+ * el_bp_position 表对应的controller
+ * 2017/12/07 04:04:41
+ */
+@Controller
+@RequestMapping("/admin/position")
+public class PositionController {
+	
+	@Autowired
+	private PositionService positionService;
+	@Autowired
+	private DepartmentService departmentService;
+	
+	/**
+	 * 查询详情
+	 * 
+	 * <p>Title: findPosition</p> 
+	 * <p>Description: </p>  
+	 * @time 下午12:01:55 
+	 * @param positionId
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/findPosition", method = RequestMethod.POST)
+	public JsonResult findPosition(@RequestParam(required = true) java.lang.Integer positionId) {
+		try {
+			Position position = positionService.findById(positionId);
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", position);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 编辑初始化数据
+	 * 
+	 * <p>Title: editPosition</p> 
+	 * <p>Description: </p>  
+	 * @time 下午12:01:24 
+	 * @param positionId
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/editPosition", method = RequestMethod.GET)
+	public String editPosition(java.lang.Integer positionId, Model model) {
+		List<Department> departmentList = departmentService.findDepartmentList();
+		List<Position> positionsList = positionService.findPositionList();
+		if (positionId != null) {
+			Position position = positionService.findById(positionId);
+			Department department = departmentService.findById(position.getDepartmentId());
+			Position positions = positionService.findByParentId(position.getPositionParentId());
+			model.addAttribute("position", position);
+			model.addAttribute("positions", positions);
+			model.addAttribute("department", department);
+		}
+		model.addAttribute("positionsList", positionsList);
+		model.addAttribute("departmentList", departmentList);
+		return "admin/position/editPosition";
+	}
+	
+	/**
+	 * 添加和修改职务
+	 * 
+	 * <p>Title: savePosition</p> 
+	 * <p>Description: </p>  
+	 * @time 下午12:00:36 
+	 * @param position
+	 * @return		  
+	 */
+	@SuppressWarnings("static-access")
+	@ResponseBody
+	@RequestMapping(value = "/savePosition", method = RequestMethod.POST)
+	public JsonResult savePosition(Position position) {
+		try {// 添加
+			ChineseInital chineseInital = new ChineseInital();
+			// 获取添加时选择的父级id
+			Integer positionParentId = position.getPositionParentId();
+			// 查询以添加时选择的父级id为positionId的职务(查询父级)
+			Position positionInfo = null;
+			if (positionParentId != null) {
+				positionInfo = positionService.findByParentId(positionParentId);
+			} else {
+				positionInfo = positionService.findMaxByParentId(DataConstant.position_top_parentId);
+			}
+			// 查询以添加时选择的父级id父级positionParentId的最大position_num
+			Position positions = positionService.findMaxByParentId(positionParentId);
+
+			if (position.getPositionId() == null) {// 添加
+				// 判断添加职务时是否选择了对应部门
+				if (position.getDepartmentId() == null) {// 不选部门默认为公司级
+					Department department = departmentService.findByNUM(DataConstant.DEPARTMENT_TOP_NUM);
+					position.setDepartmentId(department.getDepartmentId());
+				}
+				/* 判断positionParentId是否为空 */
+				if (positionParentId == null) {// positionParentId为空
+					position.setPositionParentId(DataConstant.position_top_parentId);
+					// 查询以0为positionParentId的职务的最大PositionNum
+					Position positiones = positionService.findMaxByParentId(DataConstant.position_top_parentId);
+					/* 判断最大PositionNum是否为空 */
+					if (positiones.getPositionNum() != null) {// 最大PositionNum不为空
+						Integer maxPOSNum = Integer.parseInt(positiones.getPositionNum()) + 1;
+						position.setPositionNum(String.valueOf(maxPOSNum));
+					} else {// 最大PositionNum为空,设置为1,初始化数据
+						position.setPositionNum(DataConstant.POSITION_TOP_NUM);
+					}
+				} else {// positionParentId非空
+					if (positions.getPositionNum() != null) {
+						Integer POSNum = Integer.parseInt(positions.getPositionNum()) + 1;
+						position.setPositionNum(String.valueOf(POSNum));
+					} else {
+						String POSNum = positionInfo.getPositionNum();
+						position.setPositionNum(POSNum + DataConstant.POSITION_SECOND_TOP_NUM);
+					}
+					positionInfo.setReferred(DataConstant.REFERRED);// 设置职位引用信息
+					positionService.update(positionInfo);
+				}
+				// 生成职务code
+				position.setPositionCode(chineseInital.getAllFirstLetter(position.getPositionName()));
+				// 默认设置为未被引用
+				position.setReferred(DataConstant.UNREFERRED);
+				// 默认设置为未被删除
+				position.setDeleted(DataConstant.EXIST);
+				positionService.save(position);
+				// 修改对应部门引用信息
+				Department department = departmentService.findById(position.getDepartmentId());
+				department.setReferred(DataConstant.REFERRED);
+				departmentService.update(department);
+			} else {// 修改
+				// 生成修改后的职务code
+				position.setPositionCode(chineseInital.getAllFirstLetter(position.getPositionName()));
+				positionService.update(position);
+			}
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+
+	/**
+	 * 删除职务
+	 * 
+	 * <p>Title: deletePosition</p> 
+	 * <p>Description: </p>  
+	 * @time 下午12:02:29 
+	 * @param position
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/deletePosition", method = RequestMethod.POST)
+	public JsonResult deletePosition(Position position) {
+		try {
+			Position positions = positionService.findById(position.getPositionId());
+			if (!positions.getReferred().equals(DataConstant.REFERRED)) {
+				positionService.updateDel(position);
+				return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+			} else {
+				return new JsonResult(JsonResult.FAILE_CODE, "该职务已被引用，暂时无法删除", null);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 查询  分页 模糊查询
+	 * 
+	 * <p>Title: positionList</p> 
+	 * <p>Description: </p>  
+	 * @time 下午12:02:55 
+	 * @param currentPage
+	 * @param pageSize
+	 * @param positionName
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/positionList", method = RequestMethod.GET)
+	public String positionList(
+			@RequestParam(required = false, defaultValue = DataConstant.currentPage) Integer currentPage,
+			@RequestParam(required = false, defaultValue = DataConstant.pageSize) Integer pageSize, String positionName,
+			Model model) {
+
+		String positionNames = null;
+		try {
+			if (positionName != null) {
+				positionNames = new String(positionName.replaceAll(" ", "").getBytes("ISO8859-1"), "UTF-8");
+			}
+			Pager<Position> page = positionService.findPage(positionNames, currentPage, pageSize);
+			for (int i = 0; i < page.getDataList().size(); i++) {
+				int departmentId = page.getDataList().get(i).getDepartmentId();
+				int positionParentId = page.getDataList().get(i).getPositionParentId();
+				Department department = departmentService.findDepartment(departmentId);
+				Position position = positionService.findByParentId(positionParentId);
+				page.getDataList().get(i).setDepName(department.getDepartmentName());
+				page.getDataList().get(i).setLeaderPosition(position.getPositionName());
+			}
+			model.addAttribute("page", page);
+			model.addAttribute("positionName", positionNames);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return "admin/position/positionList";
+	}
+}

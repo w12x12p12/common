@@ -1,0 +1,45 @@
+$(function(){
+	var basePath = $("#basePath").val();
+	if (window.top!=null && window.top.document.URL!=document.URL){ 
+    	window.top.location= document.URL; //这样就可以让登陆窗口显示在整个窗口了 
+    } 
+	$("#loginForm").submit(function(){
+		$.ajax({
+			url: basePath + "/admin/login/userLogin",
+		    type: "POST",
+		    async: true,
+		    data: $("#loginForm").serialize(),
+		    success: function(result){
+		    	if(result == "999999"){
+		    		layer.msg("您输入的用户名或密码有误",{time:1000});
+					return false;
+		    	}
+	    	    document.location.href=encodeURI(basePath + "/admin/login/index");
+		    },
+		    error:function(){
+		    	layer.msg("暂时无法登录",{time:1000});
+		    } 
+		});
+	    return false;
+	});
+	//点击登录
+	$("#save_btn").click(function(){
+	    if($(".login_label .username").val()!=""){
+	    	if($(".login_label .password").val()!=""){
+	    	    $("#loginForm").submit();
+	    	}else{
+	    		layer.msg("密码不能为空",{time:1000});
+	    	}
+	    }else{
+	    	layer.msg("用户名不能为空",{time:1000});
+	    }
+	});
+	//回车登录
+	$(".login_label .password").keypress(function(){
+		if(event.keyCode == 13){
+			$("#save_btn").click();
+		}
+	});
+	var h=$(window).height()-120;
+    $(".z_login_content").css("height",h+'px');
+});

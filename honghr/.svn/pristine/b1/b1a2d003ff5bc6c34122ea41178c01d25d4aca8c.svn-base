@@ -1,0 +1,92 @@
+package com.hongedu.honghr.honghr.entity;
+
+import java.io.Serializable;
+
+import com.hongedu.honghr.base.entity.BaseEntity;
+import com.hongedu.honghr.base.dao.annotation.Table;
+/**
+ * @author  
+ * el_bp_attachment 表对应实体
+ * 2017/12/07 04:00:56
+ */
+@Table(name="el_bp_attachment", pk="attachmentId")
+public class Attachment extends BaseEntity implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	/***/
+	private java.lang.Integer attachmentId;
+	/***/
+	private java.lang.String attachmentName;
+	/***/
+	private java.lang.String attachmentDir;
+	/***/
+	private java.lang.String attachmentUrl;
+	/***/
+	private java.lang.String attachmentSize;
+	/***/
+	private java.lang.String attachmentSuffix;
+	/***/
+	private java.lang.Integer absenceApplyId;
+	/***/
+	private java.lang.String deleted;
+	
+	public void setAttachmentId(java.lang.Integer value) {
+		this.attachmentId = value;
+	}
+	
+	public java.lang.Integer getAttachmentId() {
+		return attachmentId;
+	}
+	public void setAttachmentName(java.lang.String value) {
+		this.attachmentName = value;
+	}
+	
+	public java.lang.String getAttachmentName() {
+		return attachmentName;
+	}
+	public void setAttachmentDir(java.lang.String value) {
+		this.attachmentDir = value;
+	}
+	
+	public java.lang.String getAttachmentDir() {
+		return attachmentDir;
+	}
+	public void setAttachmentUrl(java.lang.String value) {
+		this.attachmentUrl = value;
+	}
+	
+	public java.lang.String getAttachmentUrl() {
+		return attachmentUrl;
+	}
+	public void setAttachmentSize(java.lang.String value) {
+		this.attachmentSize = value;
+	}
+	
+	public java.lang.String getAttachmentSize() {
+		return attachmentSize;
+	}
+	public void setAttachmentSuffix(java.lang.String value) {
+		this.attachmentSuffix = value;
+	}
+	
+	public java.lang.String getAttachmentSuffix() {
+		return attachmentSuffix;
+	}
+	public void setAbsenceApplyId(java.lang.Integer value) {
+		this.absenceApplyId = value;
+	}
+	
+	public java.lang.Integer getAbsenceApplyId() {
+		return absenceApplyId;
+	}
+	public void setDeleted(java.lang.String value) {
+		this.deleted = value;
+	}
+	
+	public java.lang.String getDeleted() {
+		return deleted;
+	}
+}
+
+

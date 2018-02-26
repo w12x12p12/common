@@ -1,0 +1,120 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+
+<script src="${ctx }/resources/js/admin/employee/employee.js"></script>
+<link rel="stylesheet" href="${ctx}/resources/js/common/jQueryValidate/css/validationEngine.jquery.css">
+<script src="${ctx}/resources/js/common/jQueryValidate/js/jquery.validationEngine.js"></script>
+<script src="${ctx}/resources/js/common/jQueryValidate/js/jquery.validationEngine-zh_CN.js"></script>
+<form class="form-inline" role="form">
+	<div class="form-group btn-group-sm z_margin_tb">
+		<label class="sr-only" for="name">查询条件</label> <input type="text"
+			name="employeeName" value="${employeeName }"
+			class="form-control input-sm" id="" placeholder="请输入员工姓名进行查询">
+		<button type="submit" class="btn btn-default">
+			<span class="glyphicon glyphicon-search" aria-hidden="true"></span>查询
+		</button>
+	</div>
+	<ul class="nav nav-list">
+		<li class="divider"></li>
+	</ul>
+	<div class="form-group  btn-group-sm" role="group" aria-label="...">
+		<button type="button" class="btn btn-default"
+			onclick="Employee.showEdit();">
+			<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+		</button>
+	</div>
+	<div class="table-responsive w_cee_table">
+		<table class="table table-striped w_cee_table">
+			<thead>
+				<tr>
+					<th>序号</th>
+					<th>用户名</th>
+					<th>姓名</th>
+					<th>性别</th>
+					<th>出生日期</th>
+					<th>年龄(周岁)</th>
+					<th>籍贯</th>
+					<th>身份证号码</th>
+					<th>学历</th>
+					<th>参加工作时间</th>
+					<th>工作年限(年)</th>
+					<th>入职时间</th>
+					<th>入职时长(年)</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<c:forEach var="entity" items="${page.dataList}" varStatus="status">
+					<tr>
+						<td>${status.index+1 + (page.currentPage-1)*page.pageSize }</td>
+						<td>${entity.username}</td>
+						<td>${entity.employeeName}</td>
+						<td><c:if test="${entity.gender=='1'}">男</c:if> <c:if
+								test="${entity.gender=='0'}">女</c:if></td>
+						<td><fmt:formatDate type="both" pattern="yyyy-MM-dd"
+								value="${entity.birthday}" /></td>
+						<td>${entity.age }</td>
+						<td>${entity.nation}</td>
+						<td>${entity.idcard}</td>
+						<td><c:if test="${entity.education=='1'}">小学</c:if> <c:if
+								test="${entity.education=='2'}">初中</c:if> <c:if
+								test="${entity.education=='3'}">高中</c:if> <c:if
+								test="${entity.education=='4'}">大专</c:if> <c:if
+								test="${entity.education=='5'}">本科</c:if> <c:if
+								test="${entity.education=='6'}">硕士</c:if> <c:if
+								test="${entity.education=='7'}">博士</c:if> <c:if
+								test="${entity.education=='8'}">博士后</c:if></td>
+						<td><fmt:formatDate type="both" pattern="yyyy-MM-dd"
+								value="${entity.workBeginTime}" /></td>
+						<td>${entity.workYear }</td>
+						<td><fmt:formatDate type="both" pattern="yyyy-MM-dd"
+								value="${entity.entryTime}" /></td>
+						<td>${entity.entryLength }</td>
+						<td align="center"><c:if test="${entity.forbided eq '1' }">
+								<button type="button" class="btn btn-default btn-sm"
+									onclick="Employee.isForbided('${entity.employeeId}','0');">
+									<span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>禁用
+								</button>
+							</c:if> <c:if test="${entity.forbided eq '0' }">
+								<button type="button" class="btn btn-default btn-sm"
+									onclick="Employee.isForbided('${entity.employeeId}','1');">
+									<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>启用
+								</button>
+							</c:if>
+							<button type="button" class="btn btn-default btn-sm"
+								onclick="Employee.showEdit('${entity.employeeId}');">
+								<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>编辑
+							</button>
+							<button type="button" class="btn btn-default  btn-sm btn-danger"
+								onclick="Employee.deleteData('${entity.employeeId}');">
+								<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>删除
+							</button></td>
+					</tr>
+				</c:forEach>
+			</tbody>
+		</table>
+		<!-- 分页区域 -->
+		<jsp:include page="/WEB-INF/jsp/common/page.jsp"></jsp:include>
+	</div>
+</form>
+<script>
+//时间控件
+$("#date01").jeDate({
+    isinitVal:false,
+    //festival:true,
+    ishmsVal:false,
+    minDate: '1920-01-01',
+    maxDate: $.nowDate({DD:0}),
+    format:"YYYY-MM-DD",
+    zIndex:3000
+}) 
+//性别单选
+$('.d_settings_radio').click(function(){
+    $(this).addClass('active').siblings().removeClass('active');
+    $(this).siblings().find(".gender").removeAttr("checked");
+    $(this).find(".gender").attr("checked",true);
+    $(this).find('input').click();
+})
+</script>

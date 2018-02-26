@@ -1,0 +1,138 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.entity.OvertimeWorkApply;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+
+/**
+ * @author  
+ * el_bp_overtime_work_apply 表对应业务实现对象
+ * 2017/12/07 04:00:57
+ */
+@Transactional
+@Service
+public class OvertimeWorkApplyService{
+	
+	@Autowired
+	private BaseDaoImpl<OvertimeWorkApply> overtimeWorkApplyDao;
+	
+	/**
+	 * 根据主键查询OvertimeWorkApply对象
+	 * @param id
+	 * @return
+	 */
+	public OvertimeWorkApply findById (Serializable id){
+		OvertimeWorkApply entity = overtimeWorkApplyDao.findById(OvertimeWorkApply.class, id);
+		return entity;
+	}
+	
+	/**
+	 * 插入OvertimeWorkApply对象
+	 * @param entity
+	 */
+	public void save (OvertimeWorkApply entity){
+		overtimeWorkApplyDao.save(entity);
+	}
+	
+	/**
+	 * 修改OvertimeWorkApply对象
+	 * @param entity
+	 */
+	public void update (OvertimeWorkApply entity){
+		overtimeWorkApplyDao.update(entity);
+	}
+	
+	/**
+	 * 删除OvertimeWorkApply对象
+	 * @param id
+	 */
+	public void delete (Serializable id){
+		overtimeWorkApplyDao.delete(OvertimeWorkApply.class, id);
+	}
+	
+	/**
+	 * 根据sql查询OvertimeWorkApply对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return OvertimeWorkApply对象集合
+	 */
+	public List<OvertimeWorkApply> findListBySql(int currentPage, int pageSize){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select OvertimeWorkApply.* from OvertimeWorkApply");
+		List<OvertimeWorkApply> list = overtimeWorkApplyDao.findListBySql(OvertimeWorkApply.class, sql.toString(), currentPage, pageSize);	
+		return list;
+	}
+	
+	/**
+	 * 根据sql查询OvertimeWorkApply集合数量
+	 * @return OvertimeWorkApply集合数量
+	 */
+	public int findCountBySql(){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select count(1) from overtime_work_apply");
+		int count = overtimeWorkApplyDao.findCountBySql(sql.toString());	
+		return count;
+	}
+	
+	/**
+	 * 根据sql查询OvertimeWorkApply分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return OvertimeWorkApply分页对象
+	 */
+	public Pager<OvertimeWorkApply> findPageBySql(int currentPage, int pageSize){
+		int totalRecord = findCountBySql();	
+		Pager<OvertimeWorkApply> pager = new Pager<OvertimeWorkApply>(currentPage, pageSize, totalRecord);
+		List<OvertimeWorkApply> dataList = findListBySql(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+	
+	/**
+	 * 根据表达式查询OvertimeWorkApply对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return OvertimeWorkApply对象集合
+	 */
+	public List<OvertimeWorkApply> findList(int currentPage, int pageSize){
+		List<Exp> expList = new ArrayList<Exp>();
+		List<OvertimeWorkApply> OvertimeWorkApplyList = overtimeWorkApplyDao.findList(OvertimeWorkApply.class, expList, currentPage, pageSize);	
+		return OvertimeWorkApplyList;
+	}
+	
+	/**
+	 * 根据表达式查询OvertimeWorkApply集合数量
+	 * @return OvertimeWorkApply集合数量
+	 */
+	public int findCount(){
+		List<Exp> expList = new ArrayList<Exp>();
+		int count = overtimeWorkApplyDao.findCount(OvertimeWorkApply.class, expList);	
+		return count;
+	}
+	
+	/**
+	 * 根据表达式查询OvertimeWorkApply分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return OvertimeWorkApply分页对象
+	 */
+	public Pager<OvertimeWorkApply> findPage(int currentPage, int pageSize){
+		int totalRecord = findCount();	
+		Pager<OvertimeWorkApply> pager = new Pager<OvertimeWorkApply>(currentPage, pageSize, totalRecord);
+		List<OvertimeWorkApply> dataList = findList(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+}
+
+

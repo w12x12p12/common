@@ -1,0 +1,240 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+
+<script src="${ctx }/resources/js/admin/employee/employee.js"></script>
+<link rel="stylesheet" href="${ctx}/resources/js/common/jQueryValidate/css/validationEngine.jquery.css">
+<script src="${ctx}/resources/js/common/jQueryValidate/js/jquery.validationEngine.js"></script>
+<script src="${ctx}/resources/js/common/jQueryValidate/js/jquery.validationEngine-zh_CN.js"></script> 
+	<form class="form-inline" role="form">
+		<div class="form-group btn-group-sm z_margin_tb">
+			<label class="sr-only" for="name">查询条件</label> 
+			<input type="text" name="employeeName" value="${employeeName }" class="form-control input-sm" id="" placeholder="请输入员工姓名进行查询">
+			<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>查询</button>
+		</div>
+		<ul class="nav nav-list"> <li class="divider"></li> </ul>
+		<div class="form-group  btn-group-sm" role="group" aria-label="...">
+		  <button type="button" class="btn btn-default" onclick="Employee.showEdit();"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增</button>
+		</div>
+		
+		<div class="table-responsive">
+			<table class="table table-striped w_cee_table">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>用户名</th>
+						<th>姓名</th>
+						<th>性别</th>
+						<th>出生日期</th>
+						<th>籍贯</th>
+						<th>联系地址</th>
+						<th>手机</th>
+						<th>邮箱</th>
+						<th>身份证号码</th>
+						<th>学历</th>
+						<th>参加工作时间</th>
+						<th>入职时间</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="entity" items="${page.dataList}" varStatus="status">
+						<tr>
+							<td>${status.index+1 + (page.currentPage-1)*page.pageSize }</td>
+							<td>${entity.username}</td>
+							<td>${entity.employeeName}</td>
+							<td>
+								<c:if test="${entity.gender=='1'}">男</c:if>
+								<c:if test="${entity.gender=='0'}">女</c:if>
+							</td>
+							<td><fmt:formatDate type="both" pattern="yyyy-MM-dd" value="${entity.birthday}" /></td>
+							<td>${entity.nation}</td>
+							<td>${entity.address}</td>
+							<td>${entity.phoneNumber}</td>
+							<td>${entity.email}</td>
+							<td>${entity.idcard}</td>
+							<td>
+								<c:if test="${entity.education=='1'}">小学</c:if>
+								<c:if test="${entity.education=='2'}">初中</c:if>
+								<c:if test="${entity.education=='3'}">高中</c:if>
+								<c:if test="${entity.education=='4'}">大专</c:if>
+								<c:if test="${entity.education=='5'}">本科</c:if>
+								<c:if test="${entity.education=='6'}">硕士</c:if>
+								<c:if test="${entity.education=='7'}">博士</c:if>
+								<c:if test="${entity.education=='8'}">博士后</c:if>
+							</td>
+							<td><fmt:formatDate type="both" pattern="yyyy-MM-dd" value="${entity.workBeginTime}" /></td>
+							<td><fmt:formatDate type="both" pattern="yyyy-MM-dd" value="${entity.entryTime}" /></td>
+							<td>
+							<c:if test="${entity.forbided eq '1' }">
+								<button type="button" class="btn btn-default btn-sm" onclick="Employee.isForbided('${entity.employeeId}','0');">禁用</button>
+							</c:if>
+							<c:if test="${entity.forbided eq '0' }">
+								<button type="button" class="btn btn-default btn-sm" onclick="Employee.isForbided('${entity.employeeId}','1');">启用</button>
+							</c:if>
+							<button type="button" class="btn btn-default btn-sm" onclick="Employee.showEdit('${entity.employeeId}');">
+							  <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>编辑
+							</button>
+							<button type="button" class="btn btn-default  btn-sm btn-danger" onclick="Employee.deleteData('${entity.employeeId}');">
+							  <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>删除
+							</button>
+							</td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+ 			<!-- 分页区域 -->
+			<jsp:include page="/WEB-INF/jsp/common/page.jsp"></jsp:include>
+		</div>
+	</form>
+
+
+	<!-- 弹出框 -->
+	<div class="modal" id="editModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">编辑用户</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal" role="form" id="editForm">
+						<input name="employeeId" type="hidden" ></input>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>用户名</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="username" type="text" placeholder="请输入用户名" maxlength="10"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>密码</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="password" type="text" placeholder="请设置密码" maxlength="20"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>姓名</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="employeeName" type="text" placeholder="请输入真实姓名" maxlength="10"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star"></b>性别</label>
+							<!-- <div class="col-sm-10">
+								<input class="form-control validate[required]"  name="gender" type="text" placeholder="请输入100字以内字符" maxlength="100"></input>
+							</div> -->
+							<div class="col-sm-10">
+<!-- 							    <label class="d_settings_radio" for="man"> -->
+							    <input type="radio"  name="gender" value="1" />男
+<!-- 							    </label> -->
+<!-- 			                    <label class="d_settings_radio" for="woman"> -->
+			                    <input type="radio"  name="gender" value="0" />女
+<!-- 			                    </label> -->
+						   </div>
+						</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><b
+							class="z_common_star"></b>出生日期</label>
+						<div class="col-sm-10">
+							<input class="form-control w_date_input" name="birthday"
+								type="text" placeholder="请选择出生日期" maxlength="100"
+								onFocus="WdatePicker({onpicked:function(){endDate.focus();},dateFmt:'yyyy-MM-dd',isShowClear:false})"
+								readonly="readonly"
+								 />
+						</div>
+					</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star"></b>籍贯</label>
+							<div class="col-sm-10">
+								<input class="form-control"  name="nation" type="text" placeholder="请输入籍贯" maxlength="50"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>地址</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="address" type="text" placeholder="请输入联系地址" maxlength="50"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>手机</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="phoneNumber" type="text" placeholder="请输入手机号码" maxlength="11"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star"></b>邮箱</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="email" type="text" placeholder="请输入邮箱" maxlength="30"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>身份证号</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="idcard" type="text" placeholder="请输入身份证号码" maxlength="20"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star"></b>学历</label>
+							<div class="col-sm-10">
+							<select name="education" class="form-control input-sm w_overtime_type" id="select_k1" class="xla_k">
+							    <option>请选择学历</option>
+								<option value="1">小学</option>
+								<option value="2">初中</option>
+								<option value="3">高中</option>
+								<option value="4">大专</option>
+								<option value="5">本科</option>
+								<option value="6">硕士</option>
+								<option value="7">博士</option>
+								<option value="8">博士后</option>
+			   				 </select>
+							
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label"><b class="z_common_star">*</b>参加工作时间：</label>
+							<div class="col-sm-10">
+								<input class="form-control w_date_input" name="workBeginTime" type="text"  placeholder="请选择参加工作时间" maxlength="100" onFocus="WdatePicker({onpicked:function(){endDate.focus();},dateFmt:'yyyy-MM-dd',isShowClear:false})" readonly="readonly" value="<fmt:formatDate type="both" value="${employeePo.workBeginTime}" pattern="yyyy-MM-dd"/>"/>
+							</div>
+					    </div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label"><b class="z_common_star">*</b>入职时间：</label>
+							<div class="col-sm-10">
+								<input class="form-control w_date_input" name="entryTime" type="text" placeholder="请选择入职时间" maxlength="100" onFocus="WdatePicker({onpicked:function(){endDate.focus();},dateFmt:'yyyy-MM-dd',isShowClear:false})" readonly="readonly" value="<fmt:formatDate type="both" value="${employeePo.entryTime}" pattern="yyyy-MM-dd"/>"/>
+							</div>
+					    </div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" id="save_btn">保存</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+//时间控件
+$("#date01").jeDate({
+    isinitVal:false,
+    //festival:true,
+    ishmsVal:false,
+    minDate: '1920-01-01',
+    maxDate: $.nowDate({DD:0}),
+    format:"YYYY-MM-DD",
+    zIndex:3000
+}) 
+//默认日期
+
+//性别单选
+$('.d_settings_radio').click(function(){
+    $(this).addClass('active').siblings().removeClass('active');
+    $(this).siblings().find(".gender").removeAttr("checked");
+    $(this).find(".gender").attr("checked",true);
+    $(this).find('input').click();
+})
+</script>

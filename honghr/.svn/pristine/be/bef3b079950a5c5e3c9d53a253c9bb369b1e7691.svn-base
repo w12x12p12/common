@@ -1,0 +1,103 @@
+package com.hongedu.honghr.honghr.entity.vo;
+
+import java.util.List;
+
+import com.hongedu.honghr.honghr.entity.BusinessTripApply;
+import com.hongedu.honghr.honghr.entity.BusinessTripApplyCheck;
+
+public class BusinessTripApplyVo extends BusinessTripApply {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private String applyEmployeeName;
+	
+	private String applyDepartmentName;
+	
+	private String applyTypeShow;
+	
+	private String applyBeginProvinceName;
+	
+	private String applyBeginAddressName;
+	
+	private String applyEndProvinceName;
+	
+	private String applyEndAddressName;
+	
+	private String applyCheckStatusShow;
+
+	private List<BusinessTripApplyCheck> businessTripApplyChecks;
+
+	public String getApplyEmployeeName() {
+		return applyEmployeeName;
+	}
+
+	public void setApplyEmployeeName(String applyEmployeeName) {
+		this.applyEmployeeName = applyEmployeeName;
+	}
+
+	public String getApplyDepartmentName() {
+		return applyDepartmentName;
+	}
+
+	public void setApplyDepartmentName(String applyDepartmentName) {
+		this.applyDepartmentName = applyDepartmentName;
+	}
+	
+	public String getApplyTypeShow() {
+		return applyTypeShow;
+	}
+
+	public void setApplyTypeShow(String applyTypeShow) {
+		this.applyTypeShow = applyTypeShow;
+	}
+
+	public String getApplyBeginProvinceName() {
+		return applyBeginProvinceName;
+	}
+
+	public void setApplyBeginProvinceName(String applyBeginProvinceName) {
+		this.applyBeginProvinceName = applyBeginProvinceName;
+	}
+
+	public String getApplyBeginAddressName() {
+		return applyBeginAddressName;
+	}
+	
+	public void setApplyBeginAddressName(String applyBeginAddressName) {
+		this.applyBeginAddressName = applyBeginAddressName;
+	}
+
+	public String getApplyEndProvinceName() {
+		return applyEndProvinceName;
+	}
+
+	public void setApplyEndProvinceName(String applyEndProvinceName) {
+		this.applyEndProvinceName = applyEndProvinceName;
+	}
+
+	public String getApplyEndAddressName() {
+		return applyEndAddressName;
+	}
+
+	public void setApplyEndAddressName(String applyEndAddressName) {
+		this.applyEndAddressName = applyEndAddressName;
+	}
+
+	public String getApplyCheckStatusShow() {
+		return applyCheckStatusShow;
+	}
+
+	public void setApplyCheckStatusShow(String applyCheckStatusShow) {
+		this.applyCheckStatusShow = applyCheckStatusShow;
+	}
+
+	public List<BusinessTripApplyCheck> getBusinessTripApplyChecks() {
+		return businessTripApplyChecks;
+	}
+
+	public void setBusinessTripApplyChecks(List<BusinessTripApplyCheck> businessTripApplyChecks) {
+		this.businessTripApplyChecks = businessTripApplyChecks;
+	}
+}

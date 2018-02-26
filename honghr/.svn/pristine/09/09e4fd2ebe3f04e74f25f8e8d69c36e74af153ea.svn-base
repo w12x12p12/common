@@ -1,0 +1,33 @@
+package com.hongedu.honghr.honghr.entity.vo;
+
+import java.util.List;
+
+import com.hongedu.honghr.honghr.entity.BusinessTripApply;
+import com.hongedu.honghr.honghr.entity.BusinessTripApplyCheck;
+
+public class BusinessTripApplyVo extends BusinessTripApply {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private String applyEmployeeName;
+
+	private List<BusinessTripApplyCheck> businessTripApplyChecks;
+
+	public String getApplyEmployeeName() {
+		return applyEmployeeName;
+	}
+
+	public void setApplyEmployeeName(String applyEmployeeName) {
+		this.applyEmployeeName = applyEmployeeName;
+	}
+
+	public List<BusinessTripApplyCheck> getBusinessTripApplyChecks() {
+		return businessTripApplyChecks;
+	}
+
+	public void setBusinessTripApplyChecks(List<BusinessTripApplyCheck> businessTripApplyChecks) {
+		this.businessTripApplyChecks = businessTripApplyChecks;
+	}
+}

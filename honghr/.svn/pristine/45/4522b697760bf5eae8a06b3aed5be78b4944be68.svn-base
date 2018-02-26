@@ -1,0 +1,83 @@
+package com.hongedu.honghr.honghr.entity;
+
+import java.io.Serializable;
+
+import com.hongedu.honghr.base.entity.BaseEntity;
+import com.hongedu.honghr.base.dao.annotation.Table;
+/**
+ * @author  
+ * el_bp_business_trip_apply_check 表对应实体
+ * 2017/12/07 04:00:57
+ */
+@Table(name="business_trip_apply_check", pk="businessTripApplyCheckId")
+public class BusinessTripApplyCheck extends BaseEntity implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	/***/
+	private java.lang.Integer businessTripApplyCheckId;
+	/***/
+	private java.lang.Integer businessTripApplyId;
+	/***/
+	private java.lang.Integer checkEmployeeId;
+	/***/
+	private java.util.Date applyCheckTime;
+	/***/
+	private java.lang.String applyIsAllowed;
+	/***/
+	private java.lang.String applyCheckSuggest;
+	/***/
+	private java.lang.String deleted;
+	
+	public void setBusinessTripApplyCheckId(java.lang.Integer value) {
+		this.businessTripApplyCheckId = value;
+	}
+	
+	public java.lang.Integer getBusinessTripApplyCheckId() {
+		return businessTripApplyCheckId;
+	}
+	public void setBusinessTripApplyId(java.lang.Integer value) {
+		this.businessTripApplyId = value;
+	}
+	
+	public java.lang.Integer getBusinessTripApplyId() {
+		return businessTripApplyId;
+	}
+	public void setCheckEmployeeId(java.lang.Integer value) {
+		this.checkEmployeeId = value;
+	}
+	
+	public java.lang.Integer getCheckEmployeeId() {
+		return checkEmployeeId;
+	}
+	public void setApplyCheckTime(java.util.Date value) {
+		this.applyCheckTime = value;
+	}
+	
+	public java.util.Date getApplyCheckTime() {
+		return applyCheckTime;
+	}
+	public void setApplyIsAllowed(java.lang.String value) {
+		this.applyIsAllowed = value;
+	}
+	
+	public java.lang.String getApplyIsAllowed() {
+		return applyIsAllowed;
+	}
+	public void setApplyCheckSuggest(java.lang.String value) {
+		this.applyCheckSuggest = value;
+	}
+	
+	public java.lang.String getApplyCheckSuggest() {
+		return applyCheckSuggest;
+	}
+	public void setDeleted(java.lang.String value) {
+		this.deleted = value;
+	}
+	
+	public java.lang.String getDeleted() {
+		return deleted;
+	}
+}
+
+

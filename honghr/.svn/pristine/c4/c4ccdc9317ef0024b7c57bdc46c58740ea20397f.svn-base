@@ -1,0 +1,48 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+<script src="${ctx }/resources/js/admin/employee/employee.js"></script>
+<form class="form-inline" role="form">
+	<div class="form-group btn-group-sm z_margin_tb">
+		<label class="sr-only" for="name">查询条件</label> 
+		<input type="text" name="employeeName" value="${employeeName}"
+			class="form-control input-sm" id="" placeholder="请输入员工姓名进行查询">
+		<button type="submit" class="btn btn-default">
+			<span class="glyphicon glyphicon-search" aria-hidden="true"></span>查询
+		</button>
+	</div>
+	<ul class="nav nav-list">
+		<li class="divider"></li>
+	</ul>
+	<div class="table-responsive">
+		<table class="table table-striped w_cee_table">
+			<thead>
+				<tr>
+					<th>序号</th>
+					<th>姓名</th>
+					<th>职务</th>
+					<th>部门</th>
+					<th>通信地址</th>
+					<th>手机号</th>
+					<th>邮箱</th>
+				</tr>
+			</thead>
+			<tbody>
+				<c:forEach var="entity" items="${page.dataList}" varStatus="status">
+					<tr>
+						<td>${status.index+1 + (page.currentPage-1)*page.pageSize }</td>
+						<td>${entity.employeeName}</td>
+						<td>${entity.positionName}</td>
+						<td>${entity.departmentName}</td>
+						<td>${entity.address}</td>
+						<td>${entity.phoneNumber}</td>
+						<td>${entity.email}</td>
+					</tr>
+				</c:forEach>
+			</tbody>
+		</table>
+		<!-- 分页区域 -->
+		<jsp:include page="/WEB-INF/jsp/common/page.jsp"></jsp:include>
+	</div>
+</form>

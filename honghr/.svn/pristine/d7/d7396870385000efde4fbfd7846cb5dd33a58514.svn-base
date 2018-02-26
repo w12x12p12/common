@@ -1,0 +1,5 @@
+package com.hongedu.honghr.honghr.common.constant;
+
+public class CodeConstant {
+	public static final Integer ABSENCE_APPLY_TYPE_MENU = 1;
+}

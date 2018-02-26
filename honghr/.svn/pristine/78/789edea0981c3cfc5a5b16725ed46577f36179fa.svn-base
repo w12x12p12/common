@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>加班申请</title>
+</head>
+<body>
+	<script type="text/javascript" src="${ctx}/resources/js/admin/overtimeWorkApply/overtimeWorkApplyCommon.js"></script>
+	<script type="text/javascript" src="${ctx}/resources/js/admin/overtimeWorkApply/addovertimeWorkApply.js"></script>
+	<form id="applyForm" class="mainForm">
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班单编号</label>
+		<div class="col-sm-10">
+			<input class="form-control form-control_readonly" type="text" name="overtimeWorkApplyNum" value="${overtimeWorkApplyVo.overtimeWorkApplyNum}" maxlength="100" readonly="readonly"/>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班人</label>
+		<div class="col-sm-10">
+			<input class="form-control form-control_readonly" type="text" name="applyEmployeeName" value="${overtimeWorkApplyVo.applyEmployeeName}" maxlength="100" readonly="readonly"/>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>所属部门</label>
+		<div class="col-sm-10">
+			<c:choose>
+				<c:when test="${fn:length(departmentList) > 1}">
+					<select name="applyDepartmentNum" class="form-control input-sm">
+						<c:forEach items="${departmentList}" var="department">
+							<option value="${department.departmentNum}">${department.departmentName}</option>
+						</c:forEach>
+					</select>
+				</c:when>
+				<c:otherwise>
+					<input class="form-control form-control_readonly" type="text" value="${departmentList[0].departmentName}" maxlength="100" readonly="readonly"/>
+					<input type="hidden" name="applyDepartmentNum" value="${departmentList[0].departmentNum}" />
+				</c:otherwise>
+			</c:choose>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班性质</label>
+		<div class="col-sm-10">
+			<c:forEach items="${codeList}" var="code">
+				<label class="w_honghr_radio_label" title="${code.codeName}">
+					<input type="radio" name="applyType" class="w_honghr_radio show_overtime_applyType" value="${code.codeValue}" />${code.codeName}
+				</label>
+			</c:forEach>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input w_edit_textArea clearfix">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班原因</label>
+		<div class="col-sm-10">
+			<textarea class="form-control w_honghr_textArea w_edit_applyReason" name="applyReason" placeholder="请输入加班原因"></textarea>
+		</div>
+	</div>
+		<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班开始时间</label>
+		<div class="col-sm-10">
+			<input id="startDate" name="applyBeginTime" class="form-control w_date_input" type="text" placeholder="请输入开始时间" maxlength="100" onFocus="var endDate=$dp.$('endDate');WdatePicker({onpicked:function(){endDate.focus();},dateFmt:'yyyy-MM-dd H:00',isShowClear:false,maxDate:'#F{$dp.$D(\'endDate\',{d:0})}'})" onchange="changeDuration();" readonly="readonly"/>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班结束时间</label>
+		<div class="col-sm-10">
+			<input id="endDate" name="applyEndTime" class="form-control w_date_input" type="text" placeholder="请输入结束时间" maxlength="100" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'startDate\',{d:0})}',dateFmt:'yyyy-MM-dd H:00',isShowClear:false})" onchange="changeDuration();" readonly="readonly"/>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班时长</label>
+		<div class="col-sm-10">
+			<input type="text" class="form-control form-control_readonly w_edit_applyDuration" value="0小时" readonly="readonly" />
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>申请日期</label>
+		<div class="col-sm-10">
+			<input class="form-control form-control_readonly" name="applyDateTime" type="text"  maxlength="100" value="<fmt:formatDate type="both" value="${overtimeWorkApplyVo.applyDateTime}" pattern="yyyy-MM-dd" />" readonly="readonly"/>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>审批人流程</label>
+		<div class="col-sm-10">
+			<button type="button" id="showEmployee" class="btn btn-default" data-toggle="modal" data-target="#myModal_add">+添加</button>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班说明</label>
+		<div class="col-sm-10 w_honghr_tips">
+			<p>1.加班时间以2小时为基准，以1小时为进制，并以实际打卡时间为准。</p>
+			<p>2.工作日加班，加班计时时间从下班一小时后开始。</p>
+			<p>3.周末及节假日加班以实际打卡时间为准，但应扣除相应的就餐时间（按每餐1小时计）。</p>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-default save_form" id="save_default">保存草稿</button>
+		<button type="button" class="btn btn-primary save_form" id="save_submit">提交审批</button>
+	</div>
+	</form>
+	<!-- 模态框（Modal） -->
+	<div class="modal fade d_model_box" id="myModal_add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"   data-backdrop="static">
+	    <div class="modal-dialog">
+	        <div class="modal-content">
+	        	<div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+	                	&times;
+	                </button>
+	            </div>
+	            <div class="modal-body">
+	           		<div class="form-group w_honghr_input">
+						<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>部门名称</label>
+						<div class="col-sm-10">
+							<select class="form-control input-sm showDepartment">
+								<option class="defaultChoice" value="-1">请选择</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group w_honghr_input">
+						<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>员工姓名</label>
+						<div class="col-sm-10">
+							<select class="form-control input-sm showName">
+								<option class="defaultChoice" value="-1">请选择</option>
+							</select>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-dismiss="modal" id="save_checkEmployee">保存</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					</div>
+				</div>
+	        </div><!-- /.modal-content -->
+	    </div><!-- /.modal -->
+	</div>
+</body>
+</html>

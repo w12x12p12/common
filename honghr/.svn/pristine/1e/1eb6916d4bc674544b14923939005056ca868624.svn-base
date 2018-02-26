@@ -1,0 +1,138 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.entity.BusinessTripApply;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+
+/**
+ * @author  
+ * el_bp_business_trip_apply 表对应业务实现对象
+ * 2017/12/07 04:00:56
+ */
+@Transactional
+@Service
+public class BusinessTripApplyService{
+	
+	@Autowired
+	private BaseDaoImpl<BusinessTripApply> businessTripApplyDao;
+	
+	/**
+	 * 根据主键查询BusinessTripApply对象
+	 * @param id
+	 * @return
+	 */
+	public BusinessTripApply findById (Serializable id){
+		BusinessTripApply entity = businessTripApplyDao.findById(BusinessTripApply.class, id);
+		return entity;
+	}
+	
+	/**
+	 * 插入BusinessTripApply对象
+	 * @param entity
+	 */
+	public void save (BusinessTripApply entity){
+		businessTripApplyDao.save(entity);
+	}
+	
+	/**
+	 * 修改BusinessTripApply对象
+	 * @param entity
+	 */
+	public void update (BusinessTripApply entity){
+		businessTripApplyDao.update(entity);
+	}
+	
+	/**
+	 * 删除BusinessTripApply对象
+	 * @param id
+	 */
+	public void delete (Serializable id){
+		businessTripApplyDao.delete(BusinessTripApply.class, id);
+	}
+	
+	/**
+	 * 根据sql查询BusinessTripApply对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return BusinessTripApply对象集合
+	 */
+	public List<BusinessTripApply> findListBySql(int currentPage, int pageSize){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select BusinessTripApply.* from BusinessTripApply");
+		List<BusinessTripApply> list = businessTripApplyDao.findListBySql(BusinessTripApply.class, sql.toString(), currentPage, pageSize);	
+		return list;
+	}
+	
+	/**
+	 * 根据sql查询BusinessTripApply集合数量
+	 * @return BusinessTripApply集合数量
+	 */
+	public int findCountBySql(){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select count(1) from business_trip_apply");
+		int count = businessTripApplyDao.findCountBySql(sql.toString());	
+		return count;
+	}
+	
+	/**
+	 * 根据sql查询BusinessTripApply分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return BusinessTripApply分页对象
+	 */
+	public Pager<BusinessTripApply> findPageBySql(int currentPage, int pageSize){
+		int totalRecord = findCountBySql();	
+		Pager<BusinessTripApply> pager = new Pager<BusinessTripApply>(currentPage, pageSize, totalRecord);
+		List<BusinessTripApply> dataList = findListBySql(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+	
+	/**
+	 * 根据表达式查询BusinessTripApply对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return BusinessTripApply对象集合
+	 */
+	public List<BusinessTripApply> findList(int currentPage, int pageSize){
+		List<Exp> expList = new ArrayList<Exp>();
+		List<BusinessTripApply> BusinessTripApplyList = businessTripApplyDao.findList(BusinessTripApply.class, expList, currentPage, pageSize);	
+		return BusinessTripApplyList;
+	}
+	
+	/**
+	 * 根据表达式查询BusinessTripApply集合数量
+	 * @return BusinessTripApply集合数量
+	 */
+	public int findCount(){
+		List<Exp> expList = new ArrayList<Exp>();
+		int count = businessTripApplyDao.findCount(BusinessTripApply.class, expList);	
+		return count;
+	}
+	
+	/**
+	 * 根据表达式查询BusinessTripApply分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return BusinessTripApply分页对象
+	 */
+	public Pager<BusinessTripApply> findPage(int currentPage, int pageSize){
+		int totalRecord = findCount();	
+		Pager<BusinessTripApply> pager = new Pager<BusinessTripApply>(currentPage, pageSize, totalRecord);
+		List<BusinessTripApply> dataList = findList(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+}
+
+

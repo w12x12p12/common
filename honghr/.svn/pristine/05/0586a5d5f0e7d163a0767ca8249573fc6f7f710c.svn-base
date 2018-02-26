@@ -1,0 +1,10 @@
+package com.hongedu.honghr.honghr.common.constant;
+
+//基础数据常量
+public class DataConstant {
+	public static final String DELETE = "0";// 删除
+	public static final String EXIST = "1";// 存在
+	public static final String FORBID = "0";// 禁用
+	public static final String ALLOW = "1";// 未禁用
+	public static final Integer FIRST_CHECK = 1;// 第一个审批人
+}

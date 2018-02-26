@@ -1,0 +1,194 @@
+<%@ page language="java" contentType="text/html; UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>个人基本信息</title>
+</head>
+<body>
+<!--中间内容-->
+         <form action="${ctx}/spoc/students/home/personalUpdate" method="post" id="editForm">
+                <input type="hidden" name="employeeId" id="employeeId" readonly="readonly" value="${employeeId}"/>  
+                
+                <div class="form-group w_honghr_input">
+           <label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>用户名：</label>
+		<div class="col-sm-8">
+			<input type="text" name="studentName" id="studentName" value="${studentInfo.spocStudent.studentName}" class="form-control form-control_readonly">
+		</div>
+          </div>
+          <div class="form-group w_honghr_input">
+           <label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>真实姓名：</label>
+		<div class="col-sm-8">
+			<input type="text" name="studentName" id="studentName" value="${studentInfo.spocStudent.studentName}" class="form-control form-control_readonly validate[required,maxSize[20]]">
+		</div>
+          </div>
+          <div class="form-group w_honghr_input">
+           <label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>性别：</label>
+		<div class="col-sm-8">
+			<label class="d_settings_radio <c:if test="${studentInfo.spocStudent.gender.equals('1')}">active</c:if>" for="man"><input type="radio" class="gender" name="gender" value="1" <c:if test="${studentInfo.spocStudent.gender.equals('1')}">checked="checked"</c:if>>男</label>
+                  		<label class="d_settings_radio <c:if test="${studentInfo.spocStudent.gender.equals('0')}">active</c:if>" for="woman"><input type="radio" class="gender" name="gender" value="0" <c:if test="${studentInfo.spocStudent.gender.equals('0')}">checked="checked"</c:if> >女</label>
+		</div>
+          </div>
+           <div class="form-group w_honghr_input">
+                <label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>出生日期：</label>
+		        <div class="col-sm-8 d_r_time">
+			              <c:if test="${!empty studentInfo.spocStudent.birthday}">
+                            <input class="form-control form-control_readonly datainp wicon" id="date01" name="birthday" type="text" placeholder="YYYY-MM-DD hh:mm:ss" value="<fmt:formatDate value="${studentInfo.spocStudent.birthday}"/>"readonly>
+                            </c:if>
+                            <c:if test="${empty studentInfo.spocStudent.birthday}">
+                            <input class="form-control form-control_readonly datainp wicon" id="date01" name="birthday" type="text" placeholder="YYYY-MM-DD hh:mm:ss" value="1990-01-01" readonly>
+                            </c:if>
+		        </div>
+           </div>
+               
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>出生地点：</label>
+		<div class="col-sm-8">
+			<input class="form-control form-control_readonly" type="text" name="applyEmployeeName" value="" readonly="readonly"/>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>联系地址：</label>
+		<div class="col-sm-8">
+			<input class="form-control form-control_readonly" type="text" name="applyEmployeeName" value="" readonly="readonly"/>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>手机号码：</label>
+		<div class="col-sm-8">
+			<input class="form-control form-control_readonly" type="text" name="applyEmployeeName" value="" readonly="readonly"/>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>电子邮箱：</label>
+		<div class="col-sm-8">
+			<input class="form-control form-control_readonly" type="text" name="applyEmployeeName" value="" readonly="readonly"/>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>教育程度：</label>
+		<div class="col-sm-8">
+			<input class="form-control form-control_readonly" type="text" name="applyEmployeeName" value="" readonly="readonly"/>
+		</div>
+	</div>
+	<div class="form-group w_honghr_input">
+		<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>入职时间：</label>
+		<div class="col-sm-8">
+			<input class="form-control form-control_readonly" type="text" name="applyEmployeeName" value="" readonly="readonly"/>
+		</div>
+	</div>
+   
+     <div class="modal-footer">
+      <button type="button" class="btn btn-primary save_form" id="save_submit">修改</button>
+      <button type="button" class="btn btn-default save_form" id="save_default">取消</button>
+     </div>
+</form>
+<script>
+var basePath=$("#basePath").val();
+//导航点击样式切换
+$('.d_h_nav li').click(function(){
+    $(this).addClass('active').siblings().removeClass('active');
+})
+//消息通知tab切换
+$('.d_notice_tab>span').click(function(){
+    $(this).addClass('active').siblings().removeClass('active');
+    $('.d_notice_tabCon>div').eq($('.d_notice_tab>span').index(this)).show().siblings().hide();
+})
+
+//校验
+$(function(){
+    $("#editForm").validationEngine({
+    	submitHandler:function(form){
+    		SubmitEditFrom();
+    	}
+	});  
+})	
+//时间控件
+$("#date01").jeDate({
+    isinitVal:false,
+    //festival:true,
+    ishmsVal:false,
+    minDate: '1920-01-01',
+    maxDate: $.nowDate({DD:0}),
+    format:"YYYY-MM-DD",
+    zIndex:3000
+}) 
+//默认日期
+
+//提交表单
+function SubmitEditFrom(){
+	 if(!$("form#editForm").validationEngine("validate")) return ;  
+	var studentId=$("#studentId").val();
+	var studentName = $("#studentName").val();
+	var nickname = $("#nickname").val();
+	var birthday = $("#date01").val();
+	var mobilePhone = $("#mobilePhone").val();
+	var email = $("#email").val();
+	var wxopenid = $("#wxopenid").val();
+	var userId = $("#userId").val();
+	var gender = "";
+	$(".gender").each(function(){
+		if($(this).attr("checked")){
+			gender = $(this).val();
+		}
+	});
+	$.ajax({
+		url:basePath+"spoc/students/home/personalUpdate",
+		type:'post',
+		data:{
+			studentId:studentId,
+			studentName:studentName,
+			nickname:nickname,
+			birthday:birthday,
+			mobilePhone:mobilePhone,
+			email:email,
+			wxopenid:wxopenid,
+			userId:userId,
+			gender:gender
+			},
+		dataType:'text',
+		success:function(data){
+			if(data=='yes'){
+				layer.msg('保存成功',{time:1000},function(){
+					window.location.href=basePath+'spoc/students/home/personList'; 
+				});
+			}else{
+				layer.msg("保存失败");
+			}
+		},
+		error:function(data){
+			layer.msg("系统错误联系管理员");
+		}
+	});
+
+}
+//性别单选
+$('.d_settings_radio').click(function(){
+    $(this).addClass('active').siblings().removeClass('active');
+    $(this).siblings().find(".gender").removeAttr("checked");
+    $(this).find(".gender").attr("checked",true);
+    $(this).find('input').click();
+})
+
+//个人设置高亮样式
+$(function(){
+	$(".d_h_setting_wrap").addClass("active");
+})
+ 
+ function personalSet(){
+	window.location.href="${ctx}/spoc/students/home/personal";
+}
+
+function back(){
+	window.location.href="${ctx}/admin/employee/personal";
+}
+
+ 
+</script>
+</body>
+</html>
+
+	

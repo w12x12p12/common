@@ -1,0 +1,137 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.entity.AbsenceApplyCheck;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+
+/**
+ * @author  
+ * el_bp_absence_apply_check 表对应业务实现对象
+ * 2017/12/07 04:00:56
+ */
+@Transactional
+@Service
+public class AbsenceApplyCheckService{
+	
+	@Autowired
+	private BaseDaoImpl<AbsenceApplyCheck> absenceApplyCheckDao;
+	
+	/**
+	 * 根据主键查询AbsenceApplyCheck对象
+	 * @param id
+	 * @return
+	 */
+	public AbsenceApplyCheck findById (Serializable id){
+		AbsenceApplyCheck entity = absenceApplyCheckDao.findById(AbsenceApplyCheck.class, id);
+		return entity;
+	}
+	
+	/**
+	 * 插入AbsenceApplyCheck对象
+	 * @param entity
+	 */
+	public void save (AbsenceApplyCheck entity){
+		absenceApplyCheckDao.save(entity);
+	}
+	
+	/**
+	 * 修改AbsenceApplyCheck对象
+	 * @param entity
+	 */
+	public void update (AbsenceApplyCheck entity){
+		absenceApplyCheckDao.update(entity);
+	}
+	
+	/**
+	 * 删除AbsenceApplyCheck对象
+	 * @param id
+	 */
+	public void delete (Serializable id){
+		absenceApplyCheckDao.delete(AbsenceApplyCheck.class, id);
+	}
+	
+	/**
+	 * 根据sql查询AbsenceApplyCheck对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return AbsenceApplyCheck对象集合
+	 */
+	public List<AbsenceApplyCheck> findListBySql(int currentPage, int pageSize){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select AbsenceApplyCheck.* from AbsenceApplyCheck");
+		List<AbsenceApplyCheck> list = absenceApplyCheckDao.findListBySql(AbsenceApplyCheck.class, sql.toString(), currentPage, pageSize);	
+		return list;
+	}
+	
+	/**
+	 * 根据sql查询AbsenceApplyCheck集合数量
+	 * @return AbsenceApplyCheck集合数量
+	 */
+	public int findCountBySql(){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select count(1) from absence_apply_check");
+		return absenceApplyCheckDao.findCountBySql(sql.toString());	
+	}
+	
+	/**
+	 * 根据sql查询AbsenceApplyCheck分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return AbsenceApplyCheck分页对象
+	 */
+	public Pager<AbsenceApplyCheck> findPageBySql(int currentPage, int pageSize){
+		int totalRecord = findCountBySql();	
+		Pager<AbsenceApplyCheck> pager = new Pager<AbsenceApplyCheck>(currentPage, pageSize, totalRecord);
+		List<AbsenceApplyCheck> dataList = findListBySql(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+	
+	/**
+	 * 根据表达式查询AbsenceApplyCheck对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return AbsenceApplyCheck对象集合
+	 */
+	public List<AbsenceApplyCheck> findList(int currentPage, int pageSize){
+		List<Exp> expList = new ArrayList<Exp>();
+		List<AbsenceApplyCheck> AbsenceApplyCheckList = absenceApplyCheckDao.findList(AbsenceApplyCheck.class, expList, currentPage, pageSize);	
+		return AbsenceApplyCheckList;
+	}
+	
+	/**
+	 * 根据表达式查询AbsenceApplyCheck集合数量
+	 * @return AbsenceApplyCheck集合数量
+	 */
+	public int findCount(){
+		List<Exp> expList = new ArrayList<Exp>();
+		int count = absenceApplyCheckDao.findCount(AbsenceApplyCheck.class, expList);	
+		return count;
+	}
+	
+	/**
+	 * 根据表达式查询AbsenceApplyCheck分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return AbsenceApplyCheck分页对象
+	 */
+	public Pager<AbsenceApplyCheck> findPage(int currentPage, int pageSize){
+		int totalRecord = findCount();	
+		Pager<AbsenceApplyCheck> pager = new Pager<AbsenceApplyCheck>(currentPage, pageSize, totalRecord);
+		List<AbsenceApplyCheck> dataList = findList(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+}
+
+

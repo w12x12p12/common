@@ -1,0 +1,242 @@
+
+package com.hongedu.honghr.honghr.web;
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import com.hongedu.honghr.util.json.JsonResult;
+import com.hongedu.honghr.util.page.Pager;
+import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.entity.Department;
+import com.hongedu.honghr.honghr.entity.Employee;
+import com.hongedu.honghr.honghr.entity.EmployeePosition;
+import com.hongedu.honghr.honghr.entity.Position;
+import com.hongedu.honghr.honghr.entity.vo.EmployeePositionVo;
+import com.hongedu.honghr.honghr.service.DepartmentService;
+import com.hongedu.honghr.honghr.service.EmployeePositionService;
+import com.hongedu.honghr.honghr.service.EmployeeService;
+import com.hongedu.honghr.honghr.service.PositionService;
+
+
+/**
+ * @author  
+ * el_bp_employee_position 表对应的controller
+ * 2017/12/07 04:04:40
+ */
+@Controller
+@RequestMapping("/admin/employeePosition")
+public class EmployeePositionController {
+	@Autowired
+	private EmployeePositionService employeePositionService;
+	@Autowired
+	private EmployeeService employeeService;
+	@Autowired
+	private PositionService positionService;
+	@Autowired
+	private DepartmentService departmentService;
+	
+	/**
+	 * 删除EmployeePosition
+	 * 
+	 * <p>Title: deleteEmployeePosition</p> 
+	 * <p>Description: </p>  
+	 * @time 下午2:11:38 
+	 * @param employeePosition
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/deleteEmployeePosition", method = RequestMethod.POST)
+	public JsonResult deleteEmployeePosition(EmployeePosition employeePosition) {
+		try {
+			// 修改deleted的值
+			employeePositionService.updateDel(employeePosition);
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * list&page
+	 * 
+	 * <p>Title: employeePositionList</p> 
+	 * <p>Description: </p>  
+	 * @time 上午9:14:47 
+	 * @param currentPage
+	 * @param pageSize
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/employeePositionList", method = RequestMethod.GET)
+	public String employeePositionList(@RequestParam(required = false, defaultValue = "1") Integer currentPage,
+			@RequestParam(required = false, defaultValue = "10") Integer pageSize, String employeeName, Model model) {
+		// 查询信息
+		Pager<EmployeePositionVo> page = employeePositionService.findPage(employeeName, currentPage, pageSize);
+		model.addAttribute("page", page);
+		model.addAttribute("employeeName", employeeName);
+		return "admin/employeePosition/employeePositionList";
+	}
+	
+	/**
+	 * 员工&部门&职务关系分配初始化
+	 * 
+	 * <p>Title: addEmployeePositon</p> 
+	 * <p>Description: </p>  
+	 * @time 下午2:05:11 
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/addEmployeePositon", method = RequestMethod.GET)
+	public String addEmployeePositon(Model model) {
+		// 查询所有未分配职务的人员
+		List<Employee> employeeList = employeeService.findEmployeeDistribute();
+		// 查询所有部门
+		List<Department> departmentList = departmentService.findDepartmentList();
+		model.addAttribute("employeeList", employeeList);
+		model.addAttribute("departmentList", departmentList);
+		return "admin/employeePosition/addEmployeePosition";
+	}
+	
+	/**
+	 * 根据departmentId查询Position ajax请求
+	 * 
+	 * <p>Title: findCourses</p> 
+	 * <p>Description: </p>  
+	 * @time 上午11:01:26 
+	 * @param departmentId
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/findPosition", method = RequestMethod.GET)
+	public JsonResult findCourses(Department department) {
+		try {
+			// 获取ajax请求传过来的departmentNum
+			String departmentNum = department.getDepartmentNum();
+			// 通过departmentNum查询Department信息departmentInfo
+			Department departmentInfo = departmentService.findByNUM(departmentNum);
+			// 定义positionList并初始化
+			List<Position> positionList = null;
+			// 判断上面查到的departmentInfo的DepartmentParentId是否为0
+			if (departmentInfo.getDepartmentParentId() != 0) {// 查询该部门写的所有职位
+				positionList = positionService.findPosByDepId(departmentInfo.getDepartmentId());
+			} else {// 查询所有职位
+				positionList = positionService.findList1();
+			}
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", positionList);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+
+	/**
+	 * 保存人员&职位&部门关系
+	 * 
+	 * <p>Title: addEmployeePositionData</p> 
+	 * <p>Description: </p>  
+	 * @time 下午2:03:11 
+	 * @param employeePositionVo
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/addEmployeePositionData", method = RequestMethod.POST)
+	public String addEmployeePositionData(EmployeePositionVo employeePositionVo) {
+		employeePositionVo.setDeleted(DataConstant.EXIST);
+		employeePositionService.insertEmployeePositionVo(employeePositionVo);
+		// 获取Department,Position Num
+		String depNum = employeePositionVo.getDepartmentNum();
+		String positionNum = employeePositionVo.getPositionNum();
+		// 查询Department,Position By Num
+		Department department = departmentService.findByNUM(depNum);
+		Position position = positionService.findByNUM(positionNum);
+		// 查询Employee By Id
+		Employee employee = employeeService.findById(employeePositionVo.getEmployeeId());
+		// 判断Department的Referred是否被引用
+		if (!department.getReferred().equals(DataConstant.REFERRED)) {
+			department.setReferred(DataConstant.REFERRED);// 设置引用
+			departmentService.update(department);
+		}
+		// 判断Position的Referred是否被引用
+		if (!position.getReferred().equals(DataConstant.REFERRED)) {
+			position.setReferred(DataConstant.REFERRED);// 设置引用
+			positionService.update(position);
+		}
+		// 判断Employee的Referred是否被引用
+		if (!employee.getReferred().equals(DataConstant.REFERRED)) {
+			employee.setReferred(DataConstant.REFERRED);// 设置引用
+			employeeService.update(employee);
+		}
+		return JsonResult.SUCCESS_CODE;
+	}
+
+	/**
+	 * 人员&部门&职务关系修改初始化
+	 * 
+	 * <p>Title: toEditEmployeePostion</p> 
+	 * <p>Description: </p>  
+	 * @time 下午2:08:02 
+	 * @param employeePositionId
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/toEditEmployeePostion/{employeePositionId}", method = RequestMethod.GET)
+	public String toEditEmployeePostion(@PathVariable("employeePositionId") Integer employeePositionId, Model model) {
+		//查询所有未分配的人员
+		List<Employee> employeeList = employeeService.findEmployeeDistribute();
+		//查询所有部门
+		List<Department> departmentList = departmentService.findDepartmentList();
+		model.addAttribute("employeeList", employeeList);
+		model.addAttribute("departmentList", departmentList);
+		if (employeePositionId != null) {
+			EmployeePositionVo employeePosition = employeePositionService.findEmployeePositionById(employeePositionId);
+			model.addAttribute("employeePosition", employeePosition);
+		}
+		return "admin/employeePosition/editEmployeePosition";
+	}
+
+	/**
+	 * 修改部门&职位&人员关系信息
+	 * 
+	 * <p>Title: editForEmployeePostion</p> 
+	 * <p>Description: </p>  
+	 * @time 下午2:10:00 
+	 * @param employeePositionVo
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/editForEmployeePostion", method = RequestMethod.POST)
+	public String editForEmployeePostion(EmployeePositionVo employeePositionVo) {
+		// 获取Department,Position Num
+		String depNum = employeePositionVo.getDepartmentNum();
+		String positionNum = employeePositionVo.getPositionNum();
+		// 查询Department,Position By Num
+		Department department = departmentService.findByNUM(depNum);
+		Position position = positionService.findByNUM(positionNum);
+		// 查询Employee By Id
+		Employee employee = employeeService.findById(employeePositionVo.getEmployeeId());
+		// 判断Department的Referred是否被引用
+		if (!department.getReferred().equals(DataConstant.REFERRED)) {
+			department.setReferred(DataConstant.REFERRED);// 设置引用
+			departmentService.update(department);
+		}
+		// 判断Position的Referred是否被引用
+		if (!position.getReferred().equals(DataConstant.REFERRED)) {
+			position.setReferred(DataConstant.REFERRED);// 设置引用
+			positionService.update(position);
+		}
+		// 判断Employee的Referred是否被引用
+		if (!employee.getReferred().equals(DataConstant.REFERRED)) {
+			employee.setReferred(DataConstant.REFERRED);// 设置引用
+			employeeService.update(employee);
+		}
+		employeePositionService.updateEmployeePositionVo(employeePositionVo);
+		return JsonResult.SUCCESS_CODE;
+	}
+}

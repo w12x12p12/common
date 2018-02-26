@@ -1,0 +1,42 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.entity.EmployeeAnnualLeave;
+
+@Transactional
+@Service
+public class EmployeeAnnualLeaveService {
+
+	@Autowired
+	private BaseDaoImpl<EmployeeAnnualLeave> employeeAnnualLeaveDao;
+
+	public boolean getIsClearAnnualLeaveHours(Integer employeeId, String yearName) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select count(1) ");
+		sb.append("from employee_annual_leave ");
+		sb.append("where employee_id = ? ");
+		sb.append("and year_name = ? ");
+		sb.append("and is_clear = ? ");
+		Integer number = employeeAnnualLeaveDao.findCountBySql(sb.toString(),
+				new Object[] { employeeId, yearName, DataConstant.CLEAR });
+		if (number != null) {
+			return number.intValue() > 0 && number.intValue() == 1 ? true : false;
+		}
+		return false;
+	}
+
+	public void insertClearAnnualLeaveHours(Integer employeeId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("insert into employee_annual_leave(employee_id,year_name,is_clear)values(?,?,?)");
+		employeeAnnualLeaveDao.insertBySql(sb.toString(), new Object[] { employeeId,
+				Integer.parseInt(new SimpleDateFormat("yyyy").format(new Date())) - 1 + "", DataConstant.CLEAR });
+	}
+}

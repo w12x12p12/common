@@ -1,0 +1,198 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.entity.Employee;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+
+/**
+ * @author el_bp_employee 表对应业务实现对象 2017/12/07 04:00:57
+ */
+@Transactional
+@Service
+public class EmployeeService {
+
+	@Autowired
+	private BaseDaoImpl<Employee> employeeDao;
+
+	/**
+	 * 根据主键查询Employee对象
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public Employee findById(Serializable id) {
+		Employee entity = employeeDao.findById(Employee.class, id);
+		return entity;
+	}
+
+	/**
+	 * 插入Employee对象
+	 * 
+	 * @param entity
+	 */
+	public void save(Employee entity) {
+		employeeDao.save(entity);
+	}
+
+	/**
+	 * 修改Employee对象
+	 * 
+	 * @param entity
+	 */
+	public void update(Employee entity) {
+		employeeDao.update(entity);
+	}
+
+	/**
+	 * 删除Employee对象
+	 * 
+	 * @param id
+	 */
+	public void delete(Serializable id) {
+		employeeDao.delete(Employee.class, id);
+	}
+
+	/**
+	 * 根据sql查询Employee对象集合
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return Employee对象集合
+	 */
+	public List<Employee> findListBySql(int currentPage, int pageSize) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select Employee.* from Employee");
+		List<Employee> list = employeeDao.findListBySql(Employee.class, sql.toString(), currentPage, pageSize);
+		return list;
+	}
+
+	/**
+	 * 根据sql查询Employee集合数量
+	 * 
+	 * @return Employee集合数量
+	 */
+	public int findCountBySql() {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select count(1) from employee");
+		int count = employeeDao.findCountBySql(sql.toString());
+		return count;
+	}
+
+	/**
+	 * 根据sql查询Employee分页对象
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return Employee分页对象
+	 */
+	public Pager<Employee> findPageBySql(int currentPage, int pageSize) {
+		int totalRecord = findCountBySql();
+		Pager<Employee> pager = new Pager<Employee>(currentPage, pageSize, totalRecord);
+		List<Employee> dataList = findListBySql(pager.getFromIndex(), pageSize);
+		pager.setDataList(dataList);
+		return pager;
+	}
+
+	/**
+	 * 根据表达式查询Employee对象集合
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return Employee对象集合
+	 */
+	public List<Employee> findList(int currentPage, int pageSize) {
+		List<Exp> expList = new ArrayList<Exp>();
+		List<Employee> EmployeeList = employeeDao.findList(Employee.class, expList, currentPage, pageSize);
+		return EmployeeList;
+	}
+
+	/**
+	 * 根据表达式查询Employee集合数量
+	 * 
+	 * @return Employee集合数量
+	 */
+	public int findCount() {
+		List<Exp> expList = new ArrayList<Exp>();
+		int count = employeeDao.findCount(Employee.class, expList);
+		return count;
+	}
+
+	/**
+	 * 根据表达式查询Employee分页对象
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return Employee分页对象
+	 */
+	public Pager<Employee> findPage(int currentPage, int pageSize) {
+		int totalRecord = findCount();
+		Pager<Employee> pager = new Pager<Employee>(currentPage, pageSize, totalRecord);
+		List<Employee> dataList = findList(pager.getFromIndex(), pageSize);
+		pager.setDataList(dataList);
+		return pager;
+	}
+
+	public Employee login(String username, String password) {
+		String sql = "select employee_id, username, password, employee_name, gender, birthday, native_place, nation, address, phone_number, email, idcard, education, work_begin_time, entry_time from employee where binary username = ? and binary password = ? and forbided = ? and deleted = ?";
+		return employeeDao.getEntityBySql(Employee.class, sql,
+				new Object[] { username, password, DataConstant.ALLOW, DataConstant.EXIST });
+	}
+
+	public List<Employee> findEmployeeListByDepartmentNum(String departmentNum, Integer applyEmployeeId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select distinct e.employee_id, e.employee_name ");
+		sb.append("from employee e ");
+		sb.append("join employee_position ep on e.employee_id = ep.employee_id ");
+		sb.append("where ep.department_num like CONCAT(? , '%') ");
+		sb.append("and ep.employee_id != ? ");
+		sb.append("and ep.deleted = ? ");
+		sb.append("and e.deleted = ? ");
+		return employeeDao.findEntityListBySql(Employee.class, sb.toString(),
+				new Object[] { departmentNum, applyEmployeeId, DataConstant.EXIST, DataConstant.EXIST });
+	}
+
+	public Employee getEmployeeById(Integer employeeId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select employee_id, employee_name ");
+		sb.append("from employee ");
+		sb.append("where employee_id = ? ");
+		sb.append("and deleted = ? ");
+		return employeeDao.getEntityBySql(Employee.class, sb.toString(),
+				new Object[] { employeeId, DataConstant.EXIST });
+	}
+    
+	/**
+	 * 查询没有被分配的员工信息
+	 * @return
+	 * @Author wanghui
+	 * @Date 2018年1月8日
+	 */
+	public List<Employee> findEmployeeDistribute() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("SELECT employee.employee_id employeeId,employee.employee_name employeeName from employee  ");
+		sb.append("LEFT JOIN employee_position ON employee.employee_id = employee_position.employee_id ");
+		sb.append("WHERE employee_position.employee_id IS NUll ");
+		sb.append("AND employee.deleted = ? ");
+		return employeeDao.findEntityListBySql(Employee.class, sb.toString(),
+				new Object[] { DataConstant.EXIST });
+	}
+}

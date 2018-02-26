@@ -1,0 +1,447 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.sql.Types;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.common.constant.NumConstant;
+import com.hongedu.honghr.honghr.common.enums.EnumApplyCheckStatus;
+import com.hongedu.honghr.honghr.common.enums.EnumApplyStatus;
+import com.hongedu.honghr.honghr.entity.BusinessTripApply;
+import com.hongedu.honghr.honghr.entity.BusinessTripApplyCheck;
+import com.hongedu.honghr.honghr.entity.vo.BusinessTripApplyVo;
+import com.hongedu.honghr.util.page.Pager;
+
+/**
+ * @author el_bp_business_trip_apply 表对应业务实现对象 2017/12/07 04:00:56
+ */
+@Transactional
+@Service
+public class BusinessTripApplyService {
+
+	@Autowired
+	private BaseDaoImpl<BusinessTripApply> businessTripApplyDao;
+	@Autowired
+	private BaseDaoImpl<BusinessTripApplyVo> businessTripApplyVoDao;
+	@Autowired
+	private BusinessTripApplyCheckService businessTripApplyCheckService;
+
+	/**
+	 * 根据主键查询BusinessTripApply对象
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public BusinessTripApply findById(Serializable id) {
+		return businessTripApplyDao.findById(BusinessTripApply.class, id);
+	}
+
+	/**
+	 * 插入BusinessTripApply对象
+	 * 
+	 * @param entity
+	 */
+	public void save(BusinessTripApply entity) {
+		businessTripApplyDao.save(entity);
+	}
+
+	/**
+	 * 修改BusinessTripApply对象
+	 * 
+	 * @param entity
+	 */
+	public void update(BusinessTripApply entity) {
+		businessTripApplyDao.update(entity);
+	}
+
+	/**
+	 * 删除BusinessTripApply对象
+	 * 
+	 * @param id
+	 */
+	public void delete(Serializable id) {
+		businessTripApplyDao.delete(BusinessTripApply.class, id);
+	}
+
+	/**
+	 * 根据sql查询BusinessTripApply对象集合
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return BusinessTripApply对象集合
+	 */
+	public List<BusinessTripApply> findListBySql(int currentPage, int pageSize) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select business_trip_apply.* from business_trip_apply");
+		return businessTripApplyDao.findListBySql(BusinessTripApply.class, sql.toString(), currentPage, pageSize);
+	}
+
+	/**
+	 * 根据sql查询AbsenceApply集合数量
+	 * 
+	 * @return AbsenceApply集合数量
+	 */
+	public int findCountBySql(String sql, Object[] args) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select count(1) from ( ");
+		sb.append(sql);
+		sb.append(")main ");
+		return businessTripApplyDao.findCountBySql(sb.toString(), args);
+	}
+
+	/**
+	 * 根据sql查询BusinessTripApply集合数量
+	 * 
+	 * @return BusinessTripApply集合数量
+	 */
+	public int findCountBySql() {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select count(1) from business_trip_apply");
+		return businessTripApplyDao.findCountBySql(sql.toString());
+	}
+
+	/**
+	 * 根据sql查询BusinessTripApply分页对象
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return BusinessTripApply分页对象
+	 */
+	public Pager<BusinessTripApply> findPageBySql(int currentPage, int pageSize) {
+		int totalRecord = findCountBySql();
+		Pager<BusinessTripApply> pager = new Pager<BusinessTripApply>(currentPage, pageSize, totalRecord);
+		List<BusinessTripApply> dataList = findListBySql(pager.getFromIndex(), pageSize);
+		pager.setDataList(dataList);
+		return pager;
+	}
+
+	/**
+	 * 根据表达式查询BusinessTripApply对象集合
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return BusinessTripApply对象集合
+	 */
+	public List<BusinessTripApply> findList(int currentPage, int pageSize) {
+		List<Exp> expList = new ArrayList<Exp>();
+		return businessTripApplyDao.findList(BusinessTripApply.class, expList, currentPage, pageSize);
+	}
+
+	/**
+	 * 根据表达式查询BusinessTripApply集合数量
+	 * 
+	 * @return BusinessTripApply集合数量
+	 */
+	public int findCount() {
+		List<Exp> expList = new ArrayList<Exp>();
+		return businessTripApplyDao.findCount(BusinessTripApply.class, expList);
+	}
+
+	public BusinessTripApplyVo getBusinessTripApplyVo(Integer businessTripApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"select b.business_trip_apply_id, b.business_trip_apply_num, b.apply_department_num, b.employee_id, b.apply_type, b.apply_reason, b.apply_begin_address, b.apply_end_address, b.apply_begin_time, b.apply_end_time, b.apply_duration, b.apply_date_time, b.apply_check_status, b.deleted, ");
+		sb.append(
+				"d.department_name applyDepartmentName, e.employee_name applyEmployeeName, c.code_name applyTypeShow, cd.code_name applyBeginCityName, cd1.code_id applyBeginProvinceId, cd1.code_name applyBeginProvinceName, cde.code_name applyEndCityName, cde1.code_id applyEndProvinceId, cde1.code_name applyEndProvinceName ");
+		sb.append("from business_trip_apply b ");
+		sb.append("left join department d on b.apply_department_num = d.department_num ");
+		sb.append("left join employee e on b.employee_id = e.employee_id ");
+		sb.append("left join code c on b.apply_type = c.code_value ");
+		sb.append("left join code cd on b.apply_begin_address = cd.code_value ");
+		sb.append("left join code cd1 on cd.code_parent_id = cd1.code_id ");
+		sb.append("left join code cde on b.apply_end_address = cde.code_value ");
+		sb.append("left join code cde1 on cde.code_parent_id = cde1.code_id ");
+		sb.append("where b.business_trip_apply_id = ? ");
+		BusinessTripApplyVo businessTripApplyVo = businessTripApplyVoDao.getEntityBySql(BusinessTripApplyVo.class,
+				sb.toString(), new Object[] { businessTripApplyId });
+		setApplyStatusShow(businessTripApplyVo);
+		businessTripApplyVo.setBusinessTripApplyCheckVos(
+				businessTripApplyCheckService.findBusinessTripApplyCheckVosByApplyId(businessTripApplyId));
+		return businessTripApplyVo;
+	}
+
+	private void setApplyStatusShow(BusinessTripApplyVo businessTripApplyVo) {
+		for (EnumApplyStatus enumApplyStatus : EnumApplyStatus.values()) {
+			if (enumApplyStatus.getCode().equals(businessTripApplyVo.getApplyCheckStatus())) {
+				businessTripApplyVo.setApplyCheckStatusShow(enumApplyStatus.getValue());
+				break;
+			}
+		}
+	}
+
+	/**
+	 * 根据查询BusinessTripApply分页对象
+	 * 
+	 * @param currentPage:当前页
+	 * @param pageSize:分页数
+	 * @return BusinessTripApply分页对象
+	 */
+	public Pager<BusinessTripApplyVo> findPage(Integer employeeId, int currentPage, int pageSize) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"select b.business_trip_apply_id, b.business_trip_apply_num, b.apply_department_num, b.employee_id, b.apply_type, b.apply_reason, b.apply_begin_time, b.apply_end_time, b.apply_duration, b.apply_date_time, b.apply_check_status, b.deleted, ");
+		sb.append(
+				"d.department_name applyDepartmentName, e.employee_name applyEmployeeName, c.code_name applyTypeShow, cd.code_name applyBeginCityName, cd1.code_name applyBeginProvinceName, cde.code_name applyEndCityName, cde1.code_name applyEndProvinceName ");
+		sb.append("from business_trip_apply b ");
+		sb.append("left join department d on b.apply_department_num = d.department_num ");
+		sb.append("left join employee e on b.employee_id = e.employee_id ");
+		sb.append("left join code c on b.apply_type = c.code_value ");
+		sb.append("left join code cd on b.apply_begin_address = cd.code_value ");
+		sb.append("left join code cd1 on cd.code_parent_id = cd1.code_id ");
+		sb.append("left join code cde on b.apply_end_address = cde.code_value ");
+		sb.append("left join code cde1 on cde.code_parent_id = cde1.code_id ");
+		sb.append("where b.employee_id = ? ");
+		sb.append("and b.deleted = ? ");
+		sb.append("order by b.business_trip_apply_id desc");
+		Pager<BusinessTripApplyVo> pager = new Pager<BusinessTripApplyVo>(currentPage, pageSize,
+				findCountBySql(sb.toString(), new Object[] { employeeId, DataConstant.EXIST }));
+		List<BusinessTripApplyVo> businessTripApplyVoList = businessTripApplyVoDao.findEntityListByPage(
+				BusinessTripApplyVo.class, sb.toString(), new Object[] { employeeId, DataConstant.EXIST },
+				pager.getFromIndex(), pageSize);
+		setApplyStatusShowByList(businessTripApplyVoList);
+		pager.setDataList(businessTripApplyVoList);
+		return pager;
+	}
+
+	private void setApplyStatusShowByList(List<BusinessTripApplyVo> businessTripApplyVoList) {
+		for (BusinessTripApplyVo businessTripApplyVo : businessTripApplyVoList) {
+			for (EnumApplyStatus enumApplyStatus : EnumApplyStatus.values()) {
+				if (enumApplyStatus.getCode().equals(businessTripApplyVo.getApplyCheckStatus())) {
+					businessTripApplyVo.setApplyCheckStatusShow(enumApplyStatus.getValue());
+					break;
+				}
+			}
+		}
+	}
+
+	public String getBusinessTripApplyNum(Integer employeeId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select count(1) from business_trip_apply where employee_id = ? ");
+		sb.append("and DATE(apply_date_time) = curdate() ");
+		Integer number = businessTripApplyDao.findCountBySql(sb.toString(), new Object[] { employeeId });
+		number = number != null ? number + 1 : 1;
+		sb.delete(0, sb.length());
+		return sb.append(NumConstant.BUSINESS_TRIP_APPLY_NUM_START)
+				.append(new SimpleDateFormat("yyyyMMdd").format(new Date())).append(employeeId).append(number)
+				.toString();
+	}
+
+	public void insertBusinessTripApplyVo(BusinessTripApplyVo businessTripApplyVo) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"insert into business_trip_apply(business_trip_apply_num, apply_department_num, employee_id, apply_type, apply_reason, apply_begin_time, apply_end_time, apply_duration, apply_begin_address, apply_end_address, apply_date_time, apply_check_status, create_employee_id, create_date_time, deleted)");
+		sb.append("values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+		int businessTripApplyId = businessTripApplyDao.insert(sb.toString(),
+				new int[] { Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.TIMESTAMP,
+						Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.VARCHAR,
+						Types.INTEGER, Types.TIMESTAMP, Types.CHAR },
+				new Object[] { businessTripApplyVo.getBusinessTripApplyNum(),
+						businessTripApplyVo.getApplyDepartmentNum(), businessTripApplyVo.getEmployeeId(),
+						businessTripApplyVo.getApplyType(), businessTripApplyVo.getApplyReason(),
+						businessTripApplyVo.getApplyBeginTime(), businessTripApplyVo.getApplyEndTime(),
+						businessTripApplyVo.getApplyDuration(), businessTripApplyVo.getApplyBeginAddress(),
+						businessTripApplyVo.getApplyEndAddress(), businessTripApplyVo.getApplyDateTime(),
+						businessTripApplyVo.getApplyCheckStatus(), businessTripApplyVo.getCreateEmployeeId(),
+						businessTripApplyVo.getCreateDateTime(), businessTripApplyVo.getDeleted() });
+		batchInsertBusinessTripApplyCheck(businessTripApplyId, businessTripApplyVo.getBusinessTripApplyChecks());
+	}
+
+	public void batchInsertBusinessTripApplyCheck(Integer businessTripApplyId,
+			List<BusinessTripApplyCheck> businessTripApplyCheckList) {
+		if (businessTripApplyCheckList != null && !businessTripApplyCheckList.isEmpty()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(
+					"insert into business_trip_apply_check(business_trip_apply_id, check_employee_id, apply_is_allowed, apply_check_sequence, deleted)values ");
+			List<Object> args = new ArrayList<Object>();
+			for (BusinessTripApplyCheck businessTripApplyCheck : businessTripApplyCheckList) {
+				args.add(businessTripApplyId);
+				args.add(businessTripApplyCheck.getCheckEmployeeId());
+				args.add(EnumApplyCheckStatus.UN_CHECK.getCode());
+				args.add(businessTripApplyCheck.getApplyCheckSequence());
+				args.add(DataConstant.EXIST);
+				sb.append("(?,?,?,?,?),");
+			}
+			String sql = sb.toString().substring(0, sb.length() - 1);
+			businessTripApplyVoDao.insertBySql(sql, args.toArray(new Object[] {}));
+		}
+	}
+
+	public void deleteApplyCheckByBusinessTripApplyId(Integer businessTripApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("delete from business_trip_apply_check ");
+		sb.append("where business_trip_apply_id = ? ");
+		businessTripApplyVoDao.delete(sb.toString(), new Object[] { businessTripApplyId });
+	}
+
+	public void updateBusinessTripApplyVo(BusinessTripApplyVo businessTripApplyVo) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"update business_trip_apply set apply_type = ?, apply_reason = ?, apply_begin_address = ?, apply_end_address = ?, apply_begin_time = ?, apply_end_time = ?, apply_duration = ? ");
+		sb.append("where business_trip_apply_id = ? ");
+		businessTripApplyDao.update(sb.toString(),
+				new Object[] { businessTripApplyVo.getApplyType(), businessTripApplyVo.getApplyReason(),
+						businessTripApplyVo.getApplyBeginAddress(), businessTripApplyVo.getApplyEndAddress(),
+						businessTripApplyVo.getApplyBeginTime(), businessTripApplyVo.getApplyEndTime(),
+						businessTripApplyVo.getApplyDuration(), businessTripApplyVo.getBusinessTripApplyId() });
+		deleteApplyCheckByBusinessTripApplyId(businessTripApplyVo.getBusinessTripApplyId());
+		batchInsertBusinessTripApplyCheck(businessTripApplyVo.getBusinessTripApplyId(),
+				businessTripApplyVo.getBusinessTripApplyChecks());
+	}
+
+	public void updateBusinessTripApplyStatus(String applyCheckStatus, Integer businessTripApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("update business_trip_apply set apply_check_status = ? ");
+		sb.append("where business_trip_apply_id = ? ");
+		businessTripApplyDao.update(sb.toString(), new Object[] { applyCheckStatus, businessTripApplyId });
+	}
+
+	public void logicalDeleteBusinessTripApplyCheck(Integer businessTripApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("update business_trip_apply_check set deleted = ? ");
+		sb.append("where business_trip_apply_id = ? ");
+		businessTripApplyDao.update(sb.toString(), new Object[] { DataConstant.DELETE, businessTripApplyId });
+	}
+
+	public void logicalDeleteBusinessTripApply(Integer businessTripApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("update business_trip_apply set deleted = ? ");
+		sb.append("where business_trip_apply_id = ? ");
+		businessTripApplyDao.update(sb.toString(), new Object[] { DataConstant.DELETE, businessTripApplyId });
+	}
+
+	public void deleteBusinessTripApply(Integer businessTripApplyId) {
+		logicalDeleteBusinessTripApplyCheck(businessTripApplyId);
+		logicalDeleteBusinessTripApply(businessTripApplyId);
+	}
+
+	public Pager<BusinessTripApplyVo> findForCheckPage(Integer employeeId, int currentPage, int pageSize) {
+		StringBuilder sb = new StringBuilder();
+		// 查询其为第一个审批人且未审批的出差申请单
+		sb.append(
+				"select b.business_trip_apply_id, b.business_trip_apply_num, b.apply_department_num, b.employee_id, b.apply_type, b.apply_reason, b.apply_begin_time, b.apply_end_time, b.apply_duration, b.apply_date_time, b.apply_check_status, b.deleted, ");
+		sb.append(
+				"d.department_name applyDepartmentName, e.employee_name applyEmployeeName, c.code_name applyTypeShow, cd.code_name applyBeginCityName, cd1.code_name applyBeginProvinceName, cde.code_name applyEndCityName, cde1.code_name applyEndProvinceName ");
+		sb.append("from business_trip_apply b ");
+		sb.append("left join department d on b.apply_department_num = d.department_num ");
+		sb.append("left join employee e on b.employee_id = e.employee_id ");
+		sb.append("left join code c on b.apply_type = c.code_value ");
+		sb.append("left join code cd on b.apply_begin_address = cd.code_value ");
+		sb.append("left join code cd1 on cd.code_parent_id = cd1.code_id ");
+		sb.append("left join code cde on b.apply_end_address = cde.code_value ");
+		sb.append("left join code cde1 on cde.code_parent_id = cde1.code_id ");
+		sb.append("join business_trip_apply_check bc on b.business_trip_apply_id = bc.business_trip_apply_id ");
+		sb.append("where bc.check_employee_id = ? ");
+		sb.append("and bc.apply_check_sequence = ? ");
+		sb.append("and bc.apply_is_allowed = ? ");
+		sb.append("and bc.deleted = ? ");
+		sb.append("and b.apply_check_status = ? ");
+		sb.append("and b.deleted = ? ");
+		sb.append("union all ");
+		// 查询其为非第一个审批人且未审批且前一个审批人已经审批通过的休假申请单
+		sb.append(
+				"select b.business_trip_apply_id, b.business_trip_apply_num, b.apply_department_num, b.employee_id, b.apply_type, b.apply_reason, b.apply_begin_time, b.apply_end_time, b.apply_duration, b.apply_date_time, b.apply_check_status, b.deleted, ");
+		sb.append(
+				"d.department_name applyDepartmentName, e.employee_name applyEmployeeName, c.code_name applyTypeShow, cd.code_name applyBeginCityName, cd1.code_name applyBeginProvinceName, cde.code_name applyEndCityName, cde1.code_name applyEndProvinceName ");
+		sb.append("from business_trip_apply b ");
+		sb.append("left join department d on b.apply_department_num = d.department_num ");
+		sb.append("left join employee e on b.employee_id = e.employee_id ");
+		sb.append("left join code c on b.apply_type = c.code_value ");
+		sb.append("left join code cd on b.apply_begin_address = cd.code_value ");
+		sb.append("left join code cd1 on cd.code_parent_id = cd1.code_id ");
+		sb.append("left join code cde on b.apply_end_address = cde.code_value ");
+		sb.append("left join code cde1 on cde.code_parent_id = cde1.code_id ");
+		sb.append("join business_trip_apply_check bc on b.business_trip_apply_id = bc.business_trip_apply_id ");
+		sb.append("where bc.check_employee_id = ? ");
+		sb.append("and bc.apply_check_sequence != ? ");
+		sb.append("and bc.apply_is_allowed = ? ");
+		sb.append("and bc.business_trip_apply_id in( ");
+		sb.append("select bk.business_trip_apply_id  ");
+		sb.append("from business_trip_apply_check bk ");
+		sb.append("where bk.business_trip_apply_id = bc.business_trip_apply_id ");
+		sb.append("and bk.apply_check_sequence = bc.apply_check_sequence - 1 ");
+		sb.append("and bk.apply_is_allowed = ? ");
+		sb.append("and bk.deleted = ?) ");
+		sb.append("and bc.deleted = ? ");
+		sb.append("and b.apply_check_status = ? ");
+		sb.append("and b.deleted = ? ");
+		Pager<BusinessTripApplyVo> pager = new Pager<BusinessTripApplyVo>(currentPage, pageSize,
+				findCountBySql(sb.toString(),
+						new Object[] { employeeId, DataConstant.FIRST_CHECK, EnumApplyCheckStatus.UN_CHECK.getCode(),
+								DataConstant.EXIST, EnumApplyStatus.WAIT_CHECK.getCode(), DataConstant.EXIST,
+								employeeId, DataConstant.FIRST_CHECK, EnumApplyCheckStatus.UN_CHECK.getCode(),
+								EnumApplyCheckStatus.AGREE.getCode(), DataConstant.EXIST, DataConstant.EXIST,
+								EnumApplyStatus.CHECK.getCode(), DataConstant.EXIST }));
+		List<BusinessTripApplyVo> businessTripApplyVoList = businessTripApplyVoDao.findEntityUnionListByPage(
+				BusinessTripApplyVo.class, sb.toString(),
+				new Object[] { employeeId, DataConstant.FIRST_CHECK, EnumApplyCheckStatus.UN_CHECK.getCode(),
+						DataConstant.EXIST, EnumApplyStatus.WAIT_CHECK.getCode(), DataConstant.EXIST, employeeId,
+						DataConstant.FIRST_CHECK, EnumApplyCheckStatus.UN_CHECK.getCode(),
+						EnumApplyCheckStatus.AGREE.getCode(), DataConstant.EXIST, DataConstant.EXIST,
+						EnumApplyStatus.CHECK.getCode(), DataConstant.EXIST },
+				pager.getFromIndex(), pageSize);
+		pager.setDataList(businessTripApplyVoList);
+		return pager;
+	}
+
+	public void checkBusinessTripApply(BusinessTripApplyCheck businessTripApplyCheck) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"update business_trip_apply_check set apply_check_time = ?, apply_is_allowed = ?, apply_check_suggest = ? ");
+		sb.append("where business_trip_apply_id = ? ");
+		sb.append("and check_employee_id = ? ");
+		businessTripApplyDao.update(sb.toString(),
+				new Object[] { businessTripApplyCheck.getApplyCheckTime(), businessTripApplyCheck.getApplyIsAllowed(),
+						businessTripApplyCheck.getApplyCheckSuggest(), businessTripApplyCheck.getBusinessTripApplyId(),
+						businessTripApplyCheck.getCheckEmployeeId() });
+		// 判断是否同意
+		if (EnumApplyCheckStatus.AGREE.getCode().equals(businessTripApplyCheck.getApplyIsAllowed())) {
+			// 查询该审批人是否为最后一个审批人
+			Integer checkEmployeeId = getCheckEmployeeIdBySeqAndBusinessTripApplyId(
+					businessTripApplyCheck.getBusinessTripApplyId());
+			// 如果该审批人为最后一个审批人将休假申请单状态改为审批通过，否则改为审批中
+			if (checkEmployeeId != null
+					&& checkEmployeeId.compareTo(businessTripApplyCheck.getCheckEmployeeId()) == 0) {
+				updateBusinessTripApplyStatus(EnumApplyStatus.CHECK_ALLOW.getCode(),
+						businessTripApplyCheck.getBusinessTripApplyId());
+			} else {
+				updateBusinessTripApplyStatus(EnumApplyStatus.CHECK.getCode(),
+						businessTripApplyCheck.getBusinessTripApplyId());
+			}
+		} else {
+			// 将出差申请单状态改为审批不通过
+			updateBusinessTripApplyStatus(EnumApplyStatus.CHECK_LIMIT.getCode(),
+					businessTripApplyCheck.getBusinessTripApplyId());
+		}
+	}
+
+	public Integer getCheckEmployeeIdBySeqAndBusinessTripApplyId(Integer businessTripApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select bc.check_employee_id ");
+		sb.append("from business_trip_apply_check bc ");
+		sb.append("where bc.apply_check_sequence =( ");
+		sb.append("select MAX(bk.apply_check_sequence) ");
+		sb.append("from business_trip_apply_check bk ");
+		sb.append("where bk.business_trip_apply_id = ? ");
+		sb.append("and bk.deleted = ?) ");
+		sb.append("and bc.business_trip_apply_id = ? ");
+		sb.append("and bc.deleted = ? ");
+		return businessTripApplyDao.getNumBySql(sb.toString(),
+				new Object[] { businessTripApplyId, DataConstant.EXIST, businessTripApplyId, DataConstant.EXIST });
+	}
+}

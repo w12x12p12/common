@@ -1,0 +1,138 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.entity.ApplyPermission;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+
+/**
+ * @author  
+ * el_bp_apply_permission 表对应业务实现对象
+ * 2017/12/07 04:00:56
+ */
+@Transactional
+@Service
+public class ApplyPermissionService{
+	
+	@Autowired
+	private BaseDaoImpl<ApplyPermission> applyPermissionDao;
+	
+	/**
+	 * 根据主键查询ApplyPermission对象
+	 * @param id
+	 * @return
+	 */
+	public ApplyPermission findById (Serializable id){
+		ApplyPermission entity = applyPermissionDao.findById(ApplyPermission.class, id);
+		return entity;
+	}
+	
+	/**
+	 * 插入ApplyPermission对象
+	 * @param entity
+	 */
+	public void save (ApplyPermission entity){
+		applyPermissionDao.save(entity);
+	}
+	
+	/**
+	 * 修改ApplyPermission对象
+	 * @param entity
+	 */
+	public void update (ApplyPermission entity){
+		applyPermissionDao.update(entity);
+	}
+	
+	/**
+	 * 删除ApplyPermission对象
+	 * @param id
+	 */
+	public void delete (Serializable id){
+		applyPermissionDao.delete(ApplyPermission.class, id);
+	}
+	
+	/**
+	 * 根据sql查询ApplyPermission对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return ApplyPermission对象集合
+	 */
+	public List<ApplyPermission> findListBySql(int currentPage, int pageSize){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select ApplyPermission.* from ApplyPermission");
+		List<ApplyPermission> list = applyPermissionDao.findListBySql(ApplyPermission.class, sql.toString(), currentPage, pageSize);	
+		return list;
+	}
+	
+	/**
+	 * 根据sql查询ApplyPermission集合数量
+	 * @return ApplyPermission集合数量
+	 */
+	public int findCountBySql(){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select count(1) from apply_permission");
+		int count = applyPermissionDao.findCountBySql(sql.toString());	
+		return count;
+	}
+	
+	/**
+	 * 根据sql查询ApplyPermission分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return ApplyPermission分页对象
+	 */
+	public Pager<ApplyPermission> findPageBySql(int currentPage, int pageSize){
+		int totalRecord = findCountBySql();	
+		Pager<ApplyPermission> pager = new Pager<ApplyPermission>(currentPage, pageSize, totalRecord);
+		List<ApplyPermission> dataList = findListBySql(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+	
+	/**
+	 * 根据表达式查询ApplyPermission对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return ApplyPermission对象集合
+	 */
+	public List<ApplyPermission> findList(int currentPage, int pageSize){
+		List<Exp> expList = new ArrayList<Exp>();
+		List<ApplyPermission> ApplyPermissionList = applyPermissionDao.findList(ApplyPermission.class, expList, currentPage, pageSize);	
+		return ApplyPermissionList;
+	}
+	
+	/**
+	 * 根据表达式查询ApplyPermission集合数量
+	 * @return ApplyPermission集合数量
+	 */
+	public int findCount(){
+		List<Exp> expList = new ArrayList<Exp>();
+		int count = applyPermissionDao.findCount(ApplyPermission.class, expList);	
+		return count;
+	}
+	
+	/**
+	 * 根据表达式查询ApplyPermission分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return ApplyPermission分页对象
+	 */
+	public Pager<ApplyPermission> findPage(int currentPage, int pageSize){
+		int totalRecord = findCount();	
+		Pager<ApplyPermission> pager = new Pager<ApplyPermission>(currentPage, pageSize, totalRecord);
+		List<ApplyPermission> dataList = findList(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+}
+
+

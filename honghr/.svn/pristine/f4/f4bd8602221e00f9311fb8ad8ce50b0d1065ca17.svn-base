@@ -1,0 +1,137 @@
+*{
+    margin:0;
+    padding:0;
+    list-style: none;
+}
+.left{
+    float:left;
+}
+.right{
+    float:right;
+}
+.clear{
+    clear:both;
+}
+ul{
+    margin:0;
+    padding:0;
+}
+input{
+    outline: none;
+}
+a:hover{
+    text-decoration:none!important;
+}
+.z_ttms_nav_wrap{
+    height: 120px;
+}
+.z_ttms_nav_top {
+    height: 120px;
+    background: url(../../img/login_topbg_01.png) no-repeat center center;
+    background-size: auto 100%;
+    z-index: 999;
+    width: 100%;
+}
+.z_ttms_login_title_eng{
+    color:#fff;
+    font-size:14px;
+    text-align: center;
+    margin-bottom:5px;
+}
+.z_homepage_logoname {
+    color: #126eaa;
+    line-height: 60px;
+    font-size: 20px;
+    margin-left:10px;
+}
+.z_login_content{
+    position: relative;
+    background:url("../../img/login_conbg_02.png") no-repeat center center;
+    background-size:auto 100%;
+    padding-top:25px;
+
+}
+.z_ttms_login_title{
+    font-size:20px;
+    color:#01568e;
+    text-align: center;
+}
+.z_login_box{
+    width: 450px;
+    height: 250px;
+    border-radius: 5px;
+    position: absolute;
+    margin-top: 30px;
+    left: 50%;
+    margin-left: -225px;
+    background: rgba(255,255,255,0.6);
+}
+.z_login_inner{
+    width: 323px;
+    margin: 0 auto;
+    padding-top:12px;
+}
+.z_login_in{
+    display: inline-block;
+    width:70px;
+    vertical-align: middle;
+    text-align: right;
+    font-weight: normal;
+    color: #323232;
+    font-size: 16px;
+}
+.z_login_user{
+    width:250px;
+    height:35px;
+    padding-left:8px;
+}
+.z_login_inner label{
+    margin-top:12px;
+}
+.z_login_submit{
+    display: block;
+    margin-top: 14px;
+    width: 250px;
+    height: 35px;
+    margin-left: 70px;
+    background: #046dac;
+    border: none;
+    border-radius: 3px;
+    color: #fff;
+    outline: none;
+}
+.z_login_submit:hover{
+    background:rgba(4,109,172,0.8);
+}
+.z_enter_code{
+    height:35px;
+    width:90px;
+}
+.z_code{
+    display: inline-block;
+    width: 90px;
+    border: 1px solid #b2b2b2;
+    height: 35px;
+    vertical-align: middle;
+    margin-left: 5px;
+}
+.z_code_box{
+    position: relative;
+}
+.z_nosee{
+    position: absolute;
+    right: -103px;
+    top: 7px;
+    font-weight: normal;
+}
+.z_arrow{
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    left: 50%;
+    border-right: 8px solid transparent;
+    border-bottom: 15px solid #fff;
+    top: 103px;
+    opacity: 0.5;
+}

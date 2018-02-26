@@ -1,0 +1,258 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Date;
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.common.constant.NumConstant;
+import com.hongedu.honghr.honghr.common.constant.SessionConstant;
+import com.hongedu.honghr.honghr.common.enums.EnumApplyCheckStatus;
+import com.hongedu.honghr.honghr.common.enums.EnumApplyStatus;
+import com.hongedu.honghr.honghr.entity.Employee;
+import com.hongedu.honghr.honghr.entity.OvertimeWorkApply;
+import com.hongedu.honghr.honghr.entity.vo.OvertimeWorkApplyVo;
+import com.hongedu.honghr.util.page.Pager;
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+
+/**
+ * @author  
+ * el_bp_overtime_work_apply 表对应业务实现对象
+ * 2017/12/07 04:00:57
+ */
+@Transactional
+@Service
+public class OvertimeWorkApplyService{
+	
+	@Autowired
+	private BaseDaoImpl<OvertimeWorkApply> overtimeWorkApplyDao;
+	
+	@Autowired
+	private BaseDaoImpl<OvertimeWorkApplyVo> overtimeWorkApplyVoDao;
+	
+	/**
+	 * 根据主键查询OvertimeWorkApply对象
+	 * @param id
+	 * @return
+	 */
+	public OvertimeWorkApply findById (Serializable id){
+		OvertimeWorkApply entity = overtimeWorkApplyDao.findById(OvertimeWorkApply.class, id);
+		return entity;
+	}
+	
+	/**
+	 * 插入OvertimeWorkApply对象
+	 * @param entity
+	 */
+	public void save (OvertimeWorkApply entity){
+		overtimeWorkApplyDao.save(entity);
+	}
+	
+	/**
+	 * 修改OvertimeWorkApply对象
+	 * @param entity
+	 */
+	public void update (OvertimeWorkApply entity){
+		overtimeWorkApplyDao.update(entity);
+	}
+	
+	/**
+	 * 删除OvertimeWorkApply对象
+	 * @param id
+	 */
+	public void delete (Serializable id){
+		overtimeWorkApplyDao.delete(OvertimeWorkApply.class, id);
+	}
+	
+	/**
+	 * 根据sql查询OvertimeWorkApply对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return OvertimeWorkApply对象集合
+	 */
+	public List<OvertimeWorkApply> findListBySql(int currentPage, int pageSize){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select OvertimeWorkApply.* from OvertimeWorkApply");
+		List<OvertimeWorkApply> list = overtimeWorkApplyDao.findListBySql(OvertimeWorkApply.class, sql.toString(), currentPage, pageSize);	
+		return list;
+	}
+	
+	/**
+	 * 根据sql查询OvertimeWorkApply集合数量
+	 * @return OvertimeWorkApply集合数量
+	 */
+	public int findCountBySql(String sql, Object[] args){
+		StringBuilder sb = new StringBuilder();
+		sb.append("select count(1) from ( ");
+		sb.append(sql);
+		sb.append(")main ");
+		return overtimeWorkApplyDao.findCountBySql(sb.toString(), args);
+	}
+	
+	/**
+	 * 根据表达式查询OvertimeWorkApply对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return OvertimeWorkApply对象集合
+	 */
+	public List<OvertimeWorkApply> findList(int currentPage, int pageSize){
+		List<Exp> expList = new ArrayList<Exp>();
+		List<OvertimeWorkApply> OvertimeWorkApplyList = overtimeWorkApplyDao.findList(OvertimeWorkApply.class, expList, currentPage, pageSize);	
+		return OvertimeWorkApplyList;
+	}
+	
+	/**
+	 * 根据表达式查询OvertimeWorkApply集合数量
+	 * @return OvertimeWorkApply集合数量
+	 */
+	public int findCount(){
+		List<Exp> expList = new ArrayList<Exp>();
+		int count = overtimeWorkApplyDao.findCount(OvertimeWorkApply.class, expList);	
+		return count;
+	}
+	
+	/**
+	 * 根据表达式查询OvertimeWorkApply分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return OvertimeWorkApply分页对象
+	 */
+	public Pager<OvertimeWorkApplyVo> findPage(int currentPage, int pageSize){
+		Employee employee = (Employee)SecurityUtils.getSubject().getSession().getAttribute(SessionConstant.SESSION_EMPLOYEE_KEY);
+		if(employee != null){
+			StringBuilder sb = new StringBuilder();
+			sb.append("select ov.overtime_work_apply_id, ov.overtime_work_apply_num, ov.employee_id, ov.apply_type, ov.apply_reason, ov.apply_begin_time, ov.apply_end_time, ov.apply_duration, ov.apply_date_time, ov.apply_check_status, ov.deleted, ");
+			sb.append("d.department_name applyDepartmentNum, e.employee_name applyEmployeeName, c.code_name applyTypeShow ");
+			sb.append("from overtime_work_apply ov ");
+			sb.append("left join department d on ov.apply_department_num = d.department_num ");
+			sb.append("left join employee e on ov.employee_id = e.employee_id ");
+			sb.append("left join code c on ov.apply_type = c.code_value ");
+			sb.append("where ov.employee_id = ? ");
+			sb.append("and ov.deleted = ? ");
+			Pager<OvertimeWorkApplyVo> pager = new Pager<OvertimeWorkApplyVo>(currentPage, pageSize, findCountBySql(sb.toString(), new Object[] { employee.getEmployeeId(), DataConstant.EXIST }));
+			List<OvertimeWorkApplyVo> dataList = overtimeWorkApplyVoDao.findEntityListByPage(OvertimeWorkApplyVo.class, sb.toString(), 
+					new Object[] { employee.getEmployeeId(), DataConstant.EXIST }, pager.getFromIndex(), pageSize);	
+			setApplyCheckStatusShowByList(dataList);
+			pager.setDataList(dataList);
+			return pager;
+		}
+		return null;
+	}
+
+	private void setApplyCheckStatusShowByList(List<OvertimeWorkApplyVo> overTimeApplyList) {
+		for (OvertimeWorkApplyVo overtimeWorkApplyVo : overTimeApplyList) {
+			for (EnumApplyStatus enumApplyStatus : EnumApplyStatus.values()) {
+				if (enumApplyStatus.getCode().equals(overtimeWorkApplyVo.getApplyCheckStatus())) {
+					overtimeWorkApplyVo.setApplyCheckStatusShow(enumApplyStatus.getValue());
+					break;
+				}
+			}
+		}
+		
+	}
+    
+	/**
+	 * 查询该领导需要审核的员工加班申请信息
+	 * @param currentPage
+	 * @param pageSize
+	 * @return
+	 * @Author wanghui
+	 * @Date 2018年1月5日
+	 */
+	public Pager<OvertimeWorkApplyVo> findAllCheckPage(Integer currentPage, Integer pageSize) {
+		Employee employee = (Employee)SecurityUtils.getSubject().getSession().getAttribute(SessionConstant.SESSION_EMPLOYEE_KEY);
+		if(employee != null){
+			StringBuilder sb = new StringBuilder();
+			sb.append("select ov.overtime_work_apply_id, ov.overtime_work_apply_num, ov.employee_id, ov.apply_type, ov.apply_reason, ov.apply_begin_time, ov.apply_end_time, ov.apply_duration, ov.apply_date_time, ov.apply_check_status, ov.deleted, ");
+			sb.append("d.department_name applyDepartmentNum, e.employee_name applyEmployeeName, c.code_name applyTypeShow ");
+			sb.append("from overtime_work_apply ov ");
+			sb.append("LEFT JOIN overtime_work_apply_check ow on ov.overtime_work_apply_id = ow.overtime_work_apply_id ");
+			sb.append("LEFT JOIN department d on ov.apply_department_num = d.department_num ");
+			sb.append("LEFT JOIN employee e ON e.employee_id = ov.employee_id ");
+			sb.append("LEFT JOIN code c on ov.apply_type = c.code_value ");
+			sb.append("where ow.check_employee_id = ? ");
+			sb.append("and ov.deleted = ? ");
+			Pager<OvertimeWorkApplyVo> pager = new Pager<OvertimeWorkApplyVo>(currentPage, pageSize, findCountBySql(sb.toString(), new Object[] { employee.getEmployeeId(), DataConstant.EXIST }));
+			List<OvertimeWorkApplyVo> dataList = overtimeWorkApplyVoDao.findEntityListByPage(OvertimeWorkApplyVo.class, sb.toString(), 
+					new Object[] { employee.getEmployeeId(), DataConstant.EXIST }, pager.getFromIndex(), pageSize);	
+			setApplyCheckStatusShowByList(dataList);
+			pager.setDataList(dataList);
+			return pager;
+		}
+		return null;
+	}
+	
+	public String getOvertimeWorkApplyNum(Integer employeeId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select Max(overtime_work_apply_id) from overtime_work_apply where employee_id = ? ");
+		Integer max_id = overtimeWorkApplyVoDao.findCountBySql(sb.toString(), new Object[] { employeeId });
+		max_id = max_id != null ? max_id : 1;
+		sb.delete(0, sb.length());
+		return sb.append(NumConstant.OVERTIME_WORK_APPLY_NUM_START)
+				.append(new SimpleDateFormat("yyyyMMdd").format(new Date())).append(employeeId).append(max_id)
+				.toString();
+	}
+
+	public Pager<OvertimeWorkApplyVo> findForCheckPage(Integer employeeId, Integer currentPage, Integer pageSize) {
+		StringBuilder sb = new StringBuilder();
+		// 查询其为第一个审批人且未审批的休假申请单
+		sb.append(
+				"select ow.overtime_work_apply_id, ow.overtime_work_apply_num, ow.employee_id, ow.apply_type, ow.apply_reason, ow.apply_begin_time, ow.apply_end_time, ow.apply_duration, ow.apply_date_time, ow.apply_check_status, ow.deleted, ");
+		sb.append(
+				"d.department_name applyDepartmentNum, e.employee_name applyEmployeeName, c.code_name applyTypeShow, oc.apply_is_allowed ");
+		sb.append("from overtime_work_apply ow ");
+		sb.append("left join department d on ow.apply_department_num = d.department_num ");
+		sb.append("left join employee e on ow.employee_id = e.employee_id ");
+		sb.append("left join code c on ow.apply_type = c.code_value ");
+		sb.append("join overtime_work_apply_check oc on ow.overtime_work_apply_id = oc.overtime_work_apply_id ");
+		sb.append("where oc.check_employee_id = ? ");
+		sb.append("and oc.apply_check_sequence = ? ");
+		sb.append("and oc.apply_is_allowed = ? ");
+		sb.append("and oc.deleted = ? ");
+		sb.append("and ow.deleted = ? ");
+		sb.append("union all ");
+		// 查询其为非第一个审批人且未审批且前一个审批人已经审批通过的休假申请单
+		sb.append(
+				"select ow.overtime_work_apply_id, ow.overtime_work_apply_num, ow.employee_id, ow.apply_type, ow.apply_reason, ow.apply_begin_time, ow.apply_end_time, ow.apply_duration, ow.apply_date_time, ow.apply_check_status, ow.deleted, ");
+		sb.append(
+				"d.department_name applyDepartmentNum, e.employee_name applyEmployeeName, c.code_name applyTypeShow, oc.apply_is_allowed ");
+		sb.append("from overtime_work_apply ow ");
+		sb.append("left join department d on ow.apply_department_num = d.department_num ");
+		sb.append("left join employee e on ow.employee_id = e.employee_id ");
+		sb.append("left join code c on ow.apply_type = c.code_value ");
+		sb.append("join overtime_work_apply_check oc on ow.overtime_work_apply_id = oc.overtime_work_apply_id ");
+		sb.append("where oc.check_employee_id = ? ");
+		sb.append("and oc.apply_check_sequence != ? ");
+		sb.append("and oc.apply_is_allowed = ? ");
+		sb.append("and oc.overtime_work_apply_check_id in( ");
+		sb.append("select overtime_work_apply_check_id ");
+		sb.append("from overtime_work_apply_check ");
+		sb.append("where apply_check_sequence = oc.apply_check_sequence - 1 ");
+		sb.append("and apply_is_allowed = ? ");
+		sb.append("and deleted = ?) ");
+		sb.append("and oc.deleted = ? ");
+		sb.append("and ow.deleted = ? ");
+		Pager<OvertimeWorkApplyVo> pager = new Pager<OvertimeWorkApplyVo>(currentPage, pageSize,
+				findCountBySql(sb.toString(),
+						new Object[] { employeeId, DataConstant.FIRST_CHECK, EnumApplyCheckStatus.UN_CHECK.getCode(),
+								DataConstant.EXIST, DataConstant.EXIST, employeeId, DataConstant.FIRST_CHECK,
+								EnumApplyCheckStatus.UN_CHECK.getCode(), EnumApplyCheckStatus.AGREE.getCode(),
+								DataConstant.EXIST, DataConstant.EXIST, DataConstant.EXIST }));
+		List<OvertimeWorkApplyVo> dataList = overtimeWorkApplyVoDao.findEntityUnionListByPage(OvertimeWorkApplyVo.class, sb.toString(),
+				new Object[] { employeeId, DataConstant.FIRST_CHECK, EnumApplyCheckStatus.UN_CHECK.getCode(),
+						DataConstant.EXIST, DataConstant.EXIST, employeeId, DataConstant.FIRST_CHECK,
+						EnumApplyCheckStatus.UN_CHECK.getCode(), EnumApplyCheckStatus.AGREE.getCode(),
+						DataConstant.EXIST, DataConstant.EXIST, DataConstant.EXIST },
+				pager.getFromIndex(), pageSize);
+		pager.setDataList(dataList);
+		return pager;
+	}
+}
+
+

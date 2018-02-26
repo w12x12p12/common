@@ -1,0 +1,4 @@
+mail.sendHost=smtp.exmail.qq.com
+mail.sendUser=help@hongedu.com.cn
+mail.password=Hongedu0000
+mail.receiveUser=help@hongedu.com.cn

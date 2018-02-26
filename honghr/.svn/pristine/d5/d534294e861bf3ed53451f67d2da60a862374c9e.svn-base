@@ -1,0 +1,125 @@
+
+package com.hongedu.honghr.honghr.web;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.hongedu.honghr.util.json.JsonResult;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.honghr.entity.Role;
+import com.hongedu.honghr.honghr.service.RoleService;
+
+
+/**
+ * @author  
+ * el_sys_role 表对应的controller
+ * 2017/12/07 04:04:41
+ */
+@Controller
+@RequestMapping("/admin/role")
+public class RoleController {
+	private final static Logger logger= LoggerFactory.getLogger(RoleController.class);
+	
+	@Autowired
+	private RoleService roleService;
+	
+	/**
+	 * 查询Role详情
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/findRole",method=RequestMethod.POST)
+	public JsonResult findRole(
+			@RequestParam(required=true)java.lang.Integer roleId) {
+		try {
+			Role role = roleService.findById(roleId);
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", role);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 编辑Role
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value="/editRole",method=RequestMethod.GET)
+	public String editRole(
+			java.lang.Integer roleId,
+			Model model) {
+		if(roleId != null){
+			Role role = roleService.findById(roleId);
+			model.addAttribute("role", role);
+		}
+		return "admin/role/editRole";
+	}
+	
+	/**
+	 * 保存Role
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveRole",method=RequestMethod.POST)
+	public JsonResult saveRole(
+			Role role
+			) {
+		try {
+			if(role.getRoleId() == null){
+				roleService.save(role);
+			}else{
+				roleService.update(role);
+			}
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 删除Role
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deleteRole",method=RequestMethod.POST)
+	public JsonResult deleteRole(
+			@RequestParam(required=true)java.lang.Integer roleId) {
+		try {
+			roleService.delete(roleId);
+		return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+						return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 查询Role表单页面
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/roleList",method=RequestMethod.GET)
+	public String roleList(
+			@RequestParam(required=false,defaultValue="1")Integer currentPage,
+			@RequestParam(required=false,defaultValue="10")Integer pageSize,
+			Model model) {
+		Pager<Role> page = roleService.findPage(currentPage, pageSize);
+		model.addAttribute("page", page);
+		return "admin/role/roleList";
+	}
+}

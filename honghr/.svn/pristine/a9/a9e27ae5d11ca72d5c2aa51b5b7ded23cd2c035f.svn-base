@@ -1,0 +1,173 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.common.constant.NumConstant;
+import com.hongedu.honghr.honghr.common.constant.SessionConstant;
+import com.hongedu.honghr.honghr.entity.AbsenceApply;
+import com.hongedu.honghr.honghr.entity.Employee;
+import com.hongedu.honghr.honghr.entity.vo.AbsenceApplyVo;
+import com.hongedu.honghr.util.page.Pager;
+
+/**
+ * @author el_bp_absence_apply 表对应业务实现对象 2017/12/07 04:00:54
+ */
+@Transactional
+@Service
+public class AbsenceApplyService {
+
+	@Autowired
+	private BaseDaoImpl<AbsenceApply> absenceApplyDao;
+	@Autowired
+	private BaseDaoImpl<AbsenceApplyVo> absenceApplyVoDao;
+
+	/**
+	 * 根据主键查询AbsenceApply对象
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public AbsenceApply findById(Serializable id) {
+		return absenceApplyDao.findById(AbsenceApply.class, id);
+	}
+
+	/**
+	 * 插入AbsenceApply对象
+	 * 
+	 * @param entity
+	 */
+	public void save(AbsenceApply entity) {
+		absenceApplyDao.save(entity);
+	}
+
+	/**
+	 * 修改AbsenceApply对象
+	 * 
+	 * @param entity
+	 */
+	public void update(AbsenceApply entity) {
+		absenceApplyDao.update(entity);
+	}
+
+	/**
+	 * 删除AbsenceApply对象
+	 * 
+	 * @param id
+	 */
+	public void delete(Serializable id) {
+		absenceApplyDao.delete(AbsenceApply.class, id);
+	}
+
+	/**
+	 * 根据sql查询AbsenceApply对象集合
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return AbsenceApply对象集合
+	 */
+	public List<AbsenceApply> findListBySql(int currentPage, int pageSize) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select absence_apply.* from absence_apply");
+		return absenceApplyDao.findListBySql(AbsenceApply.class, sql.toString(), currentPage, pageSize);
+	}
+
+	/**
+	 * 根据sql查询AbsenceApply集合数量
+	 * 
+	 * @return AbsenceApply集合数量
+	 */
+	public int findCountBySql() {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select count(1) from absence_apply");
+		return absenceApplyDao.findCountBySql(sql.toString());
+	}
+
+	/**
+	 * 根据sql查询AbsenceApply分页对象
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return AbsenceApply分页对象
+	 */
+	public Pager<AbsenceApply> findPageBySql(int currentPage, int pageSize) {
+		int totalRecord = findCountBySql();
+		Pager<AbsenceApply> pager = new Pager<AbsenceApply>(currentPage, pageSize, totalRecord);
+		List<AbsenceApply> dataList = findListBySql(pager.getFromIndex(), pageSize);
+		pager.setDataList(dataList);
+		return pager;
+	}
+
+	/**
+	 * 根据表达式查询AbsenceApply对象集合
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return AbsenceApply对象集合
+	 */
+	public List<AbsenceApply> findList(int currentPage, int pageSize) {
+		List<Exp> expList = new ArrayList<Exp>();
+		return absenceApplyDao.findList(AbsenceApply.class, expList, currentPage, pageSize);
+	}
+
+	/**
+	 * 根据表达式查询AbsenceApply集合数量
+	 * 
+	 * @return AbsenceApply集合数量
+	 */
+	public int findCount() {
+		List<Exp> expList = new ArrayList<Exp>();
+		return absenceApplyDao.findCount(AbsenceApply.class, expList);
+	}
+
+	/**
+	 * 查询AbsenceApplyVo分页对象
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return AbsenceApplyVo分页对象
+	 */
+	public Pager<AbsenceApplyVo> findPage(int currentPage, int pageSize) {
+		Employee employee = (Employee)SecurityUtils.getSubject().getSession().getAttribute(SessionConstant.SESSION_EMPLOYEE_KEY);
+		if(employee != null) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("select a.absence_apply_id, a.absence_apply_num, a.employee_id, a.apply_type, a.apply_reason, a.apply_begin_time, a.apply_end_time, a.apply_duration, a.apply_date_time, a.apply_check_status, a.deleted, ");
+			sb.append("d.department_name applyDepartmentNum, e.employee_name applyEmployeeName, c.code_name applyTypeShow, cd.code_name applyCheckStatusShow ");
+			sb.append("from absence_apply a ");
+			sb.append("left join department d on a.apply_department_num = d.department_num ");
+			sb.append("left join employee e on a.employee_id = e.employee_id ");
+			sb.append("left join code c on a.apply_type = c.code_value ");
+			sb.append("left join code cd on a.apply_check_status = cd.code_value ");
+			sb.append("where a.employee_id = ? ");
+			sb.append("and a.deleted = ? ");
+			Pager<AbsenceApplyVo> pager = new Pager<AbsenceApplyVo>(currentPage, pageSize, findCountBySql());
+			List<AbsenceApplyVo> dataList = absenceApplyVoDao.findEntityListByPage(AbsenceApplyVo.class, sb.toString(), new Object[] { employee.getEmployeeId(), DataConstant.EXIST }, pager.getFromIndex(), pageSize);
+			pager.setDataList(dataList);
+			return pager;
+		}
+		return null;
+	}
+
+	public String getAbsenceApplyNum() {
+		return NumConstant.ABSENCE_APPLY_NUM_START + new SimpleDateFormat("yyyyMMdd").format(new Date());
+	}
+}

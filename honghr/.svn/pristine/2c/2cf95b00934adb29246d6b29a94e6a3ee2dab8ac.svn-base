@@ -1,0 +1,146 @@
+package com.hongedu.honghr.honghr.entity;
+
+import java.io.Serializable;
+
+import com.hongedu.honghr.base.entity.BaseEntity;
+import com.hongedu.honghr.base.dao.annotation.Table;
+/**
+ * @author  
+ * el_bp_absence_apply 表对应实体
+ * 2017/12/07 04:00:54
+ */
+@Table(name="el_bp_absence_apply", pk="absenceApplyId")
+public class AbsenceApply extends BaseEntity implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	/***/
+	private java.lang.Integer absenceApplyId;
+	/***/
+	private java.lang.String absenceApplyNum;
+	/***/
+	private java.lang.Integer employeeId;
+	/***/
+	private java.lang.String applyType;
+	/***/
+	private java.lang.String applyReason;
+	/***/
+	private java.util.Date applyBeginTime;
+	/***/
+	private java.util.Date applyEndTime;
+	/***/
+	private java.lang.String applyDuration;
+	/***/
+	private java.util.Date applyDateTime;
+	/***/
+	private java.lang.String applyCheckStatus;
+	/***/
+	private java.lang.String applyCheckProgress;
+	/***/
+	private java.lang.Integer createEmployeeId;
+	/***/
+	private java.util.Date createDateTime;
+	/***/
+	private java.lang.String deleted;
+	
+	public void setAbsenceApplyId(java.lang.Integer value) {
+		this.absenceApplyId = value;
+	}
+	
+	public java.lang.Integer getAbsenceApplyId() {
+		return absenceApplyId;
+	}
+	public void setAbsenceApplyNum(java.lang.String value) {
+		this.absenceApplyNum = value;
+	}
+	
+	public java.lang.String getAbsenceApplyNum() {
+		return absenceApplyNum;
+	}
+	public void setEmployeeId(java.lang.Integer value) {
+		this.employeeId = value;
+	}
+	
+	public java.lang.Integer getEmployeeId() {
+		return employeeId;
+	}
+	public void setApplyType(java.lang.String value) {
+		this.applyType = value;
+	}
+	
+	public java.lang.String getApplyType() {
+		return applyType;
+	}
+	public void setApplyReason(java.lang.String value) {
+		this.applyReason = value;
+	}
+	
+	public java.lang.String getApplyReason() {
+		return applyReason;
+	}
+	public void setApplyBeginTime(java.util.Date value) {
+		this.applyBeginTime = value;
+	}
+	
+	public java.util.Date getApplyBeginTime() {
+		return applyBeginTime;
+	}
+	public void setApplyEndTime(java.util.Date value) {
+		this.applyEndTime = value;
+	}
+	
+	public java.util.Date getApplyEndTime() {
+		return applyEndTime;
+	}
+	public void setApplyDuration(java.lang.String value) {
+		this.applyDuration = value;
+	}
+	
+	public java.lang.String getApplyDuration() {
+		return applyDuration;
+	}
+	public void setApplyDateTime(java.util.Date value) {
+		this.applyDateTime = value;
+	}
+	
+	public java.util.Date getApplyDateTime() {
+		return applyDateTime;
+	}
+	public void setApplyCheckStatus(java.lang.String value) {
+		this.applyCheckStatus = value;
+	}
+	
+	public java.lang.String getApplyCheckStatus() {
+		return applyCheckStatus;
+	}
+	public void setApplyCheckProgress(java.lang.String value) {
+		this.applyCheckProgress = value;
+	}
+	
+	public java.lang.String getApplyCheckProgress() {
+		return applyCheckProgress;
+	}
+	public void setCreateEmployeeId(java.lang.Integer value) {
+		this.createEmployeeId = value;
+	}
+	
+	public java.lang.Integer getCreateEmployeeId() {
+		return createEmployeeId;
+	}
+	public void setCreateDateTime(java.util.Date value) {
+		this.createDateTime = value;
+	}
+	
+	public java.util.Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setDeleted(java.lang.String value) {
+		this.deleted = value;
+	}
+	
+	public java.lang.String getDeleted() {
+		return deleted;
+	}
+}
+
+

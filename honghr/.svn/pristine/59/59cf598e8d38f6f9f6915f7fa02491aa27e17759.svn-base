@@ -1,0 +1,235 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.sql.Types;
+import java.util.List;
+import java.util.ArrayList;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.base.dao.expression.impl.WhereExp;
+import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.entity.EmployeePosition;
+import com.hongedu.honghr.honghr.entity.vo.EmployeePositionVo;
+import com.hongedu.honghr.util.page.Pager;
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+
+/**
+ * @author el_bp_employee_position 表对应业务实现对象 2017/12/07 04:00:57
+ */
+@Transactional
+@Service
+public class EmployeePositionService {
+
+	@Autowired
+	private BaseDaoImpl<EmployeePosition> employeePositionDao;
+	@Autowired
+	private BaseDaoImpl<EmployeePositionVo> employeePositionVoDao;
+
+	/**
+	 * 根据主键查询EmployeePosition对象
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public EmployeePosition findById(Serializable id) {
+		EmployeePosition entity = employeePositionDao.findById(EmployeePosition.class, id);
+		return entity;
+	}
+
+	/**
+	 * 插入EmployeePosition对象
+	 * 
+	 * @param entity
+	 */
+	public void save(EmployeePosition entity) {
+		employeePositionDao.save(entity);
+	}
+
+	/**
+	 * 修改EmployeePosition对象
+	 * 
+	 * @param entity
+	 */
+	public void update(EmployeePosition entity) {
+		employeePositionDao.update(entity);
+	}
+
+	/**
+	 * 删除EmployeePosition对象
+	 * 
+	 * @param id
+	 */
+	public void delete(Serializable id) {
+		employeePositionDao.delete(EmployeePosition.class, id);
+	}
+
+	/**
+	 * 根据sql查询EmployeePosition对象集合
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return EmployeePosition对象集合
+	 */
+	public List<EmployeePosition> findListBySql(int currentPage, int pageSize) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select EmployeePosition.* from EmployeePosition");
+		List<EmployeePosition> list = employeePositionDao.findListBySql(EmployeePosition.class, sql.toString(),
+				currentPage, pageSize);
+		return list;
+	}
+
+	/**
+	 * 根据sql查询EmployeePosition集合数量
+	 * 
+	 * @return EmployeePosition集合数量
+	 */
+	public int findCountBySql() {
+		StringBuilder sql = new StringBuilder();
+		sql.append("select count(1) from employee_position");
+		return employeePositionDao.findCountBySql(sql.toString());
+	}
+
+	/**
+	 * 根据表达式查询EmployeePosition对象集合
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return EmployeePosition对象集合
+	 */
+	public List<EmployeePosition> findList(int currentPage, int pageSize) {
+		List<Exp> expList = new ArrayList<Exp>();
+		List<EmployeePosition> EmployeePositionList = employeePositionDao.findList(EmployeePosition.class, expList,
+				currentPage, pageSize);
+		return EmployeePositionList;
+	}
+
+	/**
+	 * 根据表达式查询EmployeePosition集合数量
+	 * 
+	 * @return EmployeePosition集合数量
+	 */
+	public int findCount() {
+		List<Exp> expList = new ArrayList<Exp>();
+		int count = employeePositionDao.findCount(EmployeePosition.class, expList);
+		return count;
+	}
+
+	/**
+	 * 根据表达式查询EmployeePosition分页对象
+	 * 
+	 * @param employeeName
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return EmployeePosition分页对象
+	 */
+	public Pager<EmployeePositionVo> findPage(String employeeName, int currentPage, int pageSize) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"SELECT ep.*,e.employee_name employeeName,d.department_name departmentName,p.position_name positionName, ");
+		sb.append("em.employee_name leaderName from employee_position ep ");
+		sb.append("LEFT JOIN employee e ON e.employee_id = ep.employee_id ");
+		sb.append("LEFT JOIN employee em ON em.employee_id = ep.leader_id ");
+		sb.append("LEFT JOIN department d on ep.department_num = d.department_num ");
+		sb.append("LEFT JOIN position p on p.position_num = ep.position_num ");
+		sb.append("where ep.deleted = ? ");
+		Pager<EmployeePositionVo> pager = new Pager<EmployeePositionVo>(currentPage, pageSize, findCountBySql());
+		List<EmployeePositionVo> dataList = employeePositionVoDao.findEntityListByPage(EmployeePositionVo.class,
+				sb.toString(), new Object[] { DataConstant.EXIST }, pager.getFromIndex(), pageSize);
+		pager.setDataList(dataList);
+		return pager;
+	}
+
+	/**
+	 * 保存员工关系
+	 */
+	public void insertEmployeePositionVo(EmployeePositionVo employeePositionVo) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("insert into employee_position(employee_id,department_num,position_num,deleted) ");
+		sb.append("values(?,?,?,?) ");
+		String sql = sb.toString();
+		employeePositionDao.insert(sql, new int[] { Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR },
+				new Object[] { employeePositionVo.getEmployeeId(), employeePositionVo.getDepartmentNum(),
+						employeePositionVo.getPositionNum(), employeePositionVo.getDeleted() });
+	}
+
+	/**
+	 * 根据id查询员工关系信息
+	 */
+	public EmployeePositionVo findEmployeePositionById(Integer employeePositionId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"SELECT ep.*,e.employee_name employeeName,d.department_name departmentName,p.position_name positionName ");
+		sb.append("from employee_position ep ");
+		sb.append("LEFT JOIN employee e ON e.employee_id = ep.employee_id ");
+		sb.append("LEFT JOIN employee em ON em.employee_id = ep.leader_id ");
+		sb.append("LEFT JOIN department d on ep.department_num = d.department_num ");
+		sb.append("LEFT JOIN position p on p.position_num = ep.position_num ");
+		sb.append("WHERE ep.employee_position_id = ? ");
+		EmployeePositionVo employeePositionVo = employeePositionVoDao.getEntityBySql(EmployeePositionVo.class,
+				sb.toString(), new Object[] { employeePositionId });
+		return employeePositionVo;
+	}
+
+	/**
+	 * 修改员工关系信息
+	 */
+	public void updateEmployeePositionVo(EmployeePositionVo employeePositionVo) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("update employee_position set employee_id = ?, department_num = ?, position_num = ? ");
+		sb.append("where employee_position_id = ? ");
+		employeePositionDao.update(sb.toString(),
+				new Object[] { employeePositionVo.getEmployeeId(), employeePositionVo.getDepartmentNum(),
+						employeePositionVo.getPositionNum(), employeePositionVo.getEmployeePositionId() });
+	}
+
+	public void updateDel(EmployeePosition employeePosition) {
+		employeePosition.setDeleted(DataConstant.DELETE);
+		employeePositionDao.update(employeePosition);
+	}
+
+	public EmployeePosition findByEMPId(Integer empId) {
+		List<Exp> expList = new ArrayList<Exp>();
+		List<EmployeePosition> EmployeePositionList = employeePositionDao.findList(EmployeePosition.class, expList);
+		EmployeePosition employeePosition = null;
+		for (int i = 0; i < EmployeePositionList.size(); i++) {
+			employeePosition = EmployeePositionList.get(i);
+			if (EmployeePositionList.get(i).getEmployeeId() == empId) {
+				break;
+			}
+		}
+		return employeePosition;
+	}
+
+	public List<EmployeePosition> findByPosNum(String oldPositionNum) {
+		List<Exp> expList = new ArrayList<Exp>();
+		expList.add(new WhereExp(EmployeePosition.class, "position_num", "=", oldPositionNum));
+		List<EmployeePosition> EmployeePositionList = employeePositionDao.findList(EmployeePosition.class, expList);
+		/*
+		 * for (int i = 0; i < EmployeePositionList.size(); i++) { employeePosition =
+		 * EmployeePositionList.get(i); if
+		 * (EmployeePositionList.get(i).getPositionNum()==oldPositionNum) { break; } }
+		 */
+		return EmployeePositionList;
+	}
+
+	public List<EmployeePositionVo> findAll() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select distinct ep.employee_id, ep.department_num, ");
+		sb.append("d.department_name ");
+		sb.append("from employee_position ep ");
+		sb.append("join department d ");
+		sb.append("on ep.department_num = d.department_num ");
+		sb.append("where ep.deleted = ? ");
+		sb.append("and d.deleted = ? ");
+		return employeePositionVoDao.findEntityListBySql(EmployeePositionVo.class, sb.toString(),
+				new Object[] { DataConstant.EXIST,DataConstant.EXIST });
+	}
+}

@@ -1,0 +1,142 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.entity.Code;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+
+/**
+ * @author  
+ * code 表对应业务实现对象
+ * 2018/01/04 10:57:56
+ */
+@Transactional
+@Service
+public class CodeService{
+	
+	private final static Logger logger= LoggerFactory.getLogger(CodeService.class);
+	
+	@Autowired
+	private BaseDaoImpl<Code> codeDao;
+	
+	/**
+	 * 根据主键查询Code对象
+	 * @param id
+	 * @return
+	 */
+	public Code findById (Serializable id){
+		Code entity = codeDao.findById(Code.class, id);
+		return entity;
+	}
+	
+	/**
+	 * 插入Code对象
+	 * @param entity
+	 */
+	public void save (Code entity){
+		codeDao.save(entity);
+	}
+	
+	/**
+	 * 修改Code对象
+	 * @param entity
+	 */
+	public void update (Code entity){
+		codeDao.update(entity);
+	}
+	
+	/**
+	 * 删除Code对象
+	 * @param id
+	 */
+	public void delete (Serializable id){
+		codeDao.delete(Code.class, id);
+	}
+	
+	/**
+	 * 根据sql查询Code对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Code对象集合
+	 */
+	public List<Code> findListBySql(int currentPage, int pageSize){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select Code.* from Code");
+		List<Code> list = codeDao.findListBySql(Code.class, sql.toString(), currentPage, pageSize);	
+		return list;
+	}
+	
+	/**
+	 * 根据sql查询Code集合数量
+	 * @return Code集合数量
+	 */
+	public int findCountBySql(){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select count(1) from Code");
+		int count = codeDao.findCountBySql( sql.toString());	
+		return count;
+	}
+	
+	/**
+	 * 根据sql查询Code分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Code分页对象
+	 */
+	public Pager<Code> findPageBySql(int currentPage, int pageSize){
+		int totalRecord = findCountBySql();	
+		Pager<Code> pager = new Pager<Code>(currentPage, pageSize, totalRecord);
+		List<Code> dataList = findListBySql(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+	
+	/**
+	 * 根据表达式查询Code对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Code对象集合
+	 */
+	public List<Code> findList(int currentPage, int pageSize){
+		List<Exp> expList = new ArrayList<Exp>();
+		List<Code> CodeList = codeDao.findList(Code.class, expList, currentPage, pageSize);	
+		return CodeList;
+	}
+	
+	/**
+	 * 根据表达式查询Code集合数量
+	 * @return Code集合数量
+	 */
+	public int findCount(){
+		List<Exp> expList = new ArrayList<Exp>();
+		int count = codeDao.findCount(Code.class, expList);	
+		return count;
+	}
+	
+	/**
+	 * 根据表达式查询Code分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Code分页对象
+	 */
+	public Pager<Code> findPage(int currentPage, int pageSize){
+		int totalRecord = findCount();	
+		Pager<Code> pager = new Pager<Code>(currentPage, pageSize, totalRecord);
+		List<Code> dataList = findList(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+}
+
+

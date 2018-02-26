@@ -1,0 +1,239 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.util.List;
+
+import java.util.ArrayList;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.base.dao.expression.impl.WhereExp;
+import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.entity.Position;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+
+/**
+ * @author el_bp_position 表对应业务实现对象 2017/12/07 04:00:58
+ */
+@Transactional
+@Service
+public class PositionService {
+
+	@Autowired
+	private BaseDaoImpl<Position> positionDao;
+
+	/**
+	 * 根据主键查询Position对象
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public Position findById(Serializable id) {
+		Position entity = positionDao.findById(Position.class, id);
+		return entity;
+	}
+
+	/**
+	 * 插入Position对象
+	 * 
+	 * @param entity
+	 */
+	public void save(Position entity) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("INSERT INTO `position`(position_name,position_code,department_id,"
+				+ "position_parent_id,position_num,referred,deleted) VALUES(?,?,?,?,?,?,?)");
+		positionDao.insertBySql(sql.toString(),
+				new Object[] { entity.getPositionName(), entity.getPositionCode(), entity.getDepartmentId(),
+						entity.getPositionParentId(), entity.getPositionNum(), entity.getReferred(),
+						entity.getDeleted() });
+
+	}
+
+	/**
+	 * 修改Position对象
+	 * 
+	 * @param entity
+	 */
+	public void update(Position entity) {
+		positionDao.update(entity);
+	}
+
+	/**
+	 * 删除Position对象
+	 * 
+	 * @param id
+	 */
+	public void delete(Serializable id) {
+		positionDao.delete(Position.class, id);
+	}
+
+	/**
+	 * 根据sql查询Position对象集合
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return Position对象集合
+	 */
+	public List<Position> findListBySql(int currentPage, int pageSize) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select Position.* from Position");
+		List<Position> list = positionDao.findListBySql(Position.class, sql.toString(), currentPage, pageSize);
+		return list;
+	}
+
+	/**
+	 * 根据sql查询Position集合数量
+	 * 
+	 * @return Position集合数量
+	 */
+	public int findCountBySql() {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select count(1) from position");
+		int count = positionDao.findCountBySql(sql.toString());
+		return count;
+	}
+
+	/**
+	 * 根据sql查询Position分页对象
+	 * 
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return Position分页对象
+	 */
+	public Pager<Position> findPageBySql(int currentPage, int pageSize) {
+		int totalRecord = findCountBySql();
+		Pager<Position> pager = new Pager<Position>(currentPage, pageSize, totalRecord);
+		List<Position> dataList = findListBySql(pager.getFromIndex(), pageSize);
+		pager.setDataList(dataList);
+		return pager;
+	}
+
+	/**
+	 * 根据表达式查询Position对象集合
+	 * 
+	 * @param positionName
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return Position对象集合
+	 */
+	public List<Position> findList(String positionName, int currentPage, int pageSize) {
+		List<Exp> expList = new ArrayList<Exp>();
+		if (positionName != null) {
+			expList.add(new WhereExp(Position.class, "position_name", "like", "%" + positionName + "%"));
+		}
+		expList.add(new WhereExp(Position.class, "deleted", "=", DataConstant.EXIST));
+		List<Position> PositionList = positionDao.findList(Position.class, expList, currentPage, pageSize);
+		return PositionList;
+	}
+
+	public List<Position> findList1() {
+		List<Exp> expList = new ArrayList<Exp>();
+		expList.add(new WhereExp(Position.class, "deleted", "=", DataConstant.EXIST));
+		List<Position> PositionList = positionDao.findList(Position.class, expList);
+		return PositionList;
+	}
+
+	/**
+	 * 根据表达式查询Position集合数量
+	 * 
+	 * @param positionName
+	 * @return Position集合数量
+	 */
+	public int findCount(String positionName) {
+		List<Exp> expList = new ArrayList<Exp>();
+		if (positionName != null) {
+			expList.add(new WhereExp(Position.class, "position_name", "like", "%" + positionName + "%"));
+		}
+		expList.add(new WhereExp(Position.class, "deleted", "=", DataConstant.EXIST));
+		int count = positionDao.findCount(Position.class, expList);
+		return count;
+	}
+
+	/**
+	 * 根据表达式查询Position分页对象
+	 * 
+	 * @param positionName
+	 * @param currentPage
+	 *            当前页
+	 * @param pageSize
+	 *            分页数
+	 * @return Position分页对象
+	 */
+	public Pager<Position> findPage(String positionName, int currentPage, int pageSize) {
+		int totalRecord = findCount(positionName);
+		Pager<Position> pager = new Pager<Position>(currentPage, pageSize, totalRecord);
+		List<Position> dataList = findList(positionName, pager.getFromIndex(), pageSize);
+		pager.setDataList(dataList);
+		return pager;
+	}
+
+	public List<Position> findPositionList() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"SELECT position.position_id positionId,position.position_num positionNum,position.position_name positionName from position ");
+		sb.append("where position.deleted = ? ");
+		return positionDao.findEntityListBySql(Position.class, sb.toString(), new Object[] { DataConstant.EXIST });
+	}
+
+	/**
+	 * 删除
+	 * 
+	 * <p>Title: updateDel</p> 
+	 * <p>Description: </p>  
+	 * @time 下午3:32:13 
+	 * @param position
+	 */
+	public void updateDel(Position position) {
+		position.setDeleted(DataConstant.DELETE);
+		positionDao.update(position);
+	}
+
+	public Position findByNUM(String positionNum) {
+		List<Exp> expList = new ArrayList<Exp>();
+		expList.add(new WhereExp(Position.class, "position_num", "=", positionNum));
+		List<Position> list = positionDao.findList(Position.class, expList);
+		Position position = new Position();
+		for (int i = 0; i < list.size(); i++) {
+			position = list.get(i);
+		}
+		return position;
+	}
+
+	public Position findByParentId(int positionParentId) {
+		List<Exp> expList = new ArrayList<Exp>();
+		expList.add(new WhereExp(Position.class, "position_id", "=", positionParentId));
+		List<Position> list = positionDao.findList(Position.class, expList);
+		Position position = new Position();
+		for (int i = 0; i < list.size(); i++) {
+			position = list.get(i);
+		}
+		return position;
+	}
+
+	public Position findMaxByParentId(Integer positionParentId) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select Max(p.position_num) ");
+		sql.append("from position p");
+		sql.append(" where p.position_parent_id = ?");
+		Position position = new Position();
+		String list = positionDao.getPropertyBySql(sql.toString(), new Object[] { positionParentId });
+		position.setPositionNum(list);
+		return position;
+	}
+
+	public List<Position> findPosByDepId(Integer departmentId) {
+		List<Exp> expList = new ArrayList<Exp>();
+		expList.add(new WhereExp(Position.class, "department_id", "=", departmentId));
+		List<Position> list = positionDao.findList(Position.class, expList);
+		return list;
+	}
+}

@@ -1,0 +1,9 @@
+jdbc.driverClassName=com.mysql.jdbc.Driver
+#jdbc.dburl=jdbc:mysql://127.0.0.1:3306/honghr?useUnicode=true&characterEncoding=UTF-8
+#jdbc.dburl=jdbc:mysql://192.168.1.188:3306/db?useUnicode=true&characterEncoding=UTF-8
+jdbc.dburl=jdbc:mysql://192.168.3.188:3306/honghr?useUnicode=true&characterEncoding=UTF-8&noAccessToProcedureBodies=true
+jdbc.username=root
+jdbc.password=999999
+#jdbc.password=123
+jdbc.maxPoolSize=50
+jdbc.minPoolSize=10

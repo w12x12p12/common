@@ -1,0 +1,205 @@
+$(function(){
+	/* 点击加班性质 */
+	$(document).on("click", ".show_overtime_applyType", function(){
+		var applyBeginTime = $("#startDate").val();
+		var applyType = $(this).val();
+		if(applyType == "102101" && new Date(applyBeginTime).getHours() < 19){
+			showMessage("工作日加班开始时间不能小于19点");
+		}
+	});
+	/* 点击添加审批人 */
+	$(document).on("click", "#showEmployee", function(){
+		$.ajax({
+			url: ctx + "/admin/overtimeWorkApply/showDepartmentList",
+			type: "GET",
+    		async: true,
+    		dataType: "JSON",
+    		success: function(departmentList){
+    			var array = [];
+    			if(departmentList){
+					array.push("<option value='-1'>请选择</option>");
+	    			$(departmentList).each(function(){
+	    				array.push("<option value='" + this.departmentNum + "'>" + this.departmentName + "</option>")
+	    			});
+    			}
+    			$(".showName").html("");
+    			$(".showDepartment").html("");
+    			$(".showName").append("<option value='-1'>请选择</option>");
+    			$(".showDepartment").append(array.join(""));
+    		},
+    		error: function(){
+				layer.msg("暂时无法获取部门",{time:1500});
+    		}
+		});
+	});
+	/* 选择审批人部门 */
+	$(".showDepartment").change(function(){
+		$.ajax({
+			url: ctx + "/admin/overtimeWorkApply/showCheckEmployeeList",
+			type: "GET",
+			async: true,
+			data: {
+				"departmentNum": $(this).val()
+			},
+			dataType: "JSON",
+			success: function(employeeList){
+				var array = [];
+				if(employeeList){
+					array.push("<option value='-1'>请选择</option>");
+					$(employeeList).each(function(){
+						array.push("<option value='" + this.employeeId + "'>" + this.employeeName + "</option>");
+					});
+				}
+				$(".showName").html("");
+				$(".showName").append(array.join(""));
+			},
+			error: function(){
+				layer.msg("暂时无法获取审批人",{time:1500});
+			}
+		});
+	});
+	/* 保存审批人 */
+	$("#save_checkEmployee").click(function(){
+		var departmentNum = $(".showDepartment").val();
+		var employeeId =  $(".showName").val();
+		if(departmentNum!="-1" && employeeId!="-1"){
+			var flag = true;
+			$(".w_checkEmployee").each(function(){
+				if($(this).attr("data") == employeeId){
+					flag = false;
+					return false;
+				}
+			});
+			if(flag){
+				$.ajax({
+					url: ctx + "/admin/overtimeWorkApply/getEmployeeById",
+					type: "GET",
+					async: true,
+					data: {
+						"employeeId": employeeId
+					},
+					dataType: "JSON",
+					success: function(employee){
+						var seq = 1;
+						var $employee = $(".w_checkEmployee");
+						if($employee.length > 0){
+							$employee.each(function(){
+								if(parseInt($(this).attr("seq")) > seq){
+									seq = parseInt($(this).attr("seq"));
+								}
+							});
+							seq++;
+						}
+						$("#showEmployee").before("<div class='w_honghr_check'><span class='w_checkEmployee' seq='" + seq + "' data='" + employee.employeeId + "'>" + seq + "." + employee.employeeName + "</span></div>");
+						if($(".w_honghr_check").length == 4){
+							$("#showEmployee").hide();
+						}
+						$("#myModal_add").modal("hide");
+					},
+					error: function(){
+						layer.msg("暂时无法添加审批人",{time:1500});
+					}
+				});
+			}else{
+				layer.msg("已添加过该审批人",{time:1500});
+			} 
+		}else{
+			layer.msg("请选择审批员工",{time:1500});
+		}
+	});
+	/* 点击删除审批人 */
+	$(document).on("click",".w_honghr_check",function(){
+		var $checkEmployee = $(this).nextAll();
+		if($checkEmployee){
+			$checkEmployee.find(".w_checkEmployee").each(function(){
+				var seq = parseInt($(this).attr("seq")) - 1;
+				var sequenceName = $(this).text();
+				var employeeName = sequenceName.substring(sequenceName.lastIndexOf("."));
+				$(this).attr("seq",seq);
+				$(this).text(seq + employeeName);
+			});
+		}
+		$(this).remove();
+		$("#showEmployee").show();
+	});
+});
+/* 添加时长 */
+function changeDuration(){
+	var applyBeginTime = $("#startDate").val();
+	var applyEndTime = $("#endDate").val();
+	var time = getOverTimeWorkApplyDurationTime(applyBeginTime,applyEndTime);
+	if(time!=null){
+		$(".w_edit_applyDuration").val(parseInt(time) + "小时");
+		var message = validateDuration(applyBeginTime,applyEndTime,$(".w_honghr_radio:checked").val(),time);
+		if(message!="000000"){
+			showMessage(message);
+			return false;
+		}
+	}
+}
+/* 判断起始日期是否为同一天 */
+function validateOverTimeWorkApplyDurationDay(applyBeginTime,applyEndTime){
+	var flag = true;
+	if((new Date(applyBeginTime)).toLocaleDateString() != (new Date(applyEndTime)).toLocaleDateString()){
+		flag = false;
+	}
+	return flag;
+}
+/* 计算时长 */
+function getOverTimeWorkApplyDurationTime(applyBeginTime,applyEndTime){
+	if(applyBeginTime && applyEndTime){
+		var msec = (new Date(applyEndTime)).getTime() - (new Date(applyBeginTime)).getTime();
+		var hours = (msec % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
+		if(new Date(applyBeginTime).getHours() < 13 && new Date(applyEndTime).getHours() > 13){
+			hours = hours > 1 ? hours - 1 : hours;
+		}
+		return hours;
+	}
+	return null;
+}
+/* 打开提示框 */
+function showMessage(message){
+	layer.confirm(message, {btn: ["确定"],closeBtn: 0},function(){
+		layer.closeAll();
+		$("#startDate").val("");
+		$("#endDate").val("");
+		$(".w_edit_applyDuration").val("0小时");
+	});
+}
+/* 验证日期*/
+function validateDuration(applyBeginTime,applyEndTime,applyType,time){
+	var flag = validateOverTimeWorkApplyDurationDay(applyBeginTime,applyEndTime);
+	if(flag){
+		if(applyType == "102101" && new Date(applyBeginTime).getHours() < 19){
+			return "工作日加班开始时间不能小于19点";
+		}
+		if(time < 2){
+			return "加班时长不能小于2小时";
+		}
+	}else{
+		return "加班起始日期必须为同一天";
+	}
+	return "000000";
+}
+/* 表单验证 */
+function validateForm(applyType,applyBeginTime,applyEndTime,$checkEmployee){
+	if(!applyType){
+		layer.msg("请选择加班性质",{time:1500});
+		return false;
+    }
+	
+	if(!(applyBeginTime && applyEndTime)){
+		layer.msg("请选择加班时间",{time:1500});
+		return false;
+	}
+	if($checkEmployee.length == 0){
+		layer.msg("请选择审批人",{time:1500});
+		return false;
+	}
+	var message = validateDuration(applyBeginTime,applyEndTime,applyType,getOverTimeWorkApplyDurationTime(applyBeginTime,applyEndTime));
+	if(message!="000000"){
+		layer.msg(message,{time:1500});
+		return false;
+	}
+	return true;
+}

@@ -1,0 +1,125 @@
+
+package com.hongedu.honghr.honghr.web;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.hongedu.honghr.util.json.JsonResult;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.honghr.entity.OvertimeWorkApply;
+import com.hongedu.honghr.honghr.service.OvertimeWorkApplyService;
+
+
+/**
+ * @author  
+ * el_bp_overtime_work_apply 表对应的controller
+ * 2017/12/07 04:04:40
+ */
+@Controller
+@RequestMapping("/admin/overtimeWorkApply")
+public class OvertimeWorkApplyController {
+	private final static Logger logger= LoggerFactory.getLogger(OvertimeWorkApplyController.class);
+	
+	@Autowired
+	private OvertimeWorkApplyService overtimeWorkApplyService;
+	
+	/**
+	 * 查询OvertimeWorkApply详情
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/findOvertimeWorkApply",method=RequestMethod.POST)
+	public JsonResult findOvertimeWorkApply(
+			@RequestParam(required=true)java.lang.Integer overtimeWorkApplyId) {
+		try {
+			OvertimeWorkApply overtimeWorkApply = overtimeWorkApplyService.findById(overtimeWorkApplyId);
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", overtimeWorkApply);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 编辑OvertimeWorkApply
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value="/editOvertimeWorkApply",method=RequestMethod.GET)
+	public String editOvertimeWorkApply(
+			java.lang.Integer overtimeWorkApplyId,
+			Model model) {
+		if(overtimeWorkApplyId != null){
+			OvertimeWorkApply overtimeWorkApply = overtimeWorkApplyService.findById(overtimeWorkApplyId);
+			model.addAttribute("overtimeWorkApply", overtimeWorkApply);
+		}
+		return "admin/overtimeWorkApply/editOvertimeWorkApply";
+	}
+	
+	/**
+	 * 保存OvertimeWorkApply
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveOvertimeWorkApply",method=RequestMethod.POST)
+	public JsonResult saveOvertimeWorkApply(
+			OvertimeWorkApply overtimeWorkApply
+			) {
+		try {
+			if(overtimeWorkApply.getOvertimeWorkApplyId() == null){
+				overtimeWorkApplyService.save(overtimeWorkApply);
+			}else{
+				overtimeWorkApplyService.update(overtimeWorkApply);
+			}
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 删除OvertimeWorkApply
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deleteOvertimeWorkApply",method=RequestMethod.POST)
+	public JsonResult deleteOvertimeWorkApply(
+			@RequestParam(required=true)java.lang.Integer overtimeWorkApplyId) {
+		try {
+			overtimeWorkApplyService.delete(overtimeWorkApplyId);
+		return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+						return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 查询OvertimeWorkApply表单页面
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/overtimeWorkApplyList",method=RequestMethod.GET)
+	public String overtimeWorkApplyList(
+			@RequestParam(required=false,defaultValue="1")Integer currentPage,
+			@RequestParam(required=false,defaultValue="10")Integer pageSize,
+			Model model) {
+		Pager<OvertimeWorkApply> page = overtimeWorkApplyService.findPage(currentPage, pageSize);
+		model.addAttribute("page", page);
+		return "admin/overtimeWorkApply/overtimeWorkApplyList";
+	}
+}

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />  
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>休假时长汇总</title>
+</head>
+<body>
+	<script type="text/javascript">
+		$(function(){
+			$(".look_detail").click(function(){
+				var flag = true;
+				$.ajax({
+					url:  ctx + "/admin/absenceApply/getOtherAbsenceApplyHourThisMonth",
+					type: "GET",
+					async: false,
+					data: {
+						"employeeId": $(this).attr("data")
+					},
+					dataType: "JSON",
+					success: function(absenceApplyTimeVo){
+						$(".showAbsenceApplyTimeVo").text("");
+						$(".show_employeeName").text(absenceApplyTimeVo.employeeName);
+						$(".show_sickLeaveHourMonth").text(absenceApplyTimeVo.sickLeaveHourMonth?absenceApplyTimeVo.sickLeaveHourMonth+"小时":"");
+						$(".show_casualLeaveHourMonth").text(absenceApplyTimeVo.casualLeaveHourMonth?absenceApplyTimeVo.casualLeaveHourMonth+"小时":"");
+						$(".show_publicLeaveHourMonth").text(absenceApplyTimeVo.publicLeaveHourMonth?absenceApplyTimeVo.publicLeaveHourMonth+"小时":"");
+						$(".show_marriageLeaveHourMonth").text(absenceApplyTimeVo.marriageLeaveHourMonth?absenceApplyTimeVo.marriageLeaveHourMonth+"小时":"");
+						$(".show_bereavementLeaveHourMonth").text(absenceApplyTimeVo.bereavementLeaveHourMonth?absenceApplyTimeVo.bereavementLeaveHourMonth+"小时":"");
+						$(".show_maternityLeaveHourMonth").text(absenceApplyTimeVo.maternityLeaveHourMonth?absenceApplyTimeVo.maternityLeaveHourMonth+"小时":"");
+						$(".show_paternityLeaveHourMonth").text(absenceApplyTimeVo.paternityLeaveHourMonth?absenceApplyTimeVo.paternityLeaveHourMonth+"小时":"");
+					},
+					error: function(){
+						layer.msg("暂时无法查看",{time:1500});
+						flag = false;
+		    		}
+				});
+				if(!flag){
+					return false;
+				}
+			});
+		});
+	</script>
+	<form class="form-inline" role="form">
+		<div class="form-group btn-group-sm z_margin_tb">
+			<label class="sr-only" for="name">查询条件</label> 
+			<input type="text" name="" value="" class="form-control input-sm" id="" placeholder="请输入">
+			<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>查询</button>
+		</div>
+		<ul class="nav nav-list"> <li class="divider"></li></ul>
+		<div class="table-responsive">
+			<table class="table table-striped w_cee_table w_see_detail">
+				<thead>
+					<tr>
+						<th rowspan="2" style="vertical-align: middle;">员工姓名</th>
+						<th rowspan="2" style="vertical-align: middle;">所属部门</th>
+						<th colspan="4">加班</th>
+						<th colspan="6">年假</th>
+						<th>其他</th>
+					</tr>
+					<tr>
+						<th>本月时长</th>
+						<th>累计时长</th>
+						<th>本月已休时长</th>
+						<th>剩余可休时长</th>
+						<th>今年累计时长</th>
+						<th>今年已休时长</th>
+						<th>抵扣去年时长</th>
+						<th>今年剩余时长</th>
+						<th>去年剩余时长</th>
+						<th>总剩余时长</th>
+						<th>本月总时长</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="entity" items="${page.dataList}" varStatus="status">
+						<tr>
+							<td style="min-width:60px;">${entity.employeeName}</td>
+							<td>${entity.departmentName}</td>
+							<td>${entity.overTimeWorkHourMonth}<c:if test="${entity.overTimeWorkHourMonth!=null && entity.overTimeWorkHourMonth!=''}">小时</c:if></td>
+							<td>${entity.overTimeWorkHourToTal}<c:if test="${entity.overTimeWorkHourToTal!=null && entity.overTimeWorkHourToTal!=''}">小时</c:if></td>
+							<td>${entity.leaveHourMonth}<c:if test="${entity.leaveHourMonth!=null && entity.leaveHourMonth!=''}">小时</c:if></td>
+							<td>${entity.remainingLeaveHour}<c:if test="${entity.remainingLeaveHour!=null && entity.remainingLeaveHour!=''}">小时</c:if></td>
+							<td>${entity.annualHourThisYear}<c:if test="${entity.annualHourThisYear!=null && entity.annualHourThisYear!=''}">小时</c:if></td>
+							<td>${entity.annualHour}<c:if test="${entity.annualHour!=null && entity.annualHour!=''}">小时</c:if></td>
+							<td>${entity.decRemainingHourLastYear}<c:if test="${entity.decRemainingHourLastYear!=null && entity.decRemainingHourLastYear!=''}">小时</c:if></td>
+							<td>${entity.remainingAnnualHourThisYear}<c:if test="${entity.remainingAnnualHourThisYear!=null && entity.remainingAnnualHourThisYear!=''}">小时</c:if></td>
+							<td>${entity.remainingAnnualHourLastYear}<c:if test="${entity.remainingAnnualHourLastYear!=null && entity.remainingAnnualHourLastYear!=''}">小时</c:if></td>
+							<td>${entity.remainingAnnualHour}<c:if test="${entity.remainingAnnualHour!=null && entity.remainingAnnualHour!=''}">小时</c:if></td>
+							<td><a href="javascript:void(0);" class="look_detail" data="${entity.employeeId}" data-toggle="modal" data-target="#myModal_look">${entity.otherAbsenceApplyHourMonth}<c:if test="${entity.otherAbsenceApplyHourMonth!=null && entity.otherAbsenceApplyHourMonth!=''}">小时</c:if></a></td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+				<!-- 分页区域 -->
+			<jsp:include page="/WEB-INF/jsp/common/page.jsp"></jsp:include>
+		</div>
+	</form>	
+	<!-- 模态框查看（Modal） -->
+	<div class="modal fade d_model_box" id="myModal_look" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+		<div class="modal-dialog modal-show">
+		 	<div class="modal-content">
+		 		<div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+	                	&times;
+	                </button>
+	                <h4 class="modal-title w_absence_title" id="myModalLabel">查看本月其余休假详情</h4>
+	            </div>
+	            <div class="modal-body">
+           			<div class="z_lcms_lookbox">
+					    <table class="table table-bordered table-striped w_show_text" style="margin:0 auto">
+					        <tr>
+					            <td>员工姓名</td>
+					            <td class="showAbsenceApplyTimeVo show_employeeName"></td>
+					        </tr>
+					        <tr>
+					            <td>本月休病假时长</td>
+					            <td class="showAbsenceApplyTimeVo show_sickLeaveHourMonth"></td>
+					        </tr>
+					        <tr>
+					            <td>本月休事假时长</td>
+					            <td class="showAbsenceApplyTimeVo show_casualLeaveHourMonth"></td>
+					        </tr>
+					        <tr>
+					        	<td>本月休公假时长</td>
+					        	<td class="showAbsenceApplyTimeVo show_publicLeaveHourMonth"></td>
+					        </tr>
+   						    <tr>
+					            <td>本月休婚假时长</td>
+					            <td class="showAbsenceApplyTimeVo show_marriageLeaveHourMonth"></td>
+					        </tr>
+					        <tr>
+					        	<td>本月休丧假时长</td>
+					        	<td class="showAbsenceApplyTimeVo show_bereavementLeaveHourMonth"></td>
+					        </tr>
+					        <tr>
+					        	<td>本月休产检假时长</td>
+					        	<td class="showAbsenceApplyTimeVo show_maternityLeaveHourMonth"></td>
+					        </tr>
+					        <tr>
+					        	<td>本月休陪产假时长</td>
+					        	<td class="showAbsenceApplyTimeVo show_paternityLeaveHourMonth"></td>
+					        </tr>
+					    </table>
+					</div>
+	            </div>
+		 	</div>
+ 		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,125 @@
+
+package com.hongedu.honghr.honghr.web;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.hongedu.honghr.util.json.JsonResult;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.honghr.entity.EmployeePosition;
+import com.hongedu.honghr.honghr.service.EmployeePositionService;
+
+
+/**
+ * @author  
+ * el_bp_employee_position 表对应的controller
+ * 2017/12/07 04:04:40
+ */
+@Controller
+@RequestMapping("/admin/employeePosition")
+public class EmployeePositionController {
+	private final static Logger logger= LoggerFactory.getLogger(EmployeePositionController.class);
+	
+	@Autowired
+	private EmployeePositionService employeePositionService;
+	
+	/**
+	 * 查询EmployeePosition详情
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/findEmployeePosition",method=RequestMethod.POST)
+	public JsonResult findEmployeePosition(
+			@RequestParam(required=true)java.lang.Integer employeePositionId) {
+		try {
+			EmployeePosition employeePosition = employeePositionService.findById(employeePositionId);
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", employeePosition);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 编辑EmployeePosition
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value="/editEmployeePosition",method=RequestMethod.GET)
+	public String editEmployeePosition(
+			java.lang.Integer employeePositionId,
+			Model model) {
+		if(employeePositionId != null){
+			EmployeePosition employeePosition = employeePositionService.findById(employeePositionId);
+			model.addAttribute("employeePosition", employeePosition);
+		}
+		return "admin/employeePosition/editEmployeePosition";
+	}
+	
+	/**
+	 * 保存EmployeePosition
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveEmployeePosition",method=RequestMethod.POST)
+	public JsonResult saveEmployeePosition(
+			EmployeePosition employeePosition
+			) {
+		try {
+			if(employeePosition.getEmployeePositionId() == null){
+				employeePositionService.save(employeePosition);
+			}else{
+				employeePositionService.update(employeePosition);
+			}
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 删除EmployeePosition
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deleteEmployeePosition",method=RequestMethod.POST)
+	public JsonResult deleteEmployeePosition(
+			@RequestParam(required=true)java.lang.Integer employeePositionId) {
+		try {
+			employeePositionService.delete(employeePositionId);
+		return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+						return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 查询EmployeePosition表单页面
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/employeePositionList",method=RequestMethod.GET)
+	public String employeePositionList(
+			@RequestParam(required=false,defaultValue="1")Integer currentPage,
+			@RequestParam(required=false,defaultValue="10")Integer pageSize,
+			Model model) {
+		Pager<EmployeePosition> page = employeePositionService.findPage(currentPage, pageSize);
+		model.addAttribute("page", page);
+		return "admin/employeePosition/employeePositionList";
+	}
+}

@@ -1,0 +1,290 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+<body>
+<script src="${ctx }/resources/js/admin/overtimeWorkApply/overtimeWorkApplyCheck.js"></script>
+ <script type="text/javascript" src="${ctx }/resources/js/admin/overtimeWorkApply/overtimeWorkApply.js"></script>
+  <script type="text/javascript" src="${ctx }/resources/js/admin/overtimeWorkApply/overtimeApplyForLook.js"></script>
+	<form class="form-inline" role="form">
+		<div class="form-group btn-group-sm z_margin_tb">
+			<label class="sr-only" for="name">查询条件</label> 
+			<input type="text" name="" value="" class="form-control input-sm" id="" placeholder="请输入">
+			<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>查询</button>
+		</div>
+		<ul class="nav nav-list"> <li class="divider"></li> </ul>
+	 </form>
+		<div class="table-responsive">
+			<table class="table table-striped w_cee_table">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>加班单编号</th>
+						<th>加班时间</th>
+						<th>时长</th>
+						<th>性质</th>
+						<th>原因</th>
+						<th>申请时间</th>
+						<th>审核状态</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="entity" items="${page.dataList}" varStatus="status">
+						<tr>
+							<td>${status.index+1 + (page.currentPage-1)*page.pageSize }</td>
+							<td>${entity.overtimeWorkApplyNum}</td>
+							<td><fmt:formatDate type="both" value="${entity.applyBeginTime}" pattern="yyyy/MM/dd HH:mm"/>至
+							<fmt:formatDate type="both" value="${entity.applyEndTime}" pattern="yyyy/MM/dd HH:mm"/></td>
+							<td>${entity.applyDuration}<c:if test="${entity.applyDuration!=null && entity.applyDuration!=''}">小时</c:if></td>
+							<td>${entity.applyTypeShow}</td>
+							<td>${entity.applyReason}</td>
+							<td><fmt:formatDate type="both" value="${entity.applyDateTime}" /></td>
+							<td>${entity.applyCheckStatusShow}</td>
+							<td>
+								<c:choose>
+								  <c:when test="${entity.applyCheckStatus == -1}">
+								      <button type="button" class="btn btn-default btn-sm overtime_edit" data="${entity.overtimeWorkApplyId}" data-toggle="modal" data-target="#myModal_edit">
+								      <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>编辑
+								      </button>
+						              <button type="button" class="btn btn-default btn-sm overtime_submitCheck" data = "${entity.overtimeWorkApplyId}">
+						  		      <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>提交申请
+							          </button>	
+							          <button type="button" class="btn btn-default  btn-sm btn-danger overtime_delete" data = "${entity.overtimeWorkApplyId}">
+							          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>删除
+							          </button>	  
+								  </c:when>
+								  <c:when test="${entity.applyCheckStatus == 0}">
+										<button type="button" class="btn btn-default btn-sm overtime_back" data = "${entity.overtimeWorkApplyId}">
+									  		<span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>撤回
+										</button>
+								  </c:when>
+								  <c:otherwise>
+										<button type="button" class="btn btn-default btn-sm overtime_look" data="${entity.overtimeWorkApplyId}" data-toggle="modal" data-target="#myModal_look">
+								  		<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>查看
+										</button>
+										<button type="button" class="btn btn-default btn-sm overtime_lookProgress" data="${entity.overtimeWorkApplyId}" data-toggle="modal" data-target="#myModal_look_progress">
+									  		<span class="glyphicon glyphicon-file" aria-hidden="true"></span>审批记录
+										</button>
+								  </c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+ 			<!-- 分页区域 -->
+			<jsp:include page="/WEB-INF/jsp/common/page.jsp"></jsp:include>
+		</div>
+
+	<!-- 模态框（Modal） -->
+	<div class="modal fade d_model_box" id="myModal_edit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+		<div class="modal-dialog modal-show">
+		 	<div class="modal-content">
+		 		<div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+	                	&times;
+	                </button>
+	                <h4 class="modal-title w_overtime_title" id="myModalLabel">编辑加班单</h4>
+	            </div>
+	            <div class="modal-body">
+	            	<form id="editcheckForm" class="form-horizontal" role="form">
+						<input name="overtimeWorkApplyId" class="edit_overtime_show w_edit_overtimeWorkApplyId" type="hidden" />
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班单编号</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control form-control_readonly edit_overtime_show w_edit_overtimeWorkApplyNum" readonly="readonly"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班人</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control form-control_readonly edit_overtime_show w_edit_applyEmployeeName" readonly="readonly"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>所属部门</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control form-control_readonly edit_overtime_show w_edit_applyDepartmentName" readOnly="readOnly" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班开始时间</label>
+							<div class="col-sm-10">
+								<input type="text" id="startDate" name="applyBeginTime" class="form-control w_date_input edit_overtime_show w_edit_applyBeginTime validate[required]" placeholder="请输入100字以内字符" maxlength="100" onFocus="var endDate=$dp.$('endDate');WdatePicker({onpicked:function(){endDate.focus();},dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false,maxDate:'#F{$dp.$D(\'endDate\',{d:-1})}'})" readonly="readonly" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班结束时间</label>
+							<div class="col-sm-10">
+								<input type="text" id="endDate" name="applyEndTime" class="form-control w_date_input edit_overtime_show w_edit_applyEndTime validate[required]" placeholder="请输入100字以内字符" maxlength="100" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'startDate\',{d:0})}',dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false})" readonly="readonly" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班性质</label>
+							<div class="col-sm-10">
+								<select name="applyType" class="form-control input-sm w_overtime_type">
+									<option value="-1">请选择</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班原因</label>
+							<div class="col-sm-10">
+								<input type="text" name="applyReason" class="form-control edit_overtime_show w_edit_applyReason validate[required]" placeholder="请输入100字以内字符" maxlength="100" />
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>申请日期</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control form-control_readonly edit_overtime_show w_edit_applyDateTime" readonly="readonly"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>审批状态</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control form-control_readonly edit_overtime_show w_edit_applyCheckStatusShow" readonly="readonly"/>
+							</div>
+						</div>
+						<div class="form-group w_honghr_input">
+							<label for="disabledSelect" class="col-sm-2 control-label" style="padding-top:0px;"><b class="z_common_star">*</b>审批人</label>
+							<div class="col-sm-10 w_edit_overtimeApplyChecks"></div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-primary" id="edit_overtimeApplyForm">保存</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+						</div>
+	            	</form>
+	            </div>
+		 	</div>
+ 		</div>
+	</div>
+	
+	<!-- 模态框（Modal） -->
+	<div class="modal fade d_model_box" id="myModal_add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"   data-backdrop="static">
+	    <div class="modal-dialog modal_show">
+	        <div class="modal-content">
+	        	<div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+	                	&times;
+	                </button>
+	                <h4 class="modal-title w_absence_title" id="myModalLabel">添加审批人</h4>
+	            </div>
+	            <div class="modal-body">
+	           		<div class="form-group w_honghr_input">
+						<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>部门名称</label>
+						<div class="col-sm-10">
+							<select class="form-control input-sm showDepartment">
+								<option class="defaultChoice" value="-1">请选择</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group w_honghr_input">
+						<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>员工姓名</label>
+						<div class="col-sm-10">
+							<select class="form-control input-sm showName">
+								<option class="defaultChoice" value="-1">请选择</option>
+							</select>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" id="save_checkEmployee">保存</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					</div>
+				</div>
+	        </div><!-- /.modal-content -->
+	    </div><!-- /.modal -->
+	</div>	
+	
+	
+	
+		<!-- 模态框查看进度（Modal） -->
+	<div class="modal fade d_model_box" id="myModal_look_progress" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+		<div class="modal-dialog modal-show">
+		 	<div class="modal-content">
+		 		<div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+	                	&times;
+	                </button>
+	                <h4 class="modal-title w_absence_title" id="myModalLabel">查看记录</h4>
+	            </div>
+	            <div class="modal-body">
+           			<div class="z_lcms_lookbox">
+					    <table class="table table-bordered table-striped w_show_progress" style="margin:0 auto">
+					        <tr class="show_progress_title">
+					            <td>审批人</td>
+					            <td>审批情况</td>
+					            <td>审批意见</td>
+					            <td>审批时间</td>
+					        </tr>
+					    </table>
+					</div>
+	            </div>
+		 	</div>
+ 		</div>
+	</div>
+	<!-- 模态框查看（Modal） -->
+	<div class="modal fade d_model_box" id="myModal_look" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+		<div class="modal-dialog modal-show">
+		 	<div class="modal-content">
+		 		<div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+	                	&times;
+	                </button>
+	                <h4 class="modal-title w_overtime_title" id="myModalLabel">查看加班申请单</h4>
+	            </div>
+	            <div class="modal-body">
+           			<div class="z_lcms_lookbox">
+					    <table class="table table-bordered table-striped w_show_text" style="margin:0 auto">
+					        <tr>
+					            <td>加班单编号</td>
+					            <td class="showOvertimeApply show_overtimeApplyNum"></td>
+					        </tr>
+					        <tr>
+					            <td>加班人</td>
+					            <td class="showOvertimeApply show_applyEmployeeName"></td>
+					        </tr>
+					        <tr>
+					            <td>所属部门</td>
+					            <td class="showOvertimeApply show_applyDepartmentName"></td>
+					        </tr>
+					        <tr>
+					        	<td>加班性质</td>
+					        	<td class="showOvertimeApply show_applyTypeShow"></td>
+					        </tr>
+    						    <tr>
+					            <td>加班原因</td>
+					            <td class="showOvertimeApply show_applyReason"></td>
+					        </tr>
+					        <tr>
+					        	<td>加班开始时间</td>
+					        	<td class="showOvertimeApply show_applyBeginTime"></td>
+					        </tr>
+					        <tr>
+					        	<td>加班结束时间</td>
+					        	<td class="showOvertimeApply show_applyEndTime"></td>
+					        </tr>
+					        <tr>
+					        	<td>加班时长</td>
+					        	<td class="showOvertimeApply show_applyDuration"></td>
+					        </tr>
+					        <tr>
+					        	<td>申请日期</td>
+					        	<td class="showOvertimeApply show_applyDateTime"></td>
+					        </tr>
+					        <tr>
+					        	<td>审批人顺序</td>
+					        	<td class="showOvertimeApply show_checkEmployeeName"></td>
+					        </tr>
+					    </table>
+					</div>
+	            </div>
+		 	</div>
+ 		</div>
+	</div>
+	
+	
+</body>		
+		
+	

@@ -1,0 +1,96 @@
+package com.hongedu.honghr.honghr.entity;
+
+import java.io.Serializable;
+
+import com.hongedu.honghr.base.entity.BaseEntity;
+import com.hongedu.honghr.base.dao.annotation.Table;
+
+/**
+ * @author el_bp_department 表对应实体 2017/12/07 04:00:57
+ */
+@Table(name = "department", pk = "departmentId")
+public class Department extends BaseEntity implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	/***/
+	private Integer departmentId;
+	/***/
+	private String departmentNum;
+	/***/
+	private String departmentName;
+	/***/
+	private String departmentIntroduction;
+
+	private String departmentRank;
+
+	private Integer departmentParentId;
+	/***/
+	private String referred;
+	/***/
+	private String deleted;
+
+	public void setDepartmentId(Integer value) {
+		this.departmentId = value;
+	}
+
+	public Integer getDepartmentId() {
+		return departmentId;
+	}
+
+	public void setDepartmentNum(String value) {
+		this.departmentNum = value;
+	}
+
+	public String getDepartmentNum() {
+		return departmentNum;
+	}
+
+	public void setDepartmentName(String value) {
+		this.departmentName = value;
+	}
+
+	public String getDepartmentName() {
+		return departmentName;
+	}
+
+	public void setDepartmentIntroduction(String value) {
+		this.departmentIntroduction = value;
+	}
+
+	public String getDepartmentIntroduction() {
+		return departmentIntroduction;
+	}
+
+	public String getDepartmentRank() {
+		return departmentRank;
+	}
+
+	public void setDepartmentRank(String departmentRank) {
+		this.departmentRank = departmentRank;
+	}
+
+	public Integer getDepartmentParentId() {
+		return departmentParentId;
+	}
+
+	public void setDepartmentParentId(Integer departmentParentId) {
+		this.departmentParentId = departmentParentId;
+	}
+
+	public void setReferred(String value) {
+		this.referred = value;
+	}
+
+	public String getReferred() {
+		return referred;
+	}
+
+	public void setDeleted(String value) {
+		this.deleted = value;
+	}
+
+	public String getDeleted() {
+		return deleted;
+	}
+}

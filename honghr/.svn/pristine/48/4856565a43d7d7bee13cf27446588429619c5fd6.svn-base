@@ -1,0 +1,83 @@
+package com.hongedu.honghr.honghr.entity;
+
+import java.io.Serializable;
+
+import com.hongedu.honghr.base.entity.BaseEntity;
+import com.hongedu.honghr.base.dao.annotation.Table;
+/**
+ * @author  
+ * el_sys_module 表对应实体
+ * 2017/12/07 04:00:58
+ */
+@Table(name="sys_module", pk="moduleId")
+public class Module extends BaseEntity implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	/***/
+	private java.lang.Integer moduleId;
+	/***/
+	private java.lang.String moduleText;
+	/***/
+	private java.lang.String modulePermission;
+	/***/
+	private java.lang.String moduleSequence;
+	/***/
+	private java.lang.String moduleType;
+	/***/
+	private java.lang.Integer moduleParentId;
+	/***/
+	private java.lang.String moduleUrl;
+	
+	public void setModuleId(java.lang.Integer value) {
+		this.moduleId = value;
+	}
+	
+	public java.lang.Integer getModuleId() {
+		return moduleId;
+	}
+	public void setModuleText(java.lang.String value) {
+		this.moduleText = value;
+	}
+	
+	public java.lang.String getModuleText() {
+		return moduleText;
+	}
+	public void setModulePermission(java.lang.String value) {
+		this.modulePermission = value;
+	}
+	
+	public java.lang.String getModulePermission() {
+		return modulePermission;
+	}
+	public void setModuleSequence(java.lang.String value) {
+		this.moduleSequence = value;
+	}
+	
+	public java.lang.String getModuleSequence() {
+		return moduleSequence;
+	}
+	public void setModuleType(java.lang.String value) {
+		this.moduleType = value;
+	}
+	
+	public java.lang.String getModuleType() {
+		return moduleType;
+	}
+	public void setModuleParentId(java.lang.Integer value) {
+		this.moduleParentId = value;
+	}
+	
+	public java.lang.Integer getModuleParentId() {
+		return moduleParentId;
+	}
+	public void setModuleUrl(java.lang.String value) {
+		this.moduleUrl = value;
+	}
+	
+	public java.lang.String getModuleUrl() {
+		return moduleUrl;
+	}
+}
+
+

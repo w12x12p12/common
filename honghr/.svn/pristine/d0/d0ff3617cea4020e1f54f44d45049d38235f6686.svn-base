@@ -1,0 +1,84 @@
+
+package com.hongedu.honghr.honghr.web;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.DisabledAccountException;
+import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.crypto.hash.SimpleHash;
+import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSONObject;
+import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.common.constant.SessionConstant;
+import com.hongedu.honghr.honghr.entity.Employee;
+import com.hongedu.honghr.honghr.service.EmployeeService;
+import com.hongedu.honghr.util.json.JsonResult;
+
+@Controller
+@RequestMapping("admin/login")
+public class LoginController {
+
+	@Autowired
+	private EmployeeService employeeService;
+
+	@ResponseBody
+	@RequestMapping(value = "/userLogin", method = RequestMethod.POST)
+	public String userLogin(String username, String password) {
+		Subject subject = SecurityUtils.getSubject();
+		UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+		try {
+			subject.login(token);
+		} catch (UnknownAccountException unknownAccountException) {
+			return JSONObject.toJSONString(new JsonResult(JsonResult.FAILE_CODE, "用户名不存在", null));
+		} catch (DisabledAccountException disabledAccountException) {
+			return JSONObject.toJSONString(new JsonResult(JsonResult.FAILE_CODE, "用户被禁用，请联系管理员", null));
+		} catch (AuthenticationException authenticationException) {
+			System.out.println("登录失败: " + authenticationException.getMessage());
+			return JSONObject.toJSONString(new JsonResult(JsonResult.FAILE_CODE, "用户名或密码有误", null));
+		}
+		return JSONObject.toJSONString(new JsonResult(JsonResult.SUCCESS_CODE, null, null));
+	}
+
+	@RequestMapping(value = "/index", method = RequestMethod.GET)
+	public String goIndex() {
+		return "index";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/editPassword", method = RequestMethod.POST)
+	public String editPassword(String newPassword) {
+		Employee employee = (Employee) SecurityUtils.getSubject().getSession()
+				.getAttribute(SessionConstant.SESSION_EMPLOYEE_KEY);
+		if (employee != null && employee.getEmployeeId() != null) {
+			Object psdMd5 = new SimpleHash(DataConstant.ENCRYPT_MD5, newPassword,
+					String.valueOf(employee.getEmployeeId()), DataConstant.HASH_ITERATION_COUNT);
+			employeeService.editPassword(psdMd5.toString(), employee.getEmployeeId());
+		}
+		return JsonResult.SUCCESS_CODE;
+	}
+	
+	/**
+	 * 退出登录
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/logout", method = RequestMethod.GET)
+	public JsonResult logout() {
+		try {
+			Employee employee = (Employee) SecurityUtils.getSubject().getPrincipal();
+			if (employee != null) {
+				SecurityUtils.getSubject().logout();
+			}
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+}

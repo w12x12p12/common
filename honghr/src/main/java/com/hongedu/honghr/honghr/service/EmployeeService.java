@@ -1,0 +1,366 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.base.dao.expression.impl.OrderExp;
+import com.hongedu.honghr.base.dao.expression.impl.WhereExp;
+import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.entity.Employee;
+import com.hongedu.honghr.honghr.entity.vo.AbsenceApplyTimeVo;
+import com.hongedu.honghr.honghr.entity.vo.EmployeeVo;
+import com.hongedu.honghr.util.page.Pager;
+
+/**
+ * @author el_bp_employee 表对应业务实现对象 2017/12/07 04:00:57
+ */
+@Transactional
+@Service
+public class EmployeeService {
+
+	@Autowired
+	private BaseDaoImpl<Employee> employeeDao;
+	@Autowired
+	private BaseDaoImpl<EmployeeVo> employeeVoDao;
+	@Autowired
+	private BaseDaoImpl<AbsenceApplyTimeVo> absenceApplyTimeVoDao;
+
+	public Employee findById(Serializable id) {
+		Employee entity = employeeDao.findById(Employee.class, id);
+		return entity;
+	}
+
+	public void save(Employee entity) {
+		entity.setReferred(DataConstant.UNREFERRED);
+		entity.setDeleted(DataConstant.EXIST);
+		entity.setForbided(DataConstant.ALLOW);
+		employeeDao.save(entity);
+	}
+
+	public void update(Employee entity) {
+		employeeDao.update(entity);
+	}
+
+	public List<Employee> findList(String employeeName, int currentPage, int pageSize) {
+		List<Exp> expList = new ArrayList<Exp>();
+		if (employeeName != null) {
+			expList.add(new WhereExp(Employee.class, "employee_name", "like", "%" + employeeName + "%"));
+		}
+		expList.add(new WhereExp(Employee.class, "deleted", "=", DataConstant.EXIST));
+		expList.add(new OrderExp(Employee.class, "employee_id", "desc"));
+		List<Employee> EmployeeList = employeeDao.findList(Employee.class, expList, currentPage, pageSize);
+		return EmployeeList;
+	}
+
+	public List<Employee> findAllList() {
+		List<Exp> expList = new ArrayList<Exp>();
+		expList.add(new WhereExp(Employee.class, "deleted", "=", DataConstant.EXIST));
+		List<Employee> EmployeeList = employeeDao.findList(Employee.class, expList);
+		return EmployeeList;
+	}
+
+	public int findCount(String employeeName) {
+		List<Exp> expList = new ArrayList<Exp>();
+		if (employeeName != null) {
+			expList.add(new WhereExp(Employee.class, "employee_name", "like", "%" + employeeName + "%"));
+		}
+		expList.add(new WhereExp(Employee.class, "deleted", "=", DataConstant.EXIST));
+		expList.add(new OrderExp(Employee.class, "employee_id", "desc"));
+		int count = employeeDao.findCount(Employee.class, expList);
+		return count;
+	}
+
+	public Pager<Employee> findPage(String employeeName, int currentPage, int pageSize) {
+		int totalRecord = findCount(employeeName);
+		Pager<Employee> pager = new Pager<Employee>(currentPage, pageSize, totalRecord);
+		List<Employee> dataList = findList(employeeName, pager.getFromIndex(), pageSize);
+		pager.setDataList(dataList);
+		return pager;
+	}
+
+	public String getPasswordByEmployeeId(Integer employeeId) {
+		String sql = "select password from employee where employee_id = ? and deleted = ?";
+		return employeeDao.getPropertyBySql(sql, new Object[] { employeeId, DataConstant.EXIST });
+	}
+
+	public Employee getInfoByUsername(String username) {
+		String sql = "select employee_id, username, password, employee_name, "
+				+ "gender, birthday, native_place, nation, address, phone_number,"
+				+ "email, idcard, education, work_begin_time, entry_time, forbided "
+				+ "from employee where binary username = ? and deleted = ?";
+		return employeeDao.getEntityBySql(Employee.class, sql, new Object[] { username, DataConstant.EXIST });
+	}
+
+	public List<Employee> findEmployeeListByDepartmentNum(String departmentNum, Integer applyEmployeeId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select distinct e.employee_id, e.employee_name ");
+		sb.append("from employee e ");
+		sb.append("join employee_position ep on e.employee_id = ep.employee_id ");
+		sb.append("where ep.department_num like concat(? , '%') ");
+		sb.append("and ep.employee_id != ? ");
+		sb.append("and ep.deleted = ? ");
+		sb.append("and e.deleted = ? ");
+		return employeeDao.findEntityListBySql(Employee.class, sb.toString(),
+				new Object[] { departmentNum, applyEmployeeId, DataConstant.EXIST, DataConstant.EXIST });
+	}
+
+	public Employee getEmployeeById(Integer employeeId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select employee_id, employee_name, work_begin_time, entry_time ");
+		sb.append("from employee ");
+		sb.append("where employee_id = ? ");
+		sb.append("and deleted = ? ");
+		return employeeDao.getEntityBySql(Employee.class, sb.toString(),
+				new Object[] { employeeId, DataConstant.EXIST });
+	}
+
+	public List<Employee> findEmployeeDistribute() {
+		StringBuilder sb = new StringBuilder();
+		// 查询未曾分配过的人员
+		sb.append("select employee.employee_id employeeId,employee.employee_name employeeName from employee  ");
+		sb.append("left join employee_position on employee.employee_id = employee_position.employee_id ");
+		sb.append("where employee_position.employee_id IS NUll ");
+		sb.append("and employee.deleted = ? ");
+		// 查询分配过删除状态为0的人员
+		sb.append(" union select employee_position.employee_id employeeId,employee.employee_name employeeName "
+				+ "	from employee_position left join employee on employee.employee_id = employee_position.employee_id "
+				+ "	where employee_position.deleted = ?");
+		return employeeDao.findEntityListBySql(Employee.class, sb.toString(),
+				new Object[] { DataConstant.EXIST, DataConstant.DELETE });
+	}
+
+	public Employee findEmployeeById(Integer employeeId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select employee.* ");
+		sb.append("from employee ");
+		sb.append("where employee_id = ? ");
+		sb.append("and deleted = ? ");
+		return employeeDao.getEntityBySql(Employee.class, sb.toString(),
+				new Object[] { employeeId, DataConstant.EXIST });
+	}
+
+	public void updateEmployee(Employee employee) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("update employee set username = ?, employee_name = ?, "
+				+ "gender = ?, birthday = ?, native_place = ?, nation = ?, ");
+		sb.append("address = ?, phone_number = ?, email = ?, education = ?, entry_time = ?,	work_begin_time=? ");
+		sb.append("where employee_id = ? ");
+		employeeDao.update(sb.toString(),
+				new Object[] { employee.getUsername(), employee.getEmployeeName(), employee.getGender(),
+						employee.getBirthday(), employee.getNativePlace(), employee.getNation(), employee.getAddress(),
+						employee.getPhoneNumber(), employee.getEmail(), employee.getEducation(),
+						employee.getEntryTime(), employee.getWorkBeginTime(), employee.getEmployeeId() });
+	}
+
+	/**
+	 * 修改密码
+	 * 
+	 * @param password
+	 * @param employeeId
+	 */
+	public void editPassword(String password, Integer employeeId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("update employee set password = ? ");
+		sb.append("where employee_id = ? ");
+		sb.append("and deleted = ? ");
+		employeeDao.update(sb.toString(), new Object[] { password, employeeId, DataConstant.EXIST });
+	}
+
+	public void updeteDel(Employee employee) {
+		employee.setDeleted(DataConstant.DELETE);
+		employeeDao.update(employee);
+	}
+
+	/**
+	 * 根据sql查询AbsenceApply集合数量
+	 * 
+	 * @return AbsenceApply集合数量
+	 */
+	public int findCountBySql(String sql, Object[] args) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select count(1) from ( ");
+		sb.append(sql);
+		sb.append(")main ");
+		return employeeDao.findCountBySql(sb.toString(), args);
+	}
+
+	/**
+	 * 查询员工list分页
+	 * 
+	 * <p>
+	 * Title: findAllEmployeeList
+	 * </p>
+	 * <p>
+	 * Description:
+	 * </p>
+	 * 
+	 * @time 下午4:42:36
+	 * @param currentPage
+	 * @param pageSize
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public Pager<EmployeeVo> findAllEmployeeList(EmployeeVo search, int currentPage, int pageSize)
+			throws UnsupportedEncodingException {
+		List<Object> params = new ArrayList<Object>();
+		params.add(DataConstant.EXIST);
+		params.add(DataConstant.EXIST);
+		params.add(DataConstant.EXIST);
+		StringBuilder sb = new StringBuilder();
+		sb.append("select e.employee_id, e.employee_name, e.phone_number, e.work_begin_time, e.entry_time, ");
+		sb.append("d.department_name ");
+		sb.append("from employee e ");
+		sb.append("left join employee_position ep ");
+		sb.append("on e.employee_id = ep.employee_id ");
+		sb.append("and ep.deleted = ? ");
+		sb.append("left join department d ");
+		sb.append("on ep.department_num = d.department_num ");
+		sb.append("and d.deleted = ? ");
+		sb.append("where e.deleted = ? ");
+		if (StringUtils.isNotEmpty(search.getEmployeeName())) {
+			search.setEmployeeName(new String(search.getEmployeeName().getBytes("ISO-8859-1"), "UTF-8"));
+			sb.append("and e.employee_name like CONCAT('%',?,'%') ");
+			params.add(search.getEmployeeName());
+		}
+		if (StringUtils.isNotEmpty(search.getDepartmentNum()) && !"default".equals(search.getDepartmentNum())) {
+			sb.append("and d.department_num like CONCAT(?,'%') ");
+			params.add(search.getDepartmentNum());
+		}
+		Pager<EmployeeVo> pager = new Pager<EmployeeVo>(currentPage, pageSize,
+				findCountBySql(sb.toString(), params.toArray(new Object[] {})));
+		List<EmployeeVo> employeeVoList = employeeVoDao.findEntityListByPage(EmployeeVo.class, sb.toString(),
+				params.toArray(new Object[] {}), pager.getFromIndex(), pageSize);
+		pager.setDataList(employeeVoList);
+		return pager;
+	}
+
+	public Pager<AbsenceApplyTimeVo> findAbsenceApplyTimeVoList(EmployeeVo search, int currentPage, int pageSize)
+			throws UnsupportedEncodingException {
+		List<Object> params = new ArrayList<Object>();
+		params.add(DataConstant.EXIST);
+		params.add(DataConstant.EXIST);
+		params.add(DataConstant.EXIST);
+		StringBuilder sb = new StringBuilder();
+		sb.append("select e.employee_id, e.employee_name, e.phone_number, e.work_begin_time, e.entry_time, ");
+		sb.append("d.department_name ");
+		sb.append("from employee e ");
+		sb.append("left join employee_position ep ");
+		sb.append("on e.employee_id = ep.employee_id ");
+		sb.append("and ep.deleted = ? ");
+		sb.append("left join department d ");
+		sb.append("on ep.department_num = d.department_num ");
+		sb.append("and d.deleted = ? ");
+		sb.append("where e.deleted = ? ");
+		if (StringUtils.isNotEmpty(search.getEmployeeName())) {
+			search.setEmployeeName(new String(search.getEmployeeName().getBytes("ISO-8859-1"), "UTF-8"));
+			sb.append("and e.employee_name like CONCAT('%',?,'%') ");
+			params.add(search.getEmployeeName());
+		}
+		if (StringUtils.isNotEmpty(search.getDepartmentNum()) && !"default".equals(search.getDepartmentNum())) {
+			sb.append("and d.department_num like CONCAT(?,'%') ");
+			params.add(search.getDepartmentNum());
+		}
+		Pager<AbsenceApplyTimeVo> pager = new Pager<AbsenceApplyTimeVo>(currentPage, pageSize,
+				findCountBySql(sb.toString(), params.toArray(new Object[] {})));
+		List<AbsenceApplyTimeVo> absenceApplyTimeVoList = absenceApplyTimeVoDao.findEntityListByPage(
+				AbsenceApplyTimeVo.class, sb.toString(), params.toArray(new Object[] {}), pager.getFromIndex(),
+				pageSize);
+		pager.setDataList(absenceApplyTimeVoList);
+		return pager;
+	}
+
+	public String getEmployeeNameById(Integer employeeId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select employee_name ");
+		sb.append("from employee ");
+		sb.append("where employee_id = ? ");
+		sb.append("and deleted = ? ");
+		return employeeDao.getPropertyBySql(sb.toString(), new Object[] { employeeId, DataConstant.EXIST });
+	}
+
+	public Integer findMaxEmployeeId() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select MAX(employee_id) from employee ");
+		return employeeDao.getNumBySql(sb.toString(), null);
+	}
+
+	/**
+	 * 校验手机号是否为已为用户名
+	 * 
+	 * <p>
+	 * Title: findEmpByUname
+	 * </p>
+	 * <p>
+	 * Description:
+	 * </p>
+	 * 
+	 * @time 上午11:08:19
+	 * @param phoneNumber
+	 * @return
+	 */
+	public Employee findEmpByUname(String phoneNumber) {
+		List<Exp> expList = new ArrayList<Exp>();
+		if (phoneNumber != null && phoneNumber != null) {
+			expList.add(new WhereExp(Employee.class, "username", "=", phoneNumber));
+		}
+		expList.add(new WhereExp(Employee.class, "deleted", "=", DataConstant.EXIST));
+		List<Employee> EmployeeList = employeeDao.findList(Employee.class, expList);
+		Employee employeeName = null;
+		for (int i = 0; i < EmployeeList.size(); i++) {
+			employeeName = EmployeeList.get(i);
+		}
+		return employeeName;
+	}
+
+	public Employee getEMailAddressByEmployeeId(Integer employeeId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select employee_id, email ");
+		sb.append("from employee ");
+		sb.append("where employee_id = ? ");
+		sb.append("and deleted = ? ");
+		return employeeDao.getEntityBySql(Employee.class, sb.toString(),
+				new Object[] { employeeId, DataConstant.EXIST });
+	}
+
+	public Employee getEmployeeByAbsenceApplyId(Integer absenceApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select e.employee_id, e.employee_name ");
+		sb.append("from employee e ");
+		sb.append("join absence_apply a on e.employee_id = a.employee_id ");
+		sb.append("where a.absence_apply_id = ? ");
+		sb.append("and a.deleted = ? ");
+		return employeeDao.getEntityBySql(Employee.class, sb.toString(),
+				new Object[] { absenceApplyId, DataConstant.EXIST });
+	}
+
+	public Employee getEmployeeByOvertimeWorkApplyId(Integer overtimeWorkApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select e.employee_id, e.employee_name ");
+		sb.append("from employee e ");
+		sb.append("join overtime_work_apply oa on e.employee_id = oa.employee_id ");
+		sb.append("where oa.overtime_work_apply_id = ? ");
+		sb.append("and oa.deleted = ? ");
+		return employeeDao.getEntityBySql(Employee.class, sb.toString(),
+				new Object[] { overtimeWorkApplyId, DataConstant.EXIST });
+	}
+
+	public Employee getEmployeeByBusinessTripApplyId(Integer businessTripApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select e.employee_id, e.employee_name ");
+		sb.append("from employee e ");
+		sb.append("join business_trip_apply b on e.employee_id = b.employee_id ");
+		sb.append("where b.business_trip_apply_id = ? ");
+		sb.append("and b.deleted = ? ");
+		return employeeDao.getEntityBySql(Employee.class, sb.toString(),
+				new Object[] { businessTripApplyId, DataConstant.EXIST });
+	}
+}

@@ -1,0 +1,92 @@
+package com.hongedu.honghr.honghr.entity;
+
+import java.io.Serializable;
+
+import com.hongedu.honghr.base.entity.BaseEntity;
+import com.hongedu.honghr.base.dao.annotation.Table;
+/**
+ * @author  
+ * el_bp_position 表对应实体
+ * 2017/12/07 04:00:58
+ */
+@Table(name="el_bp_position", pk="positionId")
+public class Position extends BaseEntity implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	/***/
+	private java.lang.Integer positionId;
+	/***/
+	private java.lang.String positionNum;
+	/***/
+	private java.lang.String positionName;
+	/***/
+	private java.lang.Integer departmentId;
+	/***/
+	private java.lang.String positionRank;
+	/***/
+	private java.lang.String positionCode;
+	/***/
+	private java.lang.String referred;
+	/***/
+	private java.lang.String deleted;
+	
+	public void setPositionId(java.lang.Integer value) {
+		this.positionId = value;
+	}
+	
+	public java.lang.Integer getPositionId() {
+		return positionId;
+	}
+	public void setPositionNum(java.lang.String value) {
+		this.positionNum = value;
+	}
+	
+	public java.lang.String getPositionNum() {
+		return positionNum;
+	}
+	public void setPositionName(java.lang.String value) {
+		this.positionName = value;
+	}
+	
+	public java.lang.String getPositionName() {
+		return positionName;
+	}
+	public void setDepartmentId(java.lang.Integer value) {
+		this.departmentId = value;
+	}
+	
+	public java.lang.Integer getDepartmentId() {
+		return departmentId;
+	}
+	public void setPositionRank(java.lang.String value) {
+		this.positionRank = value;
+	}
+	
+	public java.lang.String getPositionRank() {
+		return positionRank;
+	}
+	public void setPositionCode(java.lang.String value) {
+		this.positionCode = value;
+	}
+	
+	public java.lang.String getPositionCode() {
+		return positionCode;
+	}
+	public void setReferred(java.lang.String value) {
+		this.referred = value;
+	}
+	
+	public java.lang.String getReferred() {
+		return referred;
+	}
+	public void setDeleted(java.lang.String value) {
+		this.deleted = value;
+	}
+	
+	public java.lang.String getDeleted() {
+		return deleted;
+	}
+}
+
+

@@ -1,0 +1,236 @@
+
+package com.hongedu.honghr.honghr.web;
+
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import com.hongedu.honghr.util.json.JsonResult;
+import com.hongedu.honghr.util.page.Pager;
+import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.entity.Department;
+import com.hongedu.honghr.honghr.entity.Employee;
+import com.hongedu.honghr.honghr.entity.EmployeePosition;
+import com.hongedu.honghr.honghr.entity.Position;
+import com.hongedu.honghr.honghr.entity.vo.EmployeePositionVo;
+import com.hongedu.honghr.honghr.service.DepartmentService;
+import com.hongedu.honghr.honghr.service.EmployeePositionService;
+import com.hongedu.honghr.honghr.service.EmployeeService;
+import com.hongedu.honghr.honghr.service.PositionService;
+
+
+/**
+ * @author  
+ * el_bp_employee_position 表对应的controller
+ * 2017/12/07 04:04:40
+ */
+@Controller
+@RequestMapping("/admin/employeePosition")
+public class EmployeePositionController {
+	
+	@Autowired
+	private EmployeePositionService employeePositionService;
+	
+	@Autowired
+	private EmployeeService employeeService;
+	
+	@Autowired
+	private PositionService positionService;
+	
+	@Autowired
+	private DepartmentService departmentService;
+	
+	/**
+	 * 查询EmployeePosition详情
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/findEmployeePosition",method=RequestMethod.POST)
+	public JsonResult findEmployeePosition(
+			@RequestParam(required=true)java.lang.Integer employeePositionId) {
+		try {
+			EmployeePosition employeePosition = employeePositionService.findById(employeePositionId);
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", employeePosition);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 编辑EmployeePosition
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value="/editEmployeePosition",method=RequestMethod.GET)
+	public String editEmployeePosition(
+			java.lang.Integer employeePositionId,
+			Model model) {
+		if(employeePositionId != null){
+			EmployeePosition employeePosition = employeePositionService.findById(employeePositionId);
+			model.addAttribute("employeePosition", employeePosition);
+		}
+		return "admin/employeePosition/editEmployeePosition";
+	}
+	
+	/**
+	 * 保存EmployeePosition
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveEmployeePosition",method=RequestMethod.POST)
+	public JsonResult saveEmployeePosition(
+			EmployeePosition employeePosition
+			) {
+		try {
+			if(employeePosition.getEmployeePositionId() == null){
+				employeePositionService.save(employeePosition);
+			}else{
+				employeePositionService.update(employeePosition);
+			}
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 删除EmployeePosition
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deleteEmployeePosition",method=RequestMethod.POST)
+	public JsonResult deleteEmployeePosition(
+			EmployeePosition employeePosition) {
+		try {
+			employeePositionService.updateDel(employeePosition);
+		return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**list&page
+	 * <p>Title: employeePositionList</p> 
+	 * <p>Description: </p>  
+	 * @time 上午9:14:47 
+	 * @param currentPage
+	 * @param pageSize
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/employeePositionList",method=RequestMethod.GET)
+	public String employeePositionList(
+			@RequestParam(required=false,defaultValue="1")Integer currentPage,
+			@RequestParam(required=false,defaultValue="10")Integer pageSize,
+			String employeeName,
+			Model model) {
+		Pager<EmployeePositionVo> page = employeePositionService.findPage(employeeName,currentPage, pageSize);
+		model.addAttribute("page", page);
+		model.addAttribute("employeeName", employeeName);
+		return "admin/employeePosition/employeePositionList";
+	}
+	
+	
+	/**
+	 * 跳转至员工关系分配页面
+	 * 
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/addEmployeePositon", method = RequestMethod.GET)
+	public String addEmployeePositon(Model model) {
+			List<Employee> employeeList = employeeService.findEmployeeDistribute();
+			List<Position> positionList = positionService.findPositionList();
+			List<Department> departmentList = departmentService.findDepartmentList();
+			model.addAttribute("employeeList", employeeList);
+			model.addAttribute("positionList", positionList);
+			model.addAttribute("departmentList", departmentList);
+		    return "admin/employeePosition/addEmployeePosition";
+	}
+	
+	/**
+	 * 保存员工关系信息
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/addEmployeePositionData", method = RequestMethod.POST)
+	public String addEmployeePositionData(EmployeePositionVo employeePositionVo) {
+		employeePositionVo.setDeleted(DataConstant.EXIST);
+		employeePositionService.insertEmployeePositionVo(employeePositionVo);
+		String depNum = employeePositionVo.getDepartmentNum();
+		String positionNum = employeePositionVo.getPositionNum();
+		Department department = departmentService.findByNUM(depNum);
+		Position position = positionService.findByNUM(positionNum);
+		Employee employee = employeeService.findById(employeePositionVo.getEmployeeId());
+		if (!department.getReferred().equals(DataConstant.REFERRED)) {
+			department.setReferred(DataConstant.REFERRED);
+			departmentService.update(department);
+			if (!position.getReferred().equals(DataConstant.REFERRED)) {
+				position.setReferred(DataConstant.REFERRED);
+				positionService.update(position);
+				if (!employee.getReferred().equals(DataConstant.REFERRED)) {
+					employee.setReferred(DataConstant.REFERRED);
+					employeeService.update(employee);
+				}
+			}
+		}
+		return JsonResult.SUCCESS_CODE;
+	}
+    
+	/**
+	 * 跳转至员工关系编辑页面
+	 * @param employeePositionId
+	 */
+	@RequestMapping(value = "/toEditEmployeePostion/{employeePositionId}", method = RequestMethod.GET)
+	public String toEditEmployeePostion(@PathVariable("employeePositionId") Integer employeePositionId, Model model) {
+		List<Employee> employeeList = employeeService.findEmployeeDistribute();
+		List<Position> positionList = positionService.findPositionList();
+		List<Department> departmentList = departmentService.findDepartmentList();
+		model.addAttribute("employeeList", employeeList);
+		model.addAttribute("positionList", positionList);
+		model.addAttribute("departmentList", departmentList);
+		if (employeePositionId != null) {
+			EmployeePositionVo employeePosition = employeePositionService.findEmployeePositionById(employeePositionId);
+			model.addAttribute("employeePosition", employeePosition);
+		}
+		return "admin/employeePosition/editEmployeePosition";
+	}
+
+	/**
+	 * 修改员工关系信息
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/editForEmployeePostion", method = RequestMethod.POST)
+	public String editForEmployeePostion(EmployeePositionVo employeePositionVo) {
+		employeePositionService.updateEmployeePositionVo(employeePositionVo);
+		String depNum = employeePositionVo.getDepartmentNum();
+		String positionNum = employeePositionVo.getPositionNum();
+		Department department = departmentService.findByNUM(depNum);
+		Position position = positionService.findByNUM(positionNum);
+		Employee employee = employeeService.findById(employeePositionVo.getEmployeeId());
+		if (!department.getReferred().equals(DataConstant.REFERRED)) {
+			department.setReferred(DataConstant.REFERRED);
+			departmentService.update(department);
+			if (!position.getReferred().equals(DataConstant.REFERRED)) {
+				position.setReferred(DataConstant.REFERRED);
+				positionService.update(position);
+				if (!employee.getReferred().equals(DataConstant.REFERRED)) {
+					employee.setReferred(DataConstant.REFERRED);
+					employeeService.update(employee);
+				}
+			}
+		}
+		return JsonResult.SUCCESS_CODE;
+	}
+}

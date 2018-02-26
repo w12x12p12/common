@@ -1,0 +1,158 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+
+<script src="${ctx }/resources/js/admin/overtimeWorkApply.js"></script>
+	<form class="form-inline" role="form">
+		<div class="form-group btn-group-sm z_margin_tb">
+			<label class="sr-only" for="name">查询条件</label> 
+			<input type="text" name="" value="" class="form-control input-sm" id="" placeholder="请输入">
+			<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>查询</button>
+		</div>
+		<ul class="nav nav-list"> <li class="divider"></li> </ul>
+		<div class="table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>加班单编号</th>
+						<th>姓名</th>
+						<th>所属部门</th>
+						<th>加班开始时间</th>
+						<th>加班结束时间</th>
+						<th>加班时长</th>
+						<th>加班性质</th>
+						<th>加班原因</th>
+						<th>申请时间</th>
+						<th>审核状态</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="entity" items="${page.dataList}" varStatus="status">
+						<tr>
+							<td>${status.index+1 + (page.currentPage-1)*page.pageSize }</td>
+							<td>${entity.overtimeWorkApplyNum}</td>
+							<td>${entity.applyEmployeeName}</td>
+							<td>${entity.applyDepartmentNum}</td>
+							<td><fmt:formatDate type="both" value="${entity.applyBeginTime}" pattern="yyyy/MM/dd HH:mm"/></td>
+							<td><fmt:formatDate type="both" value="${entity.applyEndTime}" pattern="yyyy/MM/dd HH:mm"/></td>
+							<td>${entity.applyDuration}小时</td>
+							<td>${entity.applyTypeShow}</td>
+							<td>${entity.applyReason}</td>
+							<td><fmt:formatDate type="both" value="${entity.applyDateTime}" pattern="yyyy/MM/dd HH:mm"/></td>
+							<td><c:if test="${entity.applyIsAllowed == -1}">未审批</c:if></td>
+							<td>
+							<button type="button" class="btn btn-default btn-sm" onclick="OvertimeWorkApply.showEdit('${entity.overtimeWorkApplyId}');">
+							  <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>审批
+							</button>
+							<button type="button" class="btn btn-default  btn-sm btn-danger" onclick="OvertimeWorkApply.deleteData('${entity.overtimeWorkApplyId}');">
+							  <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>删除
+							</button>
+							</td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+ 			<!-- 分页区域 -->
+			<jsp:include page="/WEB-INF/jsp/common/page.jsp"></jsp:include>
+		</div>
+	</form>
+
+	<!-- 弹出框 -->
+	<div class="modal" id="editModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">编辑用户</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal" role="form" id="editForm">
+						<input name="overtimeWorkApplyId" type="hidden" ></input>
+						 <!-- <div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>overtimeWorkApplyNum</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="overtimeWorkApplyNum" type="text" placeholder="请输入100字以内字符" maxlength="100"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>employeeId</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="employeeId" type="text" placeholder="请输入100字以内字符" maxlength="100"></input>
+							</div>
+						</div> -->
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>加班类型</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="applyType" type="text" placeholder="请输入100字以内字符" maxlength="100"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>申请原因</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="applyReason" type="text" placeholder="请输入100字以内字符" maxlength="100"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>详细内容</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="applyWorkContent" type="text" placeholder="请输入100字以内字符" maxlength="100"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>开始时间</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="applyBeginTime" type="text" placeholder="请输入100字以内字符" maxlength="100"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>结束时间</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="applyEndTime" type="text" placeholder="请输入100字以内字符" maxlength="100"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>申请时长</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="applyDuration" type="text" placeholder="请输入100字以内字符" maxlength="100"></input>
+							</div>
+						</div>
+						<!-- <div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>applyCheckStatus</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="applyCheckStatus" type="text" placeholder="请输入100字以内字符" maxlength="100"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>applyCheckProgress</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="applyCheckProgress" type="text" placeholder="请输入100字以内字符" maxlength="100"></input>
+							</div>
+						</div> -->
+						<!-- <div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>createEmployeeId</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="createEmployeeId" type="text" placeholder="请输入100字以内字符" maxlength="100"></input>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="disabledSelect" class="col-sm-2 control-label"><b class="z_common_star">*</b>deleted</label>
+							<div class="col-sm-10">
+								<input class="form-control validate[required]"  name="deleted" type="text" placeholder="请输入100字以内字符" maxlength="100"></input>
+							</div>
+						</div> -->
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" id="save_btn">保存</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				</div>
+			</div>
+		</div>
+	</div>

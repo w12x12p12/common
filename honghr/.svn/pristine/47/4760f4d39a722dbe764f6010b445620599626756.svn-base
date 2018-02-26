@@ -1,0 +1,113 @@
+package com.hongedu.honghr.honghr.entity.vo;
+
+import java.util.List;
+
+import com.hongedu.honghr.honghr.entity.BusinessTripApply;
+import com.hongedu.honghr.honghr.entity.BusinessTripApplyCheck;
+
+public class BusinessTripApplyVo extends BusinessTripApply {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private String applyEmployeeName;
+	
+	private String applyDepartmentName;
+	
+	private String applyTypeShow;
+	
+	private String applyBeginProvinceName;
+	
+	private String applyBeginCityName;
+	
+	private String applyEndProvinceName;
+	
+	private String applyEndCityName;
+	
+	private String applyCheckStatusShow;
+
+	private List<BusinessTripApplyCheck> businessTripApplyChecks;
+	
+	private List<BusinessTripApplyCheckVo> businessTripApplyCheckVos;
+
+	public String getApplyEmployeeName() {
+		return applyEmployeeName;
+	}
+
+	public void setApplyEmployeeName(String applyEmployeeName) {
+		this.applyEmployeeName = applyEmployeeName;
+	}
+
+	public String getApplyDepartmentName() {
+		return applyDepartmentName;
+	}
+
+	public void setApplyDepartmentName(String applyDepartmentName) {
+		this.applyDepartmentName = applyDepartmentName;
+	}
+	
+	public String getApplyTypeShow() {
+		return applyTypeShow;
+	}
+
+	public void setApplyTypeShow(String applyTypeShow) {
+		this.applyTypeShow = applyTypeShow;
+	}
+
+	public String getApplyBeginProvinceName() {
+		return applyBeginProvinceName;
+	}
+
+	public void setApplyBeginProvinceName(String applyBeginProvinceName) {
+		this.applyBeginProvinceName = applyBeginProvinceName;
+	}
+
+	public String getApplyBeginCityName() {
+		return applyBeginCityName;
+	}
+
+	public void setApplyBeginCityName(String applyBeginCityName) {
+		this.applyBeginCityName = applyBeginCityName;
+	}
+
+	public String getApplyEndProvinceName() {
+		return applyEndProvinceName;
+	}
+
+	public void setApplyEndProvinceName(String applyEndProvinceName) {
+		this.applyEndProvinceName = applyEndProvinceName;
+	}
+
+	public String getApplyEndCityName() {
+		return applyEndCityName;
+	}
+
+	public void setApplyEndCityName(String applyEndCityName) {
+		this.applyEndCityName = applyEndCityName;
+	}
+
+	public String getApplyCheckStatusShow() {
+		return applyCheckStatusShow;
+	}
+
+	public void setApplyCheckStatusShow(String applyCheckStatusShow) {
+		this.applyCheckStatusShow = applyCheckStatusShow;
+	}
+
+	public List<BusinessTripApplyCheck> getBusinessTripApplyChecks() {
+		return businessTripApplyChecks;
+	}
+
+	public void setBusinessTripApplyChecks(List<BusinessTripApplyCheck> businessTripApplyChecks) {
+		this.businessTripApplyChecks = businessTripApplyChecks;
+	}
+
+	public List<BusinessTripApplyCheckVo> getBusinessTripApplyCheckVos() {
+		return businessTripApplyCheckVos;
+	}
+
+	public void setBusinessTripApplyCheckVos(List<BusinessTripApplyCheckVo> businessTripApplyCheckVos) {
+		this.businessTripApplyCheckVos = businessTripApplyCheckVos;
+	}
+}

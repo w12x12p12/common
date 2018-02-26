@@ -1,0 +1,456 @@
+
+package com.hongedu.honghr.honghr.web;
+
+import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.crypto.hash.SimpleHash;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.common.constant.ExcelConstant;
+import com.hongedu.honghr.honghr.common.constant.SessionConstant;
+import com.hongedu.honghr.honghr.entity.Department;
+import com.hongedu.honghr.honghr.entity.Employee;
+import com.hongedu.honghr.honghr.entity.EmployeePosition;
+import com.hongedu.honghr.honghr.entity.Position;
+import com.hongedu.honghr.honghr.entity.vo.EmployeePositionVo;
+import com.hongedu.honghr.honghr.service.DepartmentService;
+import com.hongedu.honghr.honghr.service.EmployeePositionService;
+import com.hongedu.honghr.honghr.service.EmployeeService;
+import com.hongedu.honghr.honghr.service.PositionService;
+import com.hongedu.honghr.util.excel.ExportExcel;
+import com.hongedu.honghr.util.json.JsonResult;
+import com.hongedu.honghr.util.page.Pager;
+
+@Controller
+@RequestMapping("/admin/employee")
+public class EmployeeController {
+
+	@Autowired
+	private EmployeeService employeeService;
+	@Autowired
+	private EmployeePositionService employeePositionService;
+	@Autowired
+	private DepartmentService departmentService;
+	@Autowired
+	private PositionService positionService;
+
+	/**
+	 * 查询Employee详情
+	 * 
+	 * <p>Title: findEmployee</p> 
+	 * <p>Description: </p>  
+	 * @time 下午2:27:24 
+	 * @param employeeId
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/findEmployee", method = RequestMethod.POST)
+	public JsonResult findEmployee(@RequestParam(required = true) java.lang.Integer employeeId) {
+		try {
+			Employee employee = employeeService.findById(employeeId);
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", employee);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+
+	/**
+	 * 编辑Employee
+	 * 
+	 * <p>Title: editEmployee</p> 
+	 * <p>Description: </p>  
+	 * @time 下午2:27:15 
+	 * @param employeeId
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/editEmployee", method = RequestMethod.GET)
+	public String editEmployee(Integer employeeId, Model model) {
+		if (employeeId != null) {
+			// 查询要修改的数据信息
+			Employee employee = employeeService.findById(employeeId);
+			model.addAttribute("employee", employee);
+		}
+		return "admin/employee/editEmployees";
+	}
+
+	/**
+	 * 保存Employee(添加&修改)
+	 * 
+	 * <p>Title: saveEmployee</p> 
+	 * <p>Description: </p>  
+	 * @time 下午2:27:04 
+	 * @param employee
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/saveEmployee", method = RequestMethod.POST)
+	public JsonResult saveEmployee(Employee employee) {
+		try {
+			// 判断employeeId
+			if (employee.getEmployeeId() == null) {// 添加
+				String phoneNumber = employee.getPhoneNumber();// 用户填写的手机号码
+				Date workTime = employee.getWorkBeginTime();// 用户选择的参加工作时间
+				Date entryTime = employee.getEntryTime();// 用户选择的入职时间
+				String user = employeeService.findEmpByUname(phoneNumber);
+				if (user == null) {
+					if (entryTime.getTime() < workTime.getTime()) {// 入职时间，参加工作时间校验
+						employee = null;
+						return new JsonResult(JsonResult.FAILE_CODE, "入职时间必须晚于(等于)参加工作时间", null);
+					}
+					employee.setUsername(employee.getPhoneNumber());
+					employee.setPassword(DataConstant.INIT_PASSWORD);
+					employeeService.save(employee);
+					int employeeId = employeeService.findMaxEmployeeId();
+					employeeService.editPassword(
+							new SimpleHash(DataConstant.ENCRYPT_MD5, DataConstant.INIT_PASSWORD,
+									String.valueOf(employeeId), DataConstant.HASH_ITERATION_COUNT).toString(),
+							employeeId);
+				} else {
+					employee = null;
+					return new JsonResult(JsonResult.FAILE_CODE, "手机号是用户的用户名,不能重复", null);
+				}
+			} else {// 修改
+				employee.setUsername(employee.getPhoneNumber());//修改手机号同时修改用户名
+				employeeService.update(employee);
+			}
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+
+	/**
+	 *  删除员工
+	 * 
+	 * <p>Title: deleteEmployee</p> 
+	 * <p>Description: </p>  
+	 * @time 下午2:26:53 
+	 * @param employee
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/deleteEmployee", method = RequestMethod.POST)
+	public JsonResult deleteEmployee(Employee employee) {
+		try {
+			// 查询要删除的数据信息
+			Employee employe = employeeService.findById(employee.getEmployeeId());
+			// 判断数据引用状态
+			if (!employe.getReferred().equals(DataConstant.REFERRED)) {// 没被引用，可以删除
+				// 修改deleted
+				employeeService.updeteDel(employee);
+				return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+			} else {// 已被引用，无法删除
+				return new JsonResult(JsonResult.FAILE_CODE, "该员工已被引用，暂时无法删除", null);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+
+	/**
+	 * 启用禁用
+	 * 
+	 * <p>Title: ForbidedEmployee</p> 
+	 * <p>Description: </p>  
+	 * @time 下午3:28:14 
+	 * @param employee
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/ForbidedEmployee", method = RequestMethod.POST)
+	public JsonResult ForbidedEmployee(Employee employee) {
+		try {
+			// 判断Forbided的值
+			if (employee.getForbided().equals(DataConstant.FORBID)) {// 禁用
+				employee.setForbided(employee.getForbided());
+				employeeService.update(employee);
+				return new JsonResult(JsonResult.SUCCESS_CODE, "禁用成功", null);
+			} else if (employee.getForbided().equals(DataConstant.ALLOW)) {// 启用
+				employee.setForbided(employee.getForbided());
+				employeeService.update(employee);
+				return new JsonResult(JsonResult.SUCCESS_CODE, "启用成功", null);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+		return null;
+	}
+
+	/**
+	 * 查询员工list&模糊查询&分页
+	 * 
+	 * <p>Title: employeeList</p> 
+	 * <p>Description: </p>  
+	 * @time 下午2:27:39 
+	 * @param currentPage
+	 * @param pageSize
+	 * @param employeeName
+	 * @param model
+	 * @return
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/employeeList", method = RequestMethod.GET)
+	public String employeeList(@RequestParam(required = false, defaultValue = DataConstant.currentPage) Integer currentPage,
+			@RequestParam(required = false, defaultValue = DataConstant.pageSize) Integer pageSize, String employeeName, Model model)
+			throws ParseException {
+		String employeeNames = null;
+		try {
+			if (employeeName != null) {
+				employeeNames = new String(employeeName.getBytes("ISO8859-1"), "UTF-8");
+			}
+			Pager<Employee> page = employeeService.findPage(employeeNames, currentPage, pageSize);
+			for (int i = 0; i < page.getDataList().size(); i++) {
+				SimpleDateFormat formatYear = new SimpleDateFormat("yyyy");
+				SimpleDateFormat formatMonth = new SimpleDateFormat("MM");
+				Date birthday = page.getDataList().get(i).getBirthday();// 生日
+				Date joinWorkTime = page.getDataList().get(i).getWorkBeginTime();// 参加工作时间
+				Date timeOfEntry = page.getDataList().get(i).getEntryTime();// 入职时间
+				Date date = new Date();// 现在时间
+
+				Calendar nowTime = Calendar.getInstance();
+				Calendar jWorkTime = Calendar.getInstance();
+				Calendar tOfEntry = Calendar.getInstance();
+				nowTime.setTime(date);
+				jWorkTime.setTime(joinWorkTime);
+				tOfEntry.setTime(timeOfEntry);
+				// 计算工作年限
+				int result = jWorkTime.get(Calendar.MONTH) - nowTime.get(Calendar.MONTH);
+				int month = (jWorkTime.get(Calendar.YEAR) - nowTime.get(Calendar.YEAR)) * 12;
+				int worktime = (result + month) * (-1);
+				int quotient = worktime / 12;// 年
+				// 计算本公司入职时长
+				int resultEntrytime = tOfEntry.get(Calendar.MONTH) - nowTime.get(Calendar.MONTH);
+				int monthEntrytime = (tOfEntry.get(Calendar.YEAR) - nowTime.get(Calendar.YEAR)) * 12;
+				int entrytime = (resultEntrytime + monthEntrytime) * (-1);
+				// 计算年龄
+				int Age = Integer.parseInt(formatYear.format(date)) - Integer.parseInt(formatYear.format(birthday));
+				if (formatMonth.format(date).compareTo(formatMonth.format(birthday)) < 0) {
+					Age -= 1;
+				}
+				if (Age < 0) {
+					Age = 0;
+				}
+				// 设置年龄
+				page.getDataList().get(i).setAge(Integer.toString(Age));
+				// 设置工作年限
+				page.getDataList().get(i).setWorkYear(Integer.toString(quotient));
+				// 设置本公司入职时长
+				page.getDataList().get(i).setEntryLength(Integer.toOctalString(entrytime));
+			}
+			model.addAttribute("page", page);
+			model.addAttribute("employeeName", employeeNames);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return "admin/employee/employeeList";
+	}
+
+	/**
+	 *  密码修改
+	 * 
+	 * <p>Title: password</p> 
+	 * <p>Description: </p>  
+	 * @time 下午2:28:14 
+	 * @param session
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/password", method = { RequestMethod.GET })
+	public String password(HttpSession session, Model model) {
+		return "admin/password";
+	}
+	
+	/**
+	 * 员工查询个人信息页面
+	 * 
+	 * <p>Title: personal</p> 
+	 * <p>Description: </p>  
+	 * @time 下午2:39:54 
+	 * @param session
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/personal", method = { RequestMethod.GET })
+	public String personal(HttpSession session, Model model) {
+		Employee employee = (Employee) SecurityUtils.getSubject().getSession()
+				.getAttribute(SessionConstant.SESSION_EMPLOYEE_KEY);
+		if (employee != null) {
+			Employee employeePo = employeeService.findEmployeeById(employee.getEmployeeId());
+			model.addAttribute("employeePo", employeePo);
+			model.addAttribute("employeeId", employee.getEmployeeId());
+		}
+		return "admin/employee/personal";
+	}
+
+	/**
+	 * 编辑个人信息
+	 * 
+	 * <p>Title: editPersonal</p> 
+	 * <p>Description: </p>  
+	 * @time 下午2:28:23 
+	 * @param employee
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/editPersonal", method = RequestMethod.POST)
+	public String editPersonal(Employee employee) {
+		employeeService.updateEmployee(employee);
+		return JsonResult.SUCCESS_CODE;
+	}
+
+	/**
+	 * 通讯录list&模糊查询&分页
+	 * 
+	 * <p>Title: communicateList</p> 
+	 * <p>Description: 员工通讯录列表查询/模糊查询/分页</p>  
+	 * @time 下午2:28:32 
+	 * @param currentPage
+	 * @param pageSize
+	 * @param employeePosition
+	 * @param employeeName
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/communicateList", method = { RequestMethod.GET })
+	public String communicateList(
+			@RequestParam(required = false, defaultValue = DataConstant.currentPage) Integer currentPage,
+			@RequestParam(required = false, defaultValue = DataConstant.pageSize) Integer pageSize,
+			EmployeePosition employeePosition, String employeeName, Model model) {
+		String departmentNum = employeePosition.getDepartmentNum();
+		String positionNum = employeePosition.getPositionNum();
+		String employeeNames = null;
+		try {
+			if (employeeName != null) {
+				employeeNames = new String(employeeName.getBytes("ISO8859-1"), "UTF-8");
+			}
+			// 查询部门
+			List<Department> departmentlist = departmentService.findDepartmentList();
+			// 查询职务
+			List<Position> positionlist = positionService.findList1();
+			// 查询列表/模糊查/分页
+			Pager<EmployeePositionVo> page = employeePositionService.findPage1(employeeNames, departmentNum,
+					positionNum, currentPage, pageSize);
+			model.addAttribute("page", page);
+			model.addAttribute("list", departmentlist);
+			model.addAttribute("positionlist", positionlist);
+			model.addAttribute("employeeName", employeeNames);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return "admin/employee/communicateList";
+	}
+	
+	/**
+	 * ajax 根据部门查询职位
+	 * 
+	 * <p>Title: findCourses</p> 
+	 * <p>Description: 根据部门Num查询职位信息</p>  
+	 * @time 上午9:44:11 
+	 * @param department
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/findPosition", method = RequestMethod.GET)
+	public JsonResult findPosition(Department department) {
+		try {
+			// 获取ajax请求传过来的departmentNum
+			String departmentNum = department.getDepartmentNum();
+			// 通过departmentNum查询Department信息departmentInfo
+			Department departmentInfo = departmentService.findByNUM(departmentNum);
+			// 定义positionList并初始化
+			List<Position> positionList = null;
+			// 判断上面查到的departmentInfo的DepartmentParentId是否为0
+			if (departmentInfo.getDepartmentParentId() != DataConstant.department_top_parentId) {// 查询该部门写的所有职位
+				positionList = positionService.findPosByDepId(departmentInfo.getDepartmentId());
+			} else {// 查询所有职位
+				positionList = positionService.findList1();
+			}
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", positionList);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+
+	/**
+	 * 验证原密码
+	 * 
+	 * @param oldPassword
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/validateOldPassword", method = RequestMethod.GET)
+	public String validateOldPassword(String oldPassword) {
+		Employee employee = (Employee) SecurityUtils.getSubject().getSession()
+				.getAttribute(SessionConstant.SESSION_EMPLOYEE_KEY);
+		if (employee != null && employee.getEmployeeId() != null) {
+			Object psdMd5 = new SimpleHash(DataConstant.ENCRYPT_MD5, oldPassword,
+					String.valueOf(employee.getEmployeeId()), DataConstant.HASH_ITERATION_COUNT);
+			String password = employeeService.getPasswordByEmployeeId(employee.getEmployeeId());
+			if (StringUtils.isNotEmpty(password) && password.equals(psdMd5.toString())) {
+				return JsonResult.SUCCESS_CODE;
+			}
+		}
+		return JsonResult.FAILE_CODE;
+	}
+
+	/**
+	 * 导出通讯录信息
+	 * 
+	 * <p>Title: exportCommunicate</p> 
+	 * <p>Description: 导出通讯录里所有的员工的通讯信息</p>  
+	 * @time 下午3:10:19 
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value = "/exportCommunicate", method = { RequestMethod.GET })
+	public void exportCommunicate(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			List<EmployeePositionVo> communicatelist = employeePositionService.findListToExport();
+			String[] Rows = new String[] { ExcelConstant.Sequence, ExcelConstant.Name, 
+					ExcelConstant.Position,ExcelConstant.Department, ExcelConstant.Address, 
+					ExcelConstant.CellPhoneNumber,ExcelConstant.Emill };
+			List<Object[]> employeelist = new ArrayList<Object[]>();
+			for (int i = 0; i < communicatelist.size(); i++) {
+				Object[] cellContent = new Object[Rows.length];
+				EmployeePositionVo employeeInformation = communicatelist.get(i);
+				cellContent[ExcelConstant.Row1] = i + 1;
+				cellContent[ExcelConstant.Row2] = employeeInformation.getEmployeeName();
+				cellContent[ExcelConstant.Row3] = employeeInformation.getPositionName();
+				cellContent[ExcelConstant.Row4] = employeeInformation.getDepartmentName();
+				cellContent[ExcelConstant.Row5] = employeeInformation.getAddress();
+				cellContent[ExcelConstant.Row6] = employeeInformation.getPhoneNumber();
+				cellContent[ExcelConstant.Row7] = employeeInformation.getEmail();
+				employeelist.add(cellContent);
+			}
+			String fileName = ExcelConstant.CommunicateName;
+			ExportExcel.exportExcel(request, response, fileName, Rows, employeelist,ExcelConstant.TimeFormat);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}

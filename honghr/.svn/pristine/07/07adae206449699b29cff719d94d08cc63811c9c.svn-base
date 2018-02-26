@@ -1,0 +1,61 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+
+<script src="${ctx }/resources/js/admin/overtimeWorkApply.js"></script>
+	<form class="form-inline" role="form">
+		<div class="form-group btn-group-sm z_margin_tb">
+			<label class="sr-only" for="name">查询条件</label> 
+			<input type="text" name="" value="" class="form-control input-sm" id="" placeholder="请输入">
+			<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>查询</button>
+		</div>
+		<ul class="nav nav-list"> <li class="divider"></li> </ul>
+		<div class="table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>加班单编号</th>
+						<th>姓名</th>
+						<th>所属部门</th>
+						<th>加班开始时间</th>
+						<th>加班结束时间</th>
+						<th>加班时长</th>
+						<th>加班性质</th>
+						<th>加班原因</th>
+						<th>申请时间</th>
+						<th>审核状态</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="entity" items="${page.dataList}" varStatus="status">
+						<tr>
+							<td>${status.index+1 + (page.currentPage-1)*page.pageSize }</td>
+							<td>${entity.overtimeWorkApplyNum}</td>
+							<td>${entity.applyEmployeeName}</td>
+							<td>${entity.applyDepartmentNum}</td>
+							<td><fmt:formatDate type="both" value="${entity.applyBeginTime}" pattern="yyyy/MM/dd HH:mm"/></td>
+							<td><fmt:formatDate type="both" value="${entity.applyEndTime}" pattern="yyyy/MM/dd HH:mm"/></td>
+							<td>${entity.applyDuration}小时</td>
+							<td>${entity.applyTypeShow}</td>
+							<td>${entity.applyReason}</td>
+							<td><fmt:formatDate type="both" value="${entity.applyDateTime}" /></td>
+							<td>${entity.applyCheckStatusShow}</td>
+							<td>
+							<button type="button" class="btn btn-default btn-sm" onclick="OvertimeWorkApply.showEdit('${entity.overtimeWorkApplyId}');">
+							  <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>编辑
+							</button>
+							<button type="button" class="btn btn-default  btn-sm btn-danger" onclick="OvertimeWorkApply.deleteData('${entity.overtimeWorkApplyId}');">
+							  <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>删除
+							</button>
+							</td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+ 			<!-- 分页区域 -->
+			<jsp:include page="/WEB-INF/jsp/common/page.jsp"></jsp:include>
+		</div>
+	</form>

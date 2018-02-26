@@ -1,0 +1,74 @@
+package com.hongedu.honghr.honghr.entity.vo;
+
+import java.util.List;
+
+import com.hongedu.honghr.honghr.entity.Department;
+import com.hongedu.honghr.honghr.entity.Employee;
+
+public class EmployeeVo extends Employee{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private String departmentName;
+	
+	private String annualLeaveHourTotalLastYear;
+	
+	private String annualLeaveHourTotalThisYear;
+	
+	private String remainingAnnualHourLastYear;
+	
+	private String remainingAnnualHourThisYear;
+	
+	private List<Department> departments;
+
+	public String getDepartmentName() {
+		return departmentName;
+	}
+
+	public void setDepartmentName(String departmentName) {
+		this.departmentName = departmentName;
+	}
+
+	public String getAnnualLeaveHourTotalLastYear() {
+		return annualLeaveHourTotalLastYear;
+	}
+
+	public void setAnnualLeaveHourTotalLastYear(String annualLeaveHourTotalLastYear) {
+		this.annualLeaveHourTotalLastYear = annualLeaveHourTotalLastYear;
+	}
+
+	public String getRemainingAnnualHourLastYear() {
+		return remainingAnnualHourLastYear;
+	}
+
+	public void setRemainingAnnualHourLastYear(String remainingAnnualHourLastYear) {
+		this.remainingAnnualHourLastYear = remainingAnnualHourLastYear;
+	}
+
+	public String getRemainingAnnualHourThisYear() {
+		return remainingAnnualHourThisYear;
+	}
+
+	public void setRemainingAnnualHourThisYear(String remainingAnnualHourThisYear) {
+		this.remainingAnnualHourThisYear = remainingAnnualHourThisYear;
+	}
+
+	public String getAnnualLeaveHourTotalThisYear() {
+		return annualLeaveHourTotalThisYear;
+	}
+
+	public void setAnnualLeaveHourTotalThisYear(String annualLeaveHourTotalThisYear) {
+		this.annualLeaveHourTotalThisYear = annualLeaveHourTotalThisYear;
+	}
+
+	public List<Department> getDepartments() {
+		return departments;
+	}
+
+	public void setDepartments(List<Department> departments) {
+		this.departments = departments;
+	}
+}

@@ -1,0 +1,5 @@
+package com.hongedu.honghr.honghr.common.constant;
+
+public class SessionConstant {
+	public static final String SESSION_EMPLOYEE_KEY = "employee";// 员工用户
+}

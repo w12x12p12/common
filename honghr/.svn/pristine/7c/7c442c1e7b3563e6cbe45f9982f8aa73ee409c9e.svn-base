@@ -1,0 +1,142 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.entity.Attachment;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+
+/**
+ * @author  
+ * el_bp_attachment 表对应业务实现对象
+ * 2017/12/07 04:00:56
+ */
+@Transactional
+@Service
+public class AttachmentService{
+	
+	private final static Logger logger= LoggerFactory.getLogger(AttachmentService.class);
+	
+	@Autowired
+	private BaseDaoImpl<Attachment> attachmentDao;
+	
+	/**
+	 * 根据主键查询Attachment对象
+	 * @param id
+	 * @return
+	 */
+	public Attachment findById (Serializable id){
+		Attachment entity = attachmentDao.findById(Attachment.class, id);
+		return entity;
+	}
+	
+	/**
+	 * 插入Attachment对象
+	 * @param entity
+	 */
+	public void save (Attachment entity){
+		attachmentDao.save(entity);
+	}
+	
+	/**
+	 * 修改Attachment对象
+	 * @param entity
+	 */
+	public void update (Attachment entity){
+		attachmentDao.update(entity);
+	}
+	
+	/**
+	 * 删除Attachment对象
+	 * @param id
+	 */
+	public void delete (Serializable id){
+		attachmentDao.delete(Attachment.class, id);
+	}
+	
+	/**
+	 * 根据sql查询Attachment对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Attachment对象集合
+	 */
+	public List<Attachment> findListBySql(int currentPage, int pageSize){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select Attachment.* from Attachment");
+		List<Attachment> list = attachmentDao.findListBySql(Attachment.class, sql.toString(), currentPage, pageSize);	
+		return list;
+	}
+	
+	/**
+	 * 根据sql查询Attachment集合数量
+	 * @return Attachment集合数量
+	 */
+	public int findCountBySql(){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select count(1) from Attachment");
+		int count = attachmentDao.findCountBySql(Attachment.class, sql.toString());	
+		return count;
+	}
+	
+	/**
+	 * 根据sql查询Attachment分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Attachment分页对象
+	 */
+	public Pager<Attachment> findPageBySql(int currentPage, int pageSize){
+		int totalRecord = findCountBySql();	
+		Pager<Attachment> pager = new Pager<Attachment>(currentPage, pageSize, totalRecord);
+		List<Attachment> dataList = findListBySql(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+	
+	/**
+	 * 根据表达式查询Attachment对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Attachment对象集合
+	 */
+	public List<Attachment> findList(int currentPage, int pageSize){
+		List<Exp> expList = new ArrayList<Exp>();
+		List<Attachment> AttachmentList = attachmentDao.findList(Attachment.class, expList, currentPage, pageSize);	
+		return AttachmentList;
+	}
+	
+	/**
+	 * 根据表达式查询Attachment集合数量
+	 * @return Attachment集合数量
+	 */
+	public int findCount(){
+		List<Exp> expList = new ArrayList<Exp>();
+		int count = attachmentDao.findCount(Attachment.class, expList);	
+		return count;
+	}
+	
+	/**
+	 * 根据表达式查询Attachment分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return Attachment分页对象
+	 */
+	public Pager<Attachment> findPage(int currentPage, int pageSize){
+		int totalRecord = findCount();	
+		Pager<Attachment> pager = new Pager<Attachment>(currentPage, pageSize, totalRecord);
+		List<Attachment> dataList = findList(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+}
+
+

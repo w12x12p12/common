@@ -1,0 +1,122 @@
+
+package com.hongedu.honghr.honghr.web;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.hongedu.honghr.util.json.JsonResult;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.honghr.entity.Position;
+import com.hongedu.honghr.honghr.service.PositionService;
+
+
+/**
+ * @author  
+ * el_bp_position 表对应的controller
+ * 2017/12/07 04:04:41
+ */
+@Controller
+@RequestMapping("/admin/position")
+public class PositionController {
+	
+	@Autowired
+	private PositionService positionService;
+	
+	/**
+	 * 查询Position详情
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/findPosition",method=RequestMethod.POST)
+	public JsonResult findPosition(
+			@RequestParam(required=true)java.lang.Integer positionId) {
+		try {
+			Position position = positionService.findById(positionId);
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", position);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 编辑Position
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value="/editPosition",method=RequestMethod.GET)
+	public String editPosition(
+			java.lang.Integer positionId,
+			Model model) {
+		if(positionId != null){
+			Position position = positionService.findById(positionId);
+			model.addAttribute("position", position);
+		}
+		return "admin/position/editPosition";
+	}
+	
+	/**
+	 * 保存Position
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/savePosition",method=RequestMethod.POST)
+	public JsonResult savePosition(
+			Position position
+			) {
+		try {
+			if(position.getPositionId() == null){
+				positionService.save(position);
+			}else{
+				positionService.update(position);
+			}
+			return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 删除Position
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deletePosition",method=RequestMethod.POST)
+	public JsonResult deletePosition(
+			@RequestParam(required=true)java.lang.Integer positionId) {
+		try {
+			positionService.delete(positionId);
+		return new JsonResult(JsonResult.SUCCESS_CODE, "", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+						return new JsonResult(JsonResult.FAILE_CODE, "系统异常", null);
+		}
+	}
+	
+	/**
+	 * 查询Position表单页面
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/positionList",method=RequestMethod.GET)
+	public String positionList(
+			@RequestParam(required=false,defaultValue="1")Integer currentPage,
+			@RequestParam(required=false,defaultValue="10")Integer pageSize,
+			Model model) {
+		Pager<Position> page = positionService.findPage(currentPage, pageSize);
+		model.addAttribute("page", page);
+		return "admin/position/positionList";
+	}
+}

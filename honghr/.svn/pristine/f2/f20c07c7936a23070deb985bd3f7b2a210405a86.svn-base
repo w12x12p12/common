@@ -1,0 +1,138 @@
+package com.hongedu.honghr.honghr.service;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hongedu.honghr.base.dao.expression.Exp;
+import com.hongedu.honghr.honghr.entity.EmployeePosition;
+import com.hongedu.honghr.util.page.Pager;
+
+import com.hongedu.honghr.base.dao.BaseDaoImpl;
+
+/**
+ * @author  
+ * el_bp_employee_position 表对应业务实现对象
+ * 2017/12/07 04:00:57
+ */
+@Transactional
+@Service
+public class EmployeePositionService{
+	
+	@Autowired
+	private BaseDaoImpl<EmployeePosition> employeePositionDao;
+	
+	/**
+	 * 根据主键查询EmployeePosition对象
+	 * @param id
+	 * @return
+	 */
+	public EmployeePosition findById (Serializable id){
+		EmployeePosition entity = employeePositionDao.findById(EmployeePosition.class, id);
+		return entity;
+	}
+	
+	/**
+	 * 插入EmployeePosition对象
+	 * @param entity
+	 */
+	public void save (EmployeePosition entity){
+		employeePositionDao.save(entity);
+	}
+	
+	/**
+	 * 修改EmployeePosition对象
+	 * @param entity
+	 */
+	public void update (EmployeePosition entity){
+		employeePositionDao.update(entity);
+	}
+	
+	/**
+	 * 删除EmployeePosition对象
+	 * @param id
+	 */
+	public void delete (Serializable id){
+		employeePositionDao.delete(EmployeePosition.class, id);
+	}
+	
+	/**
+	 * 根据sql查询EmployeePosition对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return EmployeePosition对象集合
+	 */
+	public List<EmployeePosition> findListBySql(int currentPage, int pageSize){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select EmployeePosition.* from EmployeePosition");
+		List<EmployeePosition> list = employeePositionDao.findListBySql(EmployeePosition.class, sql.toString(), currentPage, pageSize);	
+		return list;
+	}
+	
+	/**
+	 * 根据sql查询EmployeePosition集合数量
+	 * @return EmployeePosition集合数量
+	 */
+	public int findCountBySql(){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select count(1) from employee_position");
+		int count = employeePositionDao.findCountBySql(sql.toString());	
+		return count;
+	}
+	
+	/**
+	 * 根据sql查询EmployeePosition分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return EmployeePosition分页对象
+	 */
+	public Pager<EmployeePosition> findPageBySql(int currentPage, int pageSize){
+		int totalRecord = findCountBySql();	
+		Pager<EmployeePosition> pager = new Pager<EmployeePosition>(currentPage, pageSize, totalRecord);
+		List<EmployeePosition> dataList = findListBySql(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+	
+	/**
+	 * 根据表达式查询EmployeePosition对象集合
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return EmployeePosition对象集合
+	 */
+	public List<EmployeePosition> findList(int currentPage, int pageSize){
+		List<Exp> expList = new ArrayList<Exp>();
+		List<EmployeePosition> EmployeePositionList = employeePositionDao.findList(EmployeePosition.class, expList, currentPage, pageSize);	
+		return EmployeePositionList;
+	}
+	
+	/**
+	 * 根据表达式查询EmployeePosition集合数量
+	 * @return EmployeePosition集合数量
+	 */
+	public int findCount(){
+		List<Exp> expList = new ArrayList<Exp>();
+		int count = employeePositionDao.findCount(EmployeePosition.class, expList);	
+		return count;
+	}
+	
+	/**
+	 * 根据表达式查询EmployeePosition分页对象
+	 * @param currentPage 当前页
+	 * @param pageSize 分页数
+	 * @return EmployeePosition分页对象
+	 */
+	public Pager<EmployeePosition> findPage(int currentPage, int pageSize){
+		int totalRecord = findCount();	
+		Pager<EmployeePosition> pager = new Pager<EmployeePosition>(currentPage, pageSize, totalRecord);
+		List<EmployeePosition> dataList = findList(pager.getFromIndex() , pageSize);	
+		pager.setDataList(dataList);
+		return pager;
+	}
+}
+
+

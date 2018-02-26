@@ -1,0 +1,96 @@
+package com.hongedu.honghr.honghr.entity;
+
+import java.io.Serializable;
+
+import com.hongedu.honghr.base.entity.BaseEntity;
+import com.hongedu.honghr.base.dao.annotation.Table;
+/**
+ * @author  
+ * el_bp_department 表对应实体
+ * 2017/12/07 04:00:57
+ */
+@Table(name="department", pk="departmentId")
+public class Department extends BaseEntity implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	/***/
+	private java.lang.Integer departmentId;
+	/***/
+	private java.lang.String departmentNum;
+	/***/
+	private java.lang.String departmentName;
+	/***/
+	private java.lang.String departmentIntroduction;
+	
+	private java.lang.String departmentRank;
+	
+	private java.lang.Integer departmentParentId;
+	/***/
+	private java.lang.String referred;
+	/***/
+	private java.lang.String deleted;
+	
+	public void setDepartmentId(java.lang.Integer value) {
+		this.departmentId = value;
+	}
+	
+	public java.lang.Integer getDepartmentId() {
+		return departmentId;
+	}
+	public void setDepartmentNum(java.lang.String value) {
+		this.departmentNum = value;
+	}
+	
+	public java.lang.String getDepartmentNum() {
+		return departmentNum;
+	}
+	public void setDepartmentName(java.lang.String value) {
+		this.departmentName = value;
+	}
+	
+	public java.lang.String getDepartmentName() {
+		return departmentName;
+	}
+	public void setDepartmentIntroduction(java.lang.String value) {
+		this.departmentIntroduction = value;
+	}
+	
+	public java.lang.String getDepartmentIntroduction() {
+		return departmentIntroduction;
+	}
+	public void setReferred(java.lang.String value) {
+		this.referred = value;
+	}
+	
+	public java.lang.String getReferred() {
+		return referred;
+	}
+	public void setDeleted(java.lang.String value) {
+		this.deleted = value;
+	}
+	
+	public java.lang.String getDeleted() {
+		return deleted;
+	}
+
+	public java.lang.String getDepartmentRank() {
+		return departmentRank;
+	}
+
+	public void setDepartmentRank(java.lang.String departmentRank) {
+		this.departmentRank = departmentRank;
+	}
+
+	public java.lang.Integer getDepartmentParentId() {
+		return departmentParentId;
+	}
+
+	public void setDepartmentParentId(java.lang.Integer departmentParentId) {
+		this.departmentParentId = departmentParentId;
+	}
+	
+	
+}
+
+

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <settings>
+        <setting name="cacheEnabled" value="false" />
+    </settings>
+    <typeAliases>
+        <package name="cn.ranko.shiro.model"/>
+    </typeAliases>
+</configuration>

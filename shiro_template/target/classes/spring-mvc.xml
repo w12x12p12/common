@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <description>Spring MVC Configuration</description>
+
+    <!-- Activation Spring's Annotation -->
+    <context:annotation-config/>
+    <mvc:annotation-driven >
+        <!-- 消息转换器 -->
+        <mvc:message-converters register-defaults="true">
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes" value="text/html;charset=UTF-8"/>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <context:property-placeholder ignore-unresolvable="true" location="classpath*:props/system.properties" />
+
+    <!-- 使用Annotation自动注册Bean，在SpringMvc中只扫描@Controller注解。
+        Use-dafault-filters=”true”的情况下：<context:exclude-filter>生效，<context:include-filter>无效
+        Use-dafault-filters=”false”的情况下：<context:exclude-filter>生效，<context:include-filter>生效
+        base-package 如果多个，用“,”分隔   -->
+    <context:component-scan base-package="cn.ranko" use-default-filters="true">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+
+    <!-- 上传文件拦截，设置最大上传文件大小   10M=10*1024*1024(B)=10485760 bytes -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="${web.maxUploadSize}"/>
+        <property name="defaultEncoding" value="UTF-8"></property>
+        <!--默认编码  ISO-8859-1 -->
+        <property name="maxInMemorySize" value="4096"></property>
+        <!--最大内存大小10240  -->
+        <property name="uploadTempDir" value="/uploadtemp"></property>
+        <!-- 上传的临时目录 -->
+    </bean>
+
+    <mvc:resources mapping="/assets/**" location="/assets/**"/>
+
+    <bean id="mappingJacksonHttpMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="supportedMediaTypes">
+            <list>
+                <value>text/html;charset=UTF-8</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="messageConverters">
+            <list >
+                <ref bean="mappingJacksonHttpMessageConverter" />
+            </list>
+        </property>
+    </bean>
+
+
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+
+
+    <!--系统初始化参数配置-->
+    <bean class="cn.ranko.shiro.applicationlistener.InitializationApplicationListener"></bean>
+
+
+</beans>

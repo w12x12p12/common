@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.ranko.shiro.mapper.SysPicklistvalueMapper" >
+  <resultMap id="BaseResultMap" type="cn.ranko.shiro.model.SysPicklistvalue" >
+    <id column="picklistvalue_id" property="picklistvalueId" jdbcType="INTEGER" />
+    <result column="picklist_id" property="picklistId" jdbcType="INTEGER" />
+    <result column="pvalue" property="pvalue" jdbcType="VARCHAR" />
+    <result column="seq" property="seq" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    picklistvalue_id, picklist_id, pvalue, seq
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_picklistvalue
+    where picklistvalue_id = #{picklistvalueId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from sys_picklistvalue
+    where picklistvalue_id = #{picklistvalueId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="cn.ranko.shiro.model.SysPicklistvalue" >
+    insert into sys_picklistvalue (picklistvalue_id, picklist_id, pvalue, 
+      seq)
+    values (#{picklistvalueId,jdbcType=INTEGER}, #{picklistId,jdbcType=INTEGER}, #{pvalue,jdbcType=VARCHAR}, 
+      #{seq,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="cn.ranko.shiro.model.SysPicklistvalue" >
+    insert into sys_picklistvalue
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="picklistvalueId != null" >
+        picklistvalue_id,
+      </if>
+      <if test="picklistId != null" >
+        picklist_id,
+      </if>
+      <if test="pvalue != null" >
+        pvalue,
+      </if>
+      <if test="seq != null" >
+        seq,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="picklistvalueId != null" >
+        #{picklistvalueId,jdbcType=INTEGER},
+      </if>
+      <if test="picklistId != null" >
+        #{picklistId,jdbcType=INTEGER},
+      </if>
+      <if test="pvalue != null" >
+        #{pvalue,jdbcType=VARCHAR},
+      </if>
+      <if test="seq != null" >
+        #{seq,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.ranko.shiro.model.SysPicklistvalue" >
+    update sys_picklistvalue
+    <set >
+      <if test="picklistId != null" >
+        picklist_id = #{picklistId,jdbcType=INTEGER},
+      </if>
+      <if test="pvalue != null" >
+        pvalue = #{pvalue,jdbcType=VARCHAR},
+      </if>
+      <if test="seq != null" >
+        seq = #{seq,jdbcType=INTEGER},
+      </if>
+    </set>
+    where picklistvalue_id = #{picklistvalueId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.ranko.shiro.model.SysPicklistvalue" >
+    update sys_picklistvalue
+    set picklist_id = #{picklistId,jdbcType=INTEGER},
+      pvalue = #{pvalue,jdbcType=VARCHAR},
+      seq = #{seq,jdbcType=INTEGER}
+    where picklistvalue_id = #{picklistvalueId,jdbcType=INTEGER}
+  </update>
+  <select id="getByPicklistId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select
+    <include refid="Base_Column_List" />
+    from sys_picklistvalue
+    where picklist_id = #{picklist_id,jdbcType=INTEGER}
+  </select>
+  <delete id="deletebyPicklistId" parameterType="java.lang.Integer">
+    delete from sys_picklistvalue where  picklist_id = #{picklistId,jdbcType=INTEGER}
+  </delete>
+</mapper>

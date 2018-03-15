@@ -10,7 +10,11 @@
 <link href="${ctx}/resources/css/common/bootstrap.min.css" type="text/css" rel="stylesheet" />
 <link href="${ctx}/resources/css/common/style.css" type="text/css" rel="stylesheet" />
 <link href="${ctx}/resources/css/common/z_login.css" type="text/css" rel="stylesheet" >
-<link href="${ctx}/resources/css/common/bootstrap-fileinput.css" rel="stylesheet">
+<link href="${ctx}/resources/css/common/bootstrap-fileinput.css" rel="stylesheet"> 
+<!-- bootstrap上传插件 -->
+<link media="all" rel="stylesheet" type="text/css" href="${ctx}/resources/css/common/fileinput.css" />
+<link media="all" rel="stylesheet" type="text/css" href="${ctx}/resources/css/common/font-awesome.min.css"/>
+<!-- jquery插件 -->
 <script src="${ctx}/resources/js/common/jquery-3.2.1.min.js" type="text/javascript"></script>
 <script src="${ctx}/resources/js/common/bootstrap.min.js" type="text/javascript"></script>
 <!-- 引用日期插件 -->

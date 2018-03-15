@@ -1,7 +1,13 @@
+<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>休假申请查询</title>
+</head>
 <body>
 	<script type="text/javascript" src="${ctx}/resources/js/admin/absenceApply/absenceApplyList.js"></script>
 	<script type="text/javascript" src="${ctx}/resources/js/admin/absenceApply/absenceApplyLook.js"></script>
@@ -58,8 +64,8 @@
 							<td>${entity.applyDepartmentName}</td>
 							<td>${entity.applyTypeShow}</td>
 							<td style="max-width:70px;">${entity.applyReason}</td>
-							<td ><fmt:formatDate type="both" value="${entity.applyBeginTime}" pattern="yyyy年M月d日 HH:mm" /></td>
-							<td ><fmt:formatDate type="both" value="${entity.applyEndTime}" pattern="yyyy年M月d日 HH:mm" /></td>
+							<td><fmt:formatDate type="both" value="${entity.applyBeginTime}" pattern="yyyy年M月d日 HH:mm" /></td>
+							<td><fmt:formatDate type="both" value="${entity.applyEndTime}" pattern="yyyy年M月d日 HH:mm" /></td>
 							<td>${entity.applyDuration}<c:if test="${entity.applyDuration!=null && entity.applyDuration!=''}">小时</c:if></td>
 							<td><fmt:formatDate type="both" value="${entity.applyDateTime}" pattern="yyyy年M月d日" /></td>
 							<td>
@@ -345,3 +351,4 @@
 	    </div><!-- /.modal -->
 	</div>
 </body>
+</html>

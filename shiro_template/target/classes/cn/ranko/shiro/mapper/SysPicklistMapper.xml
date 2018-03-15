@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.ranko.shiro.mapper.SysPicklistMapper" >
+  <resultMap id="BaseResultMap" type="cn.ranko.shiro.model.SysPicklist" >
+    <id column="picklist_id" property="picklistId" jdbcType="INTEGER" />
+    <result column="picklistname" property="picklistname" jdbcType="VARCHAR" />
+    <result column="picklistkey" property="picklistkey" jdbcType="VARCHAR" />
+    <result column="deleted" property="deleted" jdbcType="INTEGER"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    picklist_id, picklistname,picklistkey,deleted
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_picklist
+    where picklist_id = #{picklistId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from sys_picklist
+    where picklist_id = #{picklistId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="cn.ranko.shiro.model.SysPicklist" >
+    insert into sys_picklist (picklist_id, picklistname)
+    values (#{picklistId,jdbcType=INTEGER}, #{picklistname,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="cn.ranko.shiro.model.SysPicklist" keyProperty="picklistId" useGeneratedKeys="true" >
+    insert into sys_picklist
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="picklistId != null" >
+        picklist_id,
+      </if>
+      <if test="picklistname != null" >
+        picklistname,
+      </if>
+      <if test="picklistkey != null" >
+        picklistkey,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="picklistId != null" >
+        #{picklistId,jdbcType=INTEGER},
+      </if>
+      <if test="picklistname != null" >
+        #{picklistname,jdbcType=VARCHAR},
+      </if>
+      <if test="picklistkey != null" >
+        #{picklistkey,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.ranko.shiro.model.SysPicklist" >
+    update sys_picklist
+    <set >
+      <if test="picklistname != null" >
+        picklistname = #{picklistname,jdbcType=VARCHAR},
+      </if>
+      <if test="picklistkey != null" >
+        picklistkey = #{picklistkey,jdbcType=VARCHAR},
+      </if>
+      <if test="deleted != null" >
+        deleted = #{deleted,jdbcType=INTEGER},
+      </if>
+    </set>
+    where picklist_id = #{picklistId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.ranko.shiro.model.SysPicklist" >
+    update sys_picklist
+    set picklistname = #{picklistname,jdbcType=VARCHAR},picklistkey = #{picklistkey,jdbcType=VARCHAR}
+    where picklist_id = #{picklistId,jdbcType=INTEGER}
+  </update>
+  <select id="countOfSysPicklist" resultType="java.lang.Integer">
+    select count(picklist_id) from sys_picklist where deleted = 0
+  </select>
+  <select id="querySysPicklist" resultMap="BaseResultMap" parameterType="cn.ranko.bean.Pagination">
+    select
+    <include refid="Base_Column_List" />
+    from sys_picklist where deleted = 0 limit #{start},#{rows}
+  </select>
+</mapper>

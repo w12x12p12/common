@@ -90,3 +90,7 @@ $(function(){
 		}
 	});
 });
+//查看出差报告
+function showBusinessTripReport(obj){
+	window.top.window.showView("出差报告预览","http://view.officeapps.live.com/op/view.aspx?src=" + ctx + $(obj).attr("data-url"));
+}

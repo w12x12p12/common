@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -5,7 +6,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>已审批列表</title>
+<title>已审批管理</title>
 </head>
 <body>
 	<script type="text/javascript" src="${ctx}/resources/js/admin/overtimeWorkApply/overtimeApplyForLook.js"></script>
@@ -89,7 +90,7 @@
 					</c:forEach>
 				</tbody>
 			</table>
-				<!-- 分页区域 -->
+			<!-- 分页区域 -->
 			<jsp:include page="/WEB-INF/jsp/common/page.jsp"></jsp:include>
 		</div>
 	</form>	

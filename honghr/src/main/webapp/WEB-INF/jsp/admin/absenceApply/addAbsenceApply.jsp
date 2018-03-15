@@ -7,7 +7,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>休假申请单</title>
+<title>填写休假申请</title>
 </head>
 <body>
 	<script type="text/javascript" src="${ctx}/resources/js/admin/absenceApply/absenceApplyCommon.js"></script>

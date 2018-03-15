@@ -117,51 +117,44 @@ $(function(){
 	/* 保存编辑 */
 	$("#edit_businessTripApplyForm").click(function(){
 		var applyType = $(".w_honghr_radio:checked").val();
-		var $checkEmployee = $(".w_checkEmployee");
+		var applyReason = $(".w_edit_applyReason").val();
+		var applyBeginAddress = $(".w_edit_showBeginCity").val();
+		var applyEndAddress = $(".w_edit_showEndCity").val();
 		var applyBeginTime = $("#startDate").val();
 		var applyEndTime = $("#endDate").val();
-		if(!applyType){
-			layer.msg("请选择出差类型",{time:1500});
-			return false;
-		}
-		if(!(applyBeginTime && applyEndTime)){
-			layer.msg("请选择出差时间",{time:1500});
-			return false;
-		}
-		if($checkEmployee.length == 0){
-			layer.msg("请选择审批人",{time:1500});
-			return false;
-		}
-		if(submit){
-			$("#editForm .edit_checkEmployee").remove();
-			$("#editForm .edit_checkSequence").remove();
-			$checkEmployee.each(function(index){
-				$("#editForm").append("<input type='hidden' name='businessTripApplyChecks["+index+"].checkEmployeeId' class='edit_checkEmployee' value='" + $(this).attr("data") + "' />");
-				$("#editForm").append("<input type='hidden' name='businessTripApplyChecks["+index+"].applyCheckSequence' class='edit_checkSequence' value='" + $(this).attr("seq") + "' />");
-			});
-			$.ajax({
-				url: ctx + "/admin/businessTripApply/editForBusinessTripApplyCheck",
-				type: "POST",
-				async: true,
-				data: $("#editForm").serialize(),
-				beforeSend: function(){
-					submit = false;
-           		},
-           		success: function(data){
-           			if(data == "000000"){
-           				layer.msg("保存成功", {time:1500}, function(){
-           					document.location.reload();
-        				});
-           			}
-           		},
-           		error: function(){
-           			layer.msg("暂时无法提交",{time:1500});
-           			submit = true;
-           		}
-			});
-		}else{
-			layer.msg("正在保存,请您耐心等待",{time:1500});
-			return false;		
+		var $checkEmployee = $(".w_checkEmployee");
+		if(validateForm(applyType, applyReason, applyBeginAddress, applyEndAddress, applyBeginTime, applyEndTime, $checkEmployee)){
+			if(submit){
+				$("#editForm .edit_checkEmployee").remove();
+				$("#editForm .edit_checkSequence").remove();
+				$checkEmployee.each(function(index){
+					$("#editForm").append("<input type='hidden' name='businessTripApplyChecks["+index+"].checkEmployeeId' class='edit_checkEmployee' value='" + $(this).attr("data") + "' />");
+					$("#editForm").append("<input type='hidden' name='businessTripApplyChecks["+index+"].applyCheckSequence' class='edit_checkSequence' value='" + $(this).attr("seq") + "' />");
+				});
+				$.ajax({
+					url: ctx + "/admin/businessTripApply/editForBusinessTripApplyCheck",
+					type: "POST",
+					async: true,
+					data: $("#editForm").serialize(),
+					beforeSend: function(){
+						submit = false;
+					},
+					success: function(data){
+						if(data == "000000"){
+							layer.msg("保存成功", {time:1500}, function(){
+								document.location.reload();
+							});
+						}
+					},
+					error: function(){
+						layer.msg("暂时无法提交",{time:1500});
+						submit = true;
+					}
+				});
+			}else{
+				layer.msg("正在保存,请您耐心等待",{time:1500});
+				return false;		
+			}
 		}
 	});
 	/* 编辑窗口打开触发 */

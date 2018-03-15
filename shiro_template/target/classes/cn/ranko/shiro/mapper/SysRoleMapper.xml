@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.ranko.shiro.mapper.SysRoleMapper" >
+  <resultMap id="BaseResultMap" type="cn.ranko.shiro.model.SysRole" >
+    <id column="role_id" property="roleId" jdbcType="INTEGER" />
+    <result column="rolename" property="rolename" jdbcType="VARCHAR" />
+    <result column="deleted" property="deleted" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    role_id, rolename, deleted
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_role
+    where role_id = #{roleId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from sys_role
+    where role_id = #{roleId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="cn.ranko.shiro.model.SysRole" >
+    insert into sys_role (role_id, rolename, deleted
+      )
+    values (#{roleId,jdbcType=INTEGER}, #{rolename,jdbcType=VARCHAR}, #{deleted,jdbcType=TINYINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="cn.ranko.shiro.model.SysRole" useGeneratedKeys="true" keyProperty="roleId"  >
+    insert into sys_role
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="roleId != null" >
+        role_id,
+      </if>
+      <if test="rolename != null" >
+        rolename,
+      </if>
+      <if test="deleted != null" >
+        deleted,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="roleId != null" >
+        #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="rolename != null" >
+        #{rolename,jdbcType=VARCHAR},
+      </if>
+      <if test="deleted != null" >
+        #{deleted,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.ranko.shiro.model.SysRole" >
+    update sys_role
+    <set >
+      <if test="rolename != null" >
+        rolename = #{rolename,jdbcType=VARCHAR},
+      </if>
+      <if test="deleted != null" >
+        deleted = #{deleted,jdbcType=TINYINT},
+      </if>
+    </set>
+    where role_id = #{roleId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.ranko.shiro.model.SysRole" >
+    update sys_role
+    set rolename = #{rolename,jdbcType=VARCHAR},
+      deleted = #{deleted,jdbcType=TINYINT}
+    where role_id = #{roleId,jdbcType=INTEGER}
+  </update>
+  <select id="countOfSysRole" resultType="java.lang.Integer">
+    select count(role_id) from sys_role where deleted = 0
+  </select>
+  <select id="querySysRole" resultMap="BaseResultMap" parameterType="cn.ranko.bean.Pagination">
+    select
+    <include refid="Base_Column_List" />
+    from sys_role where deleted = 0 limit #{start},#{rows}
+  </select>
+  <select id="selectRolenamesByUserId" resultType="java.lang.String" parameterType="java.lang.Integer">
+    select rolename from sys_role s_r LEFT JOIN sys_user_role s_u_r on s_r.role_id = s_u_r.role_id where s_u_r.user_id = #{userId} and s_r.deleted = 0
+  </select>
+  <select id="selectPermissionByUserId" resultType="java.lang.String" parameterType="java.lang.Integer">
+    select DISTINCT(s_p.permission) from sys_permission s_p where s_p.role_id in (
+    select s_r.role_id from sys_role s_r LEFT JOIN sys_user_role s_u_r on s_r.role_id = s_u_r.role_id where s_u_r.user_id = #{userId} and s_r.deleted = 0
+    )
+  </select>
+  <select id="getRolenamestr" parameterType="java.lang.Integer" resultType="java.lang.String">
+    select GROUP_CONCAT(sr.rolename) as userrolestr from sys_role sr LEFT JOIN sys_user_role sur on sr.role_id = sur.role_id where sur.user_id = #{userId}
+  </select>
+  <select id="loadAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_role where deleted = 0
+  </select>
+</mapper>

@@ -385,6 +385,62 @@ public class AbsenceApplyService {
 		return pager;
 	}
 
+	/**
+	 * 查询全部休假申请列表分页
+	 * 
+	 * @param currentPage:当前页
+	 * @param pageSize:分页数
+	 * @return AbsenceApplyVo分页对象
+	 * @throws UnsupportedEncodingException
+	 */
+	public Pager<AbsenceApplyVo> findAllPage(AbsenceApplyVo search, int currentPage, int pageSize)
+			throws UnsupportedEncodingException {
+		List<Object> params = new ArrayList<>();
+		params.add(EnumApplyStatus.DRAFT.getCode());
+		params.add(DataConstant.EXIST);
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"select a.absence_apply_id, a.absence_apply_num, a.employee_id, a.apply_type, a.apply_reason, a.apply_begin_time, a.apply_end_time, a.apply_duration, a.apply_date_time, a.apply_check_status, a.deleted, ");
+		sb.append(
+				"d.department_name applyDepartmentName, e.employee_name applyEmployeeName, c.code_name applyTypeShow ");
+		sb.append("from absence_apply a ");
+		sb.append("left join department d on a.apply_department_num = d.department_num ");
+		sb.append("left join employee e on a.employee_id = e.employee_id ");
+		sb.append("left join code c on a.apply_type = c.code_value ");
+		sb.append("where a.apply_check_status <> ? ");
+		sb.append("and a.deleted = ? ");
+		if (StringUtils.isNotEmpty(search.getApplyEmployeeName())) {
+			search.setApplyEmployeeName(new String(search.getApplyEmployeeName().getBytes("ISO-8859-1"), "UTF-8"));
+			sb.append("and e.employee_name like CONCAT('%',?,'%') ");
+			params.add(search.getApplyEmployeeName());
+		}
+		if (StringUtils.isNotEmpty(search.getApplyDepartmentNum())
+				&& !"default".equals(search.getApplyDepartmentNum())) {
+			sb.append("and d.department_num like CONCAT(?,'%') ");
+			params.add(search.getApplyDepartmentNum());
+		}
+		if (StringUtils.isNotEmpty(search.getApplyCheckStatus()) && !"default".equals(search.getApplyCheckStatus())) {
+			sb.append("and a.apply_check_status = ? ");
+			params.add(search.getApplyCheckStatus());
+		}
+		if (search.getStartTime() != null) {
+			sb.append("and a.apply_date_time >= ? ");
+			params.add(search.getStartTime());
+		}
+		if (search.getEndTime() != null) {
+			sb.append("and a.apply_date_time <= ? ");
+			params.add(search.getEndTime());
+		}
+		sb.append("order by a.employee_id,a.absence_apply_id desc");
+		Pager<AbsenceApplyVo> pager = new Pager<AbsenceApplyVo>(currentPage, pageSize,
+				findCountBySql(sb.toString(), params.toArray(new Object[] {})));
+		List<AbsenceApplyVo> absenceApplyVoList = absenceApplyVoDao.findEntityListByPage(AbsenceApplyVo.class,
+				sb.toString(), params.toArray(new Object[] {}), pager.getFromIndex(), pageSize);
+		setApplyStatusShowByList(absenceApplyVoList);
+		pager.setDataList(absenceApplyVoList);
+		return pager;
+	}
+
 	private void setApplyStatusShowByList(List<AbsenceApplyVo> absenceApplyVoList) {
 		for (AbsenceApplyVo absenceApplyVo : absenceApplyVoList) {
 			for (EnumApplyStatus enumApplyStatus : EnumApplyStatus.values()) {

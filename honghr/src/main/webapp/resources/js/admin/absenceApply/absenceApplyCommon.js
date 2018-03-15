@@ -184,11 +184,11 @@ function validateDuration(applyType,time){
 		}
 	}
 	if(time < 4){
-		if(applyType != "101105"){
-			return "除调休外休假时长不能小于4小时";
+		if(applyType == "101101"){
+			return "年假休假时长不能小于4小时";
 		}else{
 			if(time < 2){
-				return "调休时长不能小于2小时";
+				return "休假时长不能小于2小时";
 			}
 		}
 	}

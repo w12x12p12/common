@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>已审批列表</title>
+<title>已审批管理</title>
 </head>
 <body>
 	<script type="text/javascript" src="${ctx}/resources/js/admin/absenceApply/absenceApplyLook.js"></script>

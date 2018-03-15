@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>已审批列表</title>
+<title>已审批管理</title>
 </head>
 <body>
 	<script type="text/javascript" src="${ctx}/resources/js/admin/businessTripApply/businessTripApplyLook.js"></script>
@@ -91,6 +91,11 @@
 								<button type="button" class="btn btn-default btn-sm business_lookProgress" data="${entity.businessTripApplyId}" data-toggle="modal" data-target="#myModal_look_progress">
 							  		<span class="glyphicon glyphicon-file" aria-hidden="true"></span>审批记录
 								</button>
+								<c:if test="${entity.applyCheckStatus == '2' && entity.businessTripReportUrl != null && entity.businessTripReportUrl != ''}">
+									<button type="button" class="btn btn-default btn-sm business_showReport" data-url="${entity.businessTripReportUrl}" onclick="showBusinessTripReport(this);">
+										<span class="glyphicon glyphicon-book" aria-hidden="true"></span>查看报告
+									</button>
+								</c:if>
 							</td>
 						</tr>
 					</c:forEach>

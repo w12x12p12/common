@@ -207,7 +207,7 @@ public class BusinessTripApplyService {
 		params.add(DataConstant.EXIST);
 		StringBuilder sb = new StringBuilder();
 		sb.append(
-				"select b.business_trip_apply_id, b.business_trip_apply_num, b.apply_department_num, b.employee_id, b.apply_type, b.apply_reason, b.apply_begin_time, b.apply_end_time, b.apply_duration, b.apply_date_time, b.apply_check_status, b.deleted, ");
+				"select b.business_trip_apply_id, b.business_trip_apply_num, b.apply_department_num, b.employee_id, b.apply_type, b.apply_reason, b.apply_begin_time, b.apply_end_time, b.apply_duration, b.apply_date_time, b.apply_check_status, b.business_trip_report_url, b.deleted, ");
 		sb.append(
 				"d.department_name applyDepartmentName, e.employee_name applyEmployeeName, c.code_name applyTypeShow, cd.code_name applyBeginCityName, cd1.code_name applyBeginProvinceName, cde.code_name applyEndCityName, cde1.code_name applyEndProvinceName ");
 		sb.append("from business_trip_apply b ");
@@ -237,6 +237,67 @@ public class BusinessTripApplyService {
 			params.add(search.getEndTime());
 		}
 		sb.append("order by b.business_trip_apply_id desc");
+		Pager<BusinessTripApplyVo> pager = new Pager<BusinessTripApplyVo>(currentPage, pageSize,
+				findCountBySql(sb.toString(), params.toArray(new Object[] {})));
+		List<BusinessTripApplyVo> businessTripApplyVoList = businessTripApplyVoDao.findEntityListByPage(
+				BusinessTripApplyVo.class, sb.toString(), params.toArray(new Object[] {}), pager.getFromIndex(),
+				pageSize);
+		setApplyStatusShowByList(businessTripApplyVoList);
+		pager.setDataList(businessTripApplyVoList);
+		return pager;
+	}
+
+	/**
+	 * 查询所有BusinessTripApply分页对象
+	 * 
+	 * @param currentPage:当前页
+	 * @param pageSize:分页数
+	 * @return BusinessTripApply分页对象
+	 * @throws UnsupportedEncodingException
+	 */
+	public Pager<BusinessTripApplyVo> findAllPage(BusinessTripApplyVo search, int currentPage, int pageSize)
+			throws UnsupportedEncodingException {
+		List<Object> params = new ArrayList<>();
+		params.add(EnumApplyStatus.DRAFT.getCode());
+		params.add(DataConstant.EXIST);
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"select b.business_trip_apply_id, b.business_trip_apply_num, b.apply_department_num, b.employee_id, b.apply_type, b.apply_reason, b.apply_begin_time, b.apply_end_time, b.apply_duration, b.apply_date_time, b.apply_check_status, b.business_trip_report_url, b.deleted, ");
+		sb.append(
+				"d.department_name applyDepartmentName, e.employee_name applyEmployeeName, c.code_name applyTypeShow, cd.code_name applyBeginCityName, cd1.code_name applyBeginProvinceName, cde.code_name applyEndCityName, cde1.code_name applyEndProvinceName ");
+		sb.append("from business_trip_apply b ");
+		sb.append("left join department d on b.apply_department_num = d.department_num ");
+		sb.append("left join employee e on b.employee_id = e.employee_id ");
+		sb.append("left join code c on b.apply_type = c.code_value ");
+		sb.append("left join code cd on b.apply_begin_address = cd.code_value ");
+		sb.append("left join code cd1 on cd.code_parent_id = cd1.code_id ");
+		sb.append("left join code cde on b.apply_end_address = cde.code_value ");
+		sb.append("left join code cde1 on cde.code_parent_id = cde1.code_id ");
+		sb.append("where b.apply_check_status <> ? ");
+		sb.append("and b.deleted = ? ");
+		if (StringUtils.isNotEmpty(search.getApplyEmployeeName())) {
+			search.setApplyEmployeeName(new String(search.getApplyEmployeeName().getBytes("ISO-8859-1"), "UTF-8"));
+			sb.append("and e.employee_name like CONCAT('%',?,'%') ");
+			params.add(search.getApplyEmployeeName());
+		}
+		if (StringUtils.isNotEmpty(search.getApplyDepartmentNum())
+				&& !"default".equals(search.getApplyDepartmentNum())) {
+			sb.append("and d.department_num like CONCAT(?,'%') ");
+			params.add(search.getApplyDepartmentNum());
+		}
+		if (StringUtils.isNotEmpty(search.getApplyCheckStatus()) && !"default".equals(search.getApplyCheckStatus())) {
+			sb.append("and b.apply_check_status = ? ");
+			params.add(search.getApplyCheckStatus());
+		}
+		if (search.getStartTime() != null) {
+			sb.append("and b.apply_date_time >= ? ");
+			params.add(search.getStartTime());
+		}
+		if (search.getEndTime() != null) {
+			sb.append("and b.apply_date_time <= ? ");
+			params.add(search.getEndTime());
+		}
+		sb.append("order by b.employee_id,b.business_trip_apply_id desc");
 		Pager<BusinessTripApplyVo> pager = new Pager<BusinessTripApplyVo>(currentPage, pageSize,
 				findCountBySql(sb.toString(), params.toArray(new Object[] {})));
 		List<BusinessTripApplyVo> businessTripApplyVoList = businessTripApplyVoDao.findEntityListByPage(
@@ -513,7 +574,7 @@ public class BusinessTripApplyService {
 		params.add(EnumApplyCheckStatus.UN_CHECK.getCode());
 		StringBuilder sb = new StringBuilder();
 		sb.append(
-				"select b.business_trip_apply_id, b.business_trip_apply_num, b.apply_department_num, b.employee_id, b.apply_type, b.apply_reason, b.apply_begin_time, b.apply_end_time, b.apply_duration, b.apply_date_time, b.apply_check_status, b.deleted, ");
+				"select b.business_trip_apply_id, b.business_trip_apply_num, b.apply_department_num, b.employee_id, b.apply_type, b.apply_reason, b.apply_begin_time, b.apply_end_time, b.apply_duration, b.apply_date_time, b.apply_check_status, b.business_trip_report_url, b.deleted, ");
 		sb.append(
 				"d.department_name applyDepartmentName, e.employee_name applyEmployeeName, c.code_name applyTypeShow, cd.code_name applyBeginCityName, cd1.code_name applyBeginProvinceName, cde.code_name applyEndCityName, cde1.code_name applyEndProvinceName, ");
 		sb.append(
@@ -609,5 +670,24 @@ public class BusinessTripApplyService {
 			receiverMail.setPersonalName(message.append("宏程教育人事考勤系统").toString());
 			MailCommon.sendMail(receiverMail);
 		}
+	}
+
+	public void saveBusinessTripReport(BusinessTripApply businessTripApply) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("update business_trip_apply set business_trip_report_url = ? ");
+		sb.append("where business_trip_apply_id = ? ");
+		sb.append("and apply_check_status = ? ");
+		sb.append("and deleted = ?");
+		businessTripApplyDao.update(sb.toString(),
+				new Object[] { businessTripApply.getBusinessTripReportUrl(), businessTripApply.getBusinessTripApplyId(),
+						EnumApplyStatus.CHECK_ALLOW.getCode(), DataConstant.EXIST });
+	}
+
+	public void deleteBusinessTripReport(Integer businessTripApplyId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("update business_trip_apply set business_trip_report_url = null ");
+		sb.append("where business_trip_apply_id = ? ");
+		sb.append("and deleted = ?");
+		businessTripApplyDao.update(sb.toString(), new Object[] { businessTripApplyId, DataConstant.EXIST });
 	}
 }

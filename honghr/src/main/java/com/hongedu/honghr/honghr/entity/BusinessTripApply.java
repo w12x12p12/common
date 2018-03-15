@@ -24,24 +24,24 @@ public class BusinessTripApply extends BaseEntity implements Serializable {
 	private String applyDepartmentNum;
 	/***/
 	private Integer employeeId;
-	
+
 	private String applyType;
 	/***/
 	private String applyReason;
 	/***/
-	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
 	private Date applyBeginTime;
 	/***/
-	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
 	private Date applyEndTime;
 	/***/
 	private String applyDuration;
 	/***/
 	private String applyBeginAddress;
-	
+
 	private String applyEndAddress;
 	/***/
-	@DateTimeFormat(pattern="yyyy-MM-dd")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date applyDateTime;
 	/***/
 	private String applyCheckStatus;
@@ -51,6 +51,8 @@ public class BusinessTripApply extends BaseEntity implements Serializable {
 	private Integer createEmployeeId;
 	/***/
 	private Date createDateTime;
+	/***/
+	private String businessTripReportUrl;
 	/***/
 	private String deleted;
 
@@ -125,7 +127,7 @@ public class BusinessTripApply extends BaseEntity implements Serializable {
 	public String getApplyDuration() {
 		return applyDuration;
 	}
-	
+
 	public String getApplyBeginAddress() {
 		return applyBeginAddress;
 	}
@@ -180,6 +182,14 @@ public class BusinessTripApply extends BaseEntity implements Serializable {
 
 	public Date getCreateDateTime() {
 		return createDateTime;
+	}
+
+	public String getBusinessTripReportUrl() {
+		return businessTripReportUrl;
+	}
+
+	public void setBusinessTripReportUrl(String businessTripReportUrl) {
+		this.businessTripReportUrl = businessTripReportUrl;
 	}
 
 	public void setDeleted(String value) {

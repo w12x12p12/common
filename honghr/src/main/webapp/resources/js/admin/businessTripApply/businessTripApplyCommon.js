@@ -160,3 +160,31 @@ function changeDuration(){
 		$(".w_edit_applyDuration").val(parseFloat(time) + "天");
 	}
 }
+/* 表单验证 */
+function validateForm(applyType, applyReason, applyBeginAddress, applyEndAddress, applyBeginTime, applyEndTime, $checkEmployee){
+	if(!applyType){
+		layer.msg("请选择出差类型",{time:1500});
+		return false;
+	}
+	if(!applyReason){
+		layer.msg("请填写出差事由",{time:1500});
+		return false;
+	}
+	if(applyBeginAddress == "-1"){
+		layer.msg("请选择出差始发地",{time:1500});
+		return false;
+	}
+	if(applyEndAddress == "-1"){
+		layer.msg("请选择出差目的地",{time:1500});
+		return false;
+	}
+	if(!(applyBeginTime && applyEndTime)){
+		layer.msg("请选择出差时间",{time:1500});
+		return false;
+	}
+	if($checkEmployee.length == 0){
+		layer.msg("请选择审批人",{time:1500});
+		return false;
+	}
+	return true;
+}

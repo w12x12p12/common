@@ -209,7 +209,6 @@ public class OvertimeWorkApplyController {
 			model.addAttribute("page", page);
 		}
 		model.addAttribute("departmentList", departmentService.findDepartmentList());
-		model.addAttribute("overtimeWorkApplyVo", search);
 		return "admin/overtimeWorkApply/overtimeWorkApplyForCheck";
 	}
 
@@ -422,7 +421,6 @@ public class OvertimeWorkApplyController {
 			model.addAttribute("page", page);
 		}
 		model.addAttribute("departmentList", departmentService.findDepartmentList());
-		model.addAttribute("overtimeWorkApplyVo", search);
 		return "admin/overtimeWorkApply/overtimeApplyCheckFor";
 	}
 
@@ -496,6 +494,28 @@ public class OvertimeWorkApplyController {
 	public String findOvertimeApplyId(Integer overtimeWorkApplyId) {
 		OvertimeWorkApplyVo overtimeWorkApplyVo = overtimeWorkApplyService.findovertimeApplyVo(overtimeWorkApplyId);
 		return JSONObject.toJSONString(overtimeWorkApplyVo);
+	}
+
+	/**
+	 * 查询所有加班申请列表
+	 * 
+	 * @param model
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	@RequestMapping(value = "/overtimeApplyListTotal", method = RequestMethod.GET)
+	public String overtimeApplyListTotal(
+			@RequestParam(required = false, defaultValue = PageConstant.DEFAULT_PAGE_START) Integer currentPage,
+			@RequestParam(required = false, defaultValue = PageConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
+			OvertimeWorkApplyVo search, Model model) throws UnsupportedEncodingException {
+		Employee employee = (Employee) SecurityUtils.getSubject().getSession()
+				.getAttribute(SessionConstant.SESSION_EMPLOYEE_KEY);
+		if (employee != null) {
+			Pager<OvertimeWorkApplyVo> page = overtimeWorkApplyService.findAllPage(search, currentPage, pageSize);
+			model.addAttribute("page", page);
+		}
+		model.addAttribute("departmentList", departmentService.findDepartmentList());
+		return "admin/overtimeWorkApply/overtimeApplyListTotal";
 	}
 
 	/**

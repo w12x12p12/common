@@ -189,6 +189,61 @@ public class OvertimeWorkApplyService {
 		return pager;
 	}
 
+	/**
+	 * 查询所有OvertimeWorkApply分页对象
+	 * 
+	 * @param currentPage当前页
+	 * @param pageSize分页数
+	 * @return OvertimeWorkApply分页对象
+	 */
+	public Pager<OvertimeWorkApplyVo> findAllPage(OvertimeWorkApplyVo search, int currentPage, int pageSize)
+			throws UnsupportedEncodingException {
+		List<Object> params = new ArrayList<Object>();
+		params.add(EnumApplyStatus.DRAFT.getCode());
+		params.add(DataConstant.EXIST);
+		StringBuilder sb = new StringBuilder();
+		sb.append(
+				"select ov.overtime_work_apply_id, ov.overtime_work_apply_num, ov.employee_id, ov.apply_type, ov.apply_reason, ov.apply_begin_time, ov.apply_end_time, ov.apply_duration, ov.apply_date_time, ov.apply_check_status, ov.deleted, ");
+		sb.append(
+				"d.department_name applyDepartmentName, e.employee_name applyEmployeeName, c.code_name applyTypeShow ");
+		sb.append("from overtime_work_apply ov ");
+		sb.append("left join department d on ov.apply_department_num = d.department_num ");
+		sb.append("left join employee e on ov.employee_id = e.employee_id ");
+		sb.append("left join code c on ov.apply_type = c.code_value ");
+		sb.append("where ov.apply_check_status <> ? ");
+		sb.append("and ov.deleted = ? ");
+		if (StringUtils.isNotEmpty(search.getApplyEmployeeName())) {
+			search.setApplyEmployeeName(new String(search.getApplyEmployeeName().getBytes("ISO-8859-1"), "UTF-8"));
+			sb.append("and e.employee_name like CONCAT('%',?,'%') ");
+			params.add(search.getApplyEmployeeName());
+		}
+		if (StringUtils.isNotEmpty(search.getApplyDepartmentNum())
+				&& !"default".equals(search.getApplyDepartmentNum())) {
+			sb.append("and d.department_num like CONCAT(?,'%') ");
+			params.add(search.getApplyDepartmentNum());
+		}
+		if (StringUtils.isNotEmpty(search.getApplyCheckStatus()) && !"default".equals(search.getApplyCheckStatus())) {
+			sb.append("and ov.apply_check_status = ? ");
+			params.add(search.getApplyCheckStatus());
+		}
+		if (search.getStartTime() != null) {
+			sb.append("and ov.apply_date_time >= ? ");
+			params.add(search.getStartTime());
+		}
+		if (search.getEndTime() != null) {
+			sb.append("and ov.apply_date_time <= ? ");
+			params.add(search.getEndTime());
+		}
+		sb.append("order by ov.employee_id,ov.overtime_work_apply_id desc");
+		Pager<OvertimeWorkApplyVo> pager = new Pager<OvertimeWorkApplyVo>(currentPage, pageSize,
+				findCountBySql(sb.toString(), params.toArray(new Object[] {})));
+		List<OvertimeWorkApplyVo> dataList = overtimeWorkApplyVoDao.findEntityListByPage(OvertimeWorkApplyVo.class,
+				sb.toString(), params.toArray(new Object[] {}), pager.getFromIndex(), pageSize);
+		setApplyStatusShowByList(dataList);
+		pager.setDataList(dataList);
+		return pager;
+	}
+
 	private void setApplyStatusShowByList(List<OvertimeWorkApplyVo> overTimeApplyVoList) {
 		for (OvertimeWorkApplyVo overtimeWorkApplyVo : overTimeApplyVoList) {
 			for (EnumApplyStatus enumApplyStatus : EnumApplyStatus.values()) {

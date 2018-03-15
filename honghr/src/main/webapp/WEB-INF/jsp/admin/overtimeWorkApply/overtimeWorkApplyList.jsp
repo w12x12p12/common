@@ -1,7 +1,13 @@
+<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>加班申请查询</title>
+</head>
 <body>
     <script type="text/javascript" src="${ctx}/resources/js/admin/overtimeWorkApply/overtimeWorkApplyList.js"></script>
     <script type="text/javascript" src="${ctx}/resources/js/admin/overtimeWorkApply/overtimeApplyForLook.js"></script>
@@ -32,7 +38,7 @@
 			<button type="submit" class="btn btn-primary btn-search"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>查询</button>
 	  </div>
 	  <ul class="nav nav-list"><li class="divider"></li></ul>
-		<div class="table-responsive">
+	  <div class="table-responsive">
 			<table class="table table-striped w_cee_table">
 				<thead>
 					<tr>
@@ -325,3 +331,4 @@
 	    </div><!-- /.modal -->
 	</div>	
 </body>		
+</html>

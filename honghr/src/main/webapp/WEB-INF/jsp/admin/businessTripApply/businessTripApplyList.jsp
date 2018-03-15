@@ -1,11 +1,21 @@
+<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>出差申请查询</title>
+</head>
 <body>
 	<script type="text/javascript" src="${ctx}/resources/js/admin/businessTripApply/businessTripApplyList.js"></script>
 	<script type="text/javascript" src="${ctx}/resources/js/admin/businessTripApply/businessTripApplyLook.js"></script>
 	<script type="text/javascript" src="${ctx}/resources/js/admin/businessTripApply/businessTripApplyCommon.js"></script>
+	<!-- bootstrap上传插件 -->
+	<script type="text/javascript" src="${ctx}/resources/js/common/fileinput.min.js"></script>
+	<script type="text/javascript" src="${ctx}/resources/js/common/locales/zh.js"></script>
+	<script type="text/javascript" src="${ctx}/resources/js/common/theme/fa/theme.js"></script>
 	<form class="form-inline" role="form">
 		<div class="form-group btn-group-sm z_margin_tb">
 			<label class="sr-only" for="name">查询条件</label> 
@@ -31,7 +41,7 @@
 			<input type="text" id="lastDate" class="Wdate form-control input-sm input-date" name="endTime" value="${param.endTime}" placeholder="请选择结束日期" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'beginDate\')}'})" readonly="readonly" style="background-color:#fff;"/> 
 			<button type="submit" class="btn btn-primary btn-search"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>查询</button>
 		</div>
-		<ul class="nav nav-list"> <li class="divider"></li> </ul>
+		<ul class="nav nav-list"> <li class="divider"></li></ul>
 		<div class="table-responsive">
 			<table class="table table-striped w_cee_table">
 				<thead>
@@ -109,6 +119,23 @@
 										<button type="button" class="btn btn-default btn-sm business_lookProgress" data="${entity.businessTripApplyId}" data-toggle="modal" data-target="#myModal_look_progress">
 									  		<span class="glyphicon glyphicon-file" aria-hidden="true"></span>审批记录
 										</button>
+										<c:if test="${entity.applyCheckStatus == 2}">
+											<c:choose>
+												<c:when test="${entity.businessTripReportUrl != null && entity.businessTripReportUrl != ''}">
+													<button type="button" class="btn btn-default btn-sm business_showReport" data-url="${entity.businessTripReportUrl}" onclick="showBusinessTripReport(this);">
+														<span class="glyphicon glyphicon-book" aria-hidden="true"></span>查看报告
+													</button>
+													<button type="button" class="btn btn-default btn-sm btn-danger business_delReport" data="${entity.businessTripApplyId}" data-url="${entity.businessTripReportUrl}">
+														<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>删除报告
+													</button>
+												</c:when>
+												<c:otherwise>
+													<button type="button" class="btn btn-default btn-sm business_upload" data="${entity.businessTripApplyId}" data-toggle="modal" data-target="#myModal_upload">
+												  		<span class="glyphicon glyphicon-open" aria-hidden="true"></span>上传报告
+													</button>
+												</c:otherwise>
+											</c:choose>
+										</c:if>
 									</c:otherwise>
 								 </c:choose>
 							</td>
@@ -327,7 +354,7 @@
 		</div>
 	</div>
 	<!-- 模态框（Modal） -->
-	<div class="modal fade d_model_box" id="myModal_add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"   data-backdrop="static">
+	<div class="modal fade d_model_box" id="myModal_add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
 	    <div class="modal-dialog modal-show">
 	        <div class="modal-content">
 	        	<div class="modal-header">
@@ -361,4 +388,22 @@
 	        </div><!-- /.modal-content -->
 	    </div><!-- /.modal -->
 	</div>
+	<!-- 模态框上传（Modal） -->
+	<div class="modal fade d_model_box" id="myModal_upload" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-show">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title w_absence_title" id="myModalLabel">上传出差报告</h4>
+                </div>
+                <div class="modal-body">
+                    <a href="javascript:void(0);" id="fileDownload" class="form-control" style="border:none;">下载出差报告excel模板</a>
+                	<input type="file" id="fileUpload" name="reportFile" class="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" multiple data-overwrite-initial="false">
+                    <input type="hidden" name="businessTripApplyId">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="${ctx}/resources/js/admin/businessTripApply/businessTripApplyReport.js"></script>
 </body>
+</html>

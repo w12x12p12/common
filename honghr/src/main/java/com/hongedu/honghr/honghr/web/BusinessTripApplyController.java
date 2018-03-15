@@ -1,12 +1,19 @@
 
 package com.hongedu.honghr.honghr.web;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -18,15 +25,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.hongedu.honghr.honghr.common.constant.CodeConstant;
 import com.hongedu.honghr.honghr.common.constant.DataConstant;
+import com.hongedu.honghr.honghr.common.constant.FileConstant;
 import com.hongedu.honghr.honghr.common.constant.PageConstant;
 import com.hongedu.honghr.honghr.common.constant.SessionConstant;
 import com.hongedu.honghr.honghr.common.enums.EnumApplyCheckStatus;
 import com.hongedu.honghr.honghr.common.enums.EnumApplyStatus;
+import com.hongedu.honghr.honghr.entity.BusinessTripApply;
 import com.hongedu.honghr.honghr.entity.BusinessTripApplyCheck;
 import com.hongedu.honghr.honghr.entity.Code;
 import com.hongedu.honghr.honghr.entity.Department;
@@ -38,9 +48,12 @@ import com.hongedu.honghr.honghr.service.BusinessTripApplyService;
 import com.hongedu.honghr.honghr.service.CodeService;
 import com.hongedu.honghr.honghr.service.DepartmentService;
 import com.hongedu.honghr.honghr.service.EmployeeService;
+import com.hongedu.honghr.honghr.service.FileDeleteService;
 import com.hongedu.honghr.honghr.service.MailService;
+import com.hongedu.honghr.util.download.DownloadUtil;
 import com.hongedu.honghr.util.json.JsonResult;
 import com.hongedu.honghr.util.page.Pager;
+import com.hongedu.honghr.util.upload.UploadUtil;
 
 /**
  * @author el_bp_business_trip_apply 表对应的controller 2017/12/07 04:04:40
@@ -338,7 +351,6 @@ public class BusinessTripApplyController {
 			model.addAttribute("page", page);
 		}
 		model.addAttribute("departmentList", departmentService.findDepartmentList());
-		model.addAttribute("businessTripApplyVo", search);
 		return "admin/businessTripApply/businessTripApplyListForCheck";
 	}
 
@@ -433,8 +445,107 @@ public class BusinessTripApplyController {
 			model.addAttribute("page", page);
 		}
 		model.addAttribute("departmentList", departmentService.findDepartmentList());
-		model.addAttribute("businessTripApplyVo", search);
 		return "/admin/businessTripApply/businessTripApplyListHasCheck";
+	}
+
+	/**
+	 * 下载出差报告模板
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/downloadModalExcel", method = RequestMethod.GET)
+	public void downloadModalExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		// 获取要下载的文件路径
+		String realPath = request.getSession().getServletContext().getRealPath(FileConstant.BUSINESS_TRIP_REPORT_MODAL);
+		// 获取要下载的文件
+		File downloadFile = new File(realPath, "business_trip_report.xlsx");
+		if (!downloadFile.exists()) {
+			PrintWriter writer = response.getWriter();
+			writer.println("<html><script>history.go(-1)</script></html>");
+			return;
+		}
+		DownloadUtil.downloadFile(response, downloadFile);
+	}
+
+	/**
+	 * 上传出差报告
+	 * 
+	 * @param request
+	 * @param fileList
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/uploadBusinessTripReport", method = RequestMethod.POST)
+	public String uploadBusinessTripReport(MultipartFile reportFile, HttpServletRequest request) {
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		// 定义资源的保存路径
+		String savePath = FileConstant.BUSINESS_TRIP_REPORT_URL + format.format(new Date()) + "/";
+		Map<String, Object> resultMap = UploadUtil.uploadFile(request, reportFile, savePath);
+		return JSONObject.toJSONString(resultMap);
+	}
+
+	/**
+	 * 出差报告入库
+	 * 
+	 * @param request
+	 * @param fileList
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/saveBusinessTripReport", method = RequestMethod.PUT)
+	public String saveBusinessTripReport(BusinessTripApply businessTripApply) {
+		Employee employee = (Employee) SecurityUtils.getSubject().getSession()
+				.getAttribute(SessionConstant.SESSION_EMPLOYEE_KEY);
+		if (employee != null) {
+			businessTripApplyService.saveBusinessTripReport(businessTripApply);
+		}
+		return JsonResult.SUCCESS_CODE;
+	}
+
+	/**
+	 * 删除出差报告
+	 * 
+	 * @param businessTripApplyId
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/deleteBusinessTripReport", method = RequestMethod.POST)
+	public String deleteBusinessTripReport(BusinessTripApply businessTripApply, HttpServletRequest request) {
+		Employee employee = (Employee) SecurityUtils.getSubject().getSession()
+				.getAttribute(SessionConstant.SESSION_EMPLOYEE_KEY);
+		if (employee != null) {
+			businessTripApplyService.deleteBusinessTripReport(businessTripApply.getBusinessTripApplyId());
+			new Thread(new FileDeleteService(businessTripApply.getBusinessTripReportUrl(), request)).start();
+		}
+		return JsonResult.SUCCESS_CODE;
+	}
+
+	/**
+	 * 查看出差申请汇总页面
+	 * 
+	 * @param currentPage:当前页
+	 * @param pageSize:分页数
+	 * @param model
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	@RequestMapping(value = "/businessTripApplyListTotal", method = RequestMethod.GET)
+	public String businessTripApplyListTotal(
+			@RequestParam(required = false, defaultValue = PageConstant.DEFAULT_PAGE_START) Integer currentPage,
+			@RequestParam(required = false, defaultValue = PageConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
+			BusinessTripApplyVo search, Model model) throws UnsupportedEncodingException {
+		Employee employee = (Employee) SecurityUtils.getSubject().getSession()
+				.getAttribute(SessionConstant.SESSION_EMPLOYEE_KEY);
+		if (employee != null) {
+			Pager<BusinessTripApplyVo> page = businessTripApplyService.findAllPage(search, currentPage, pageSize);
+			model.addAttribute("page", page);
+		}
+		model.addAttribute("departmentList", departmentService.findDepartmentList());
+		return "admin/businessTripApply/businessTripApplyListTotal";
 	}
 
 	private String getHours(Date beginTime, Date endTime) {

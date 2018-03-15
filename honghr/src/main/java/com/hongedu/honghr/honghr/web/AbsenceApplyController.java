@@ -956,7 +956,6 @@ public class AbsenceApplyController {
 			}
 		}
 		model.addAttribute("page", page);
-		model.addAttribute("employeeVo", search);
 		model.addAttribute("departmentList", departmentService.findDepartmentList());
 		return "admin/absenceApply/annualLeaveHourManage";
 	}
@@ -1014,7 +1013,6 @@ public class AbsenceApplyController {
 			model.addAttribute("page", page);
 		}
 		model.addAttribute("departmentList", departmentService.findDepartmentList());
-		model.addAttribute("absenceApplyVo", search);
 		return "admin/absenceApply/absenceApplyListForCheck";
 	}
 
@@ -1094,7 +1092,6 @@ public class AbsenceApplyController {
 			model.addAttribute("page", page);
 		}
 		model.addAttribute("departmentList", departmentService.findDepartmentList());
-		model.addAttribute("absenceApplyVo", search);
 		return "admin/absenceApply/absenceApplyListHasCheck";
 	}
 
@@ -1288,7 +1285,6 @@ public class AbsenceApplyController {
 			}
 		}
 		model.addAttribute("page", page);
-		model.addAttribute("employeeVo", search);
 		model.addAttribute("departmentList", departmentService.findDepartmentList());
 		return "admin/absenceApply/remainingLeaveHoursCount";
 	}
@@ -1324,6 +1320,30 @@ public class AbsenceApplyController {
 			}
 		}
 		return JSONObject.toJSONString(absenceApplyTimeVo);
+	}
+
+	/**
+	 * 查看休假申请汇总页面
+	 * 
+	 * @param currentPage:当前页
+	 * @param pageSize:分页数
+	 * @param model
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	@RequestMapping(value = "/absenceApplyListTotal", method = RequestMethod.GET)
+	public String absenceApplyListTotal(
+			@RequestParam(required = false, defaultValue = PageConstant.DEFAULT_PAGE_START) Integer currentPage,
+			@RequestParam(required = false, defaultValue = PageConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
+			AbsenceApplyVo search, Model model) throws UnsupportedEncodingException {
+		Employee employee = (Employee) SecurityUtils.getSubject().getSession()
+				.getAttribute(SessionConstant.SESSION_EMPLOYEE_KEY);
+		if (employee != null) {
+			Pager<AbsenceApplyVo> page = absenceApplyService.findAllPage(search, currentPage, pageSize);
+			model.addAttribute("page", page);
+		}
+		model.addAttribute("departmentList", departmentService.findDepartmentList());
+		return "admin/absenceApply/absenceApplyListTotal";
 	}
 
 	/**

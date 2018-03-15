@@ -67,6 +67,9 @@
 					<li class="z_menu_li"><a href="${ctx}/admin/overtimeWorkApply/overtimeWorkApplyList" id="overtimeWorkApplyList" target="mainFrame" onclick="selectMenu(this);" style="font-size:16px;color:#000;text-indent:30px;"><span>加班申请查询</span></a></li>
 					<li class="z_menu_li"><a href="${ctx}/admin/overtimeWorkApply/overtimeWorkApplyForCheck" target="mainFrame" onclick="selectMenu(this);" style="font-size:16px;color:#000;text-indent:30px;"><span>待审批管理</span></a></li>
 					<li class="z_menu_li"><a href="${ctx}/admin/overtimeWorkApply/overtimeApplyCheckFor" target="mainFrame" onclick="selectMenu(this);" style="font-size:16px;color:#000;text-indent:30px;"><span>已审批管理</span></a></li>
+					<c:if test="${employeeKey.username == 'admin'}">
+						<li class="z_menu_li"><a href="${ctx}/admin/overtimeWorkApply/overtimeApplyListTotal" target="mainFrame" onclick="selectMenu(this);" style="font-size:16px;color:#000;text-indent:30px;"><span>加班申请汇总</span></a></li>
+					</c:if>
 				</ul>
 			</div>
 			<div class="menu_default panel">
@@ -83,6 +86,9 @@
 					</c:if>
 					<li class="z_menu_li"><a href="${ctx}/admin/absenceApply/absenceApplyListForCheck" target="mainFrame" onclick="selectMenu(this);" style="font-size:16px;color:#000;text-indent:30px;"><span>待审批管理</span></a></li>
 					<li class="z_menu_li"><a href="${ctx}/admin/absenceApply/absenceApplyListHasCheck" target="mainFrame" onclick="selectMenu(this);" style="font-size:16px;color:#000;text-indent:30px;"><span>已审批管理</span></a></li>
+					<c:if test="${employeeKey.username == 'admin'}">
+						<li class="z_menu_li"><a href="${ctx}/admin/absenceApply/absenceApplyListTotal" target="mainFrame" onclick="selectMenu(this);" style="font-size:16px;color:#000;text-indent:30px;"><span>休假申请汇总</span></a></li>
+					</c:if>
 				</ul>
 			</div>
 			<div class="menu_default panel">
@@ -95,6 +101,9 @@
 					<li class="z_menu_li"><a href="${ctx}/admin/businessTripApply/businessTripApplyList" id="businessTripApplyList" target="mainFrame" onclick="selectMenu(this);" style="font-size:16px;color:#000;text-indent:30px;"><span>出差申请查询</span></a></li>
 					<li class="z_menu_li"><a href="${ctx}/admin/businessTripApply/businessTripApplyListForCheck" target="mainFrame" onclick="selectMenu(this);" style="font-size:16px;color:#000;text-indent:30px;"><span>待审批管理</span></a></li>
 					<li class="z_menu_li"><a href="${ctx}/admin/businessTripApply/businessTripApplyListHasCheck" target="mainFrame" onclick="selectMenu(this);" style="font-size:16px;color:#000;text-indent:30px;"><span>已审批管理</span></a></li>
+					<c:if test="${employeeKey.username == 'admin'}">
+						<li class="z_menu_li"><a href="${ctx}/admin/businessTripApply/businessTripApplyListTotal" target="mainFrame" onclick="selectMenu(this);" style="font-size:16px;color:#000;text-indent:30px;"><span>出差申请汇总</span></a></li>
+					</c:if>
 				</ul>
 			</div>
 			<c:if test="${employeeKey.username == 'admin'}"> 
@@ -297,6 +306,18 @@
     		}
     	});
     } 
+    //弹出office预览框
+    function showView(title, content){
+    	layer.open({
+			  type: 2,
+		      title: title,
+		      shadeClose: true,
+		      shade: false,
+		      maxmin: true, //开启最大化最小化按钮
+		      area: ["893px", "600px"],
+		      content: content
+		});
+    }
 </script>
 </body>
 </html>
